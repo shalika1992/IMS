@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC  "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+    <!-- Base Definition -->
+    <definition name="login-template" template="/WEB-INF/pages/template/login/template.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="dashboard-template" template="/WEB-INF/pages/template/dashboard/template.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="header_mob" value="/WEB-INF/pages/template/home/header_mob.jsp"/>
+        <put-attribute name="header" value="/WEB-INF/pages/template/home/header.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/pages/template/home/menu.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/pages/template/home/footer.jsp"/>
+    </definition>
+
+    <definition name="home-template" template="/WEB-INF/pages/template/home/template.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="header_mob" value="/WEB-INF/pages/template/home/header_mob.jsp"/>
+        <put-attribute name="header" value="/WEB-INF/pages/template/home/header.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/pages/template/home/menu.jsp"/>
+        <put-attribute name="body" value=""/>
+        <put-attribute name="footer" value="/WEB-INF/pages/template/home/footer.jsp"/>
+    </definition>
+
+    <definition name="newuser-template" template="/WEB-INF/pages/template/userregistration/template.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="header" value="/WEB-INF/pages/template/userregistration/header.jsp"/>
+        <put-attribute name="footer" value="/WEB-INF/pages/template/userregistration/footer.jsp"/>
+    </definition>
+
+    <definition name="login/login" extends="login-template">
+        <put-attribute name="body" value="/WEB-INF/pages/login/login.jsp"/>
+    </definition>
+
+    <definition name="home/home" extends="dashboard-template">
+        <put-attribute name="body" value="/WEB-INF/pages/home/home.jsp"/>
+    </definition>
+
+    <definition name="404" extends="newuser-template">
+        <put-attribute name="body" value="/errors/404.jsp"/>
+    </definition>
+
+    <definition name="error" extends="newuser-template">
+        <put-attribute name="body" value="/errors/error.jsp"/>
+    </definition>
+</tiles-definitions>
