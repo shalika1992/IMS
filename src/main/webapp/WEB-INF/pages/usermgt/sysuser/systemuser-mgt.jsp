@@ -14,7 +14,238 @@
 
 <html>
 <head>
-    <title>Title</title>
+    <script>
+        let oTable;
+
+        let token = $("meta[name='_csrf']").attr("content");
+        let header = $("meta[name='_csrf_header']").attr("content");
+
+        $(document).ready(function () {
+            loadDataTable();
+        });
+
+        function loadDataTable() {
+            let token = $("meta[name='_csrf']").attr("content");
+            let header = $("meta[name='_csrf_header']").attr("content");
+            let stringify_aoData = function (aoData) {
+                let o = {};
+                let modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];
+                jQuery.each(aoData, function (idx, obj) {
+                    if (obj.name) {
+                        for (let i = 0; i < modifiers.length; i++) {
+                            if (obj.name.substring(0, modifiers[i].length) == modifiers[i]) {
+                                let index = parseInt(obj.name.substring(modifiers[i].length));
+                                let key = 'a' + modifiers[i].substring(0, modifiers[i].length - 1);
+                                if (!o[key]) {
+                                    o[key] = [];
+                                }
+                                o[key][index] = obj.value;
+                                return;
+                            }
+                        }
+                        o[obj.name] = obj.value;
+                    } else {
+                        o[idx] = obj;
+                    }
+                });
+                return JSON.stringify(o);
+            };
+
+            oTable = $('#table').dataTable({
+                bServerSide: true,
+                sAjaxSource: "${pageContext.servletContext.contextPath}/listSystemUser.json",
+                fnServerData: function (sSource, aoData, fnCallback) {
+                    aoData.push(
+                        {'name': 'csrf_token', 'value': token},
+                        {'name': 'header', 'value': header},
+                        {'name': 'userName', 'value': $('#userName').val()},
+                        {'name': 'fullName', 'value': $('#fullName').val()},
+                        {'name': 'mobileNumber', 'value': $('#mobileNumber').val()},
+                        {'name': 'email', 'value': $('#email').val()},
+                        {'name': 'userRoleCode', 'value': $('#userRoleCode').val()},
+                        {'name': 'status', 'value': $('#status').val()}
+                    );
+                    $.ajax({
+                        dataType: 'json',
+                        type: 'POST',
+                        url: "${pageContext.request.contextPath}/listSystemUser.json",
+                        contentType: "application/json",
+                        data: stringify_aoData(aoData),
+                        success: fnCallback,
+                        error: function (e) {
+                            window.location = "${pageContext.request.contextPath}/logout.htm";
+                        }
+                    });
+                },
+                bJQueryUI: true,
+                sPaginationType: "full_numbers",
+                bDeferRender: true,
+                responsive: true,
+                lengthMenu: [5, 10, 20, 50, 100],
+                searching: false,
+                scrollY: '50vh',
+                scrollX: true,
+                scrollCollapse: true,
+                initComplete: function (settings, json) {
+                    document.getElementById('data-table-loading').style.display = "none";
+                    document.getElementById('data-table-wrapper').style.display = "block";
+                },
+                fnDrawCallback: function (oSettings) {
+                    $(".table ").css({"width": "100%"});
+                },
+                columnDefs: [
+                    {
+                        title: "User Name",
+                        targets: 0,
+                        mDataProp: "userName",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Full Name",
+                        targets: 1,
+                        mDataProp: "fullName",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "User Role",
+                        targets: 2,
+                        mDataProp: "userRole",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Email",
+                        targets: 3,
+                        mDataProp: "email",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Mobile Number",
+                        targets: 4,
+                        mDataProp: "mobileNumber",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Last Logged Date",
+                        targets: 5,
+                        mDataProp: "lastLoggedDate",
+                        defaultContent: "--",
+                        render: function (data) {
+                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                        }
+                    }
+                    ,
+                    {
+                        title: "Status",
+                        targets: 6,
+                        mDataProp: "status",
+                        defaultContent: "--",
+                        render: function (data, type, full, meta) {
+                            let status = {
+                                'Active': {
+                                    'title': 'Active',
+                                    'class': ' label-light-info'
+                                },
+                                'Inactive': {
+                                    'title': 'Inactive',
+                                    'class': ' label-light-danger'
+                                },
+                                'New': {
+                                    'title': 'New',
+                                    'class': ' label-light-primary'
+                                },
+                                'Changed': {
+                                    'title': 'Changed',
+                                    'class': ' label-light-success'
+                                },
+                                'Reset': {
+                                    'title': 'Reset',
+                                    'class': ' label-light-warning'
+                                },
+                                'De-Active': {
+                                    'title': 'De-Active',
+                                    'class': ' label-light-danger'
+                                },
+                                'Pending': {
+                                    'title': 'Pending',
+                                    'class': 'label-light-warning'
+                                }
+                            };
+                            if (typeof status[data] === 'undefined') {
+                                return data;
+                            }
+                            return '<span class="label label-lg font-weight-bold' + status[data].class + ' label-inline">' + status[data].title + '</span>';
+                        },
+                    }
+                    , {
+                        label: 'Created Time',
+                        name: 'createdTime',
+                        targets: 7,
+                        mDataProp: "createdTime",
+                        render: function (data) {
+                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                        }
+                    },
+                    {
+                        title: "Last Updated Time",
+                        targets: 8,
+                        mDataProp: "lastUpdatedTime",
+                        defaultContent: "--",
+                        render: function (data) {
+                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                        }
+                    },
+                    {
+                        title: "Last Updated User",
+                        targets: 9,
+                        mDataProp: "lastUpdatedUser",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Update",
+                        sortable: false,
+                        className: "dt-center",
+                        mRender: function (data, type, full) {
+                            return '<div>\n\
+            <a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Update" id=' + full.userName + ' onclick="editSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a>\n\
+            \</div>';
+                        },
+                        targets: 10,
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Delete",
+                        sortable: false,
+                        className: "dt-center",
+                        mRender: function (data, type, full) {
+                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon" title="Delete" id=' + full.userName + ' onclick="deleteSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M6,8 L6,20.5 C6,21.3284271 6.67157288,22 7.5,22 L16.5,22 C17.3284271,22 18,21.3284271 18,20.5 L18,8 L6,8 Z" fill="#000000" fill-rule="nonzero"/><path d="M14,4.5 L14,4 C14,3.44771525 13.5522847,3 13,3 L11,3 C10.4477153,3 10,3.44771525 10,4 L10,4.5 L5.5,4.5 C5.22385763,4.5 5,4.72385763 5,5 L5,5.5 C5,5.77614237 5.22385763,6 5.5,6 L18.5,6 C18.7761424,6 19,5.77614237 19,5.5 L19,5 C19,4.72385763 18.7761424,4.5 18.5,4.5 L14,4.5 Z" fill="#000000" opacity="0.3"/></g></svg></span></a></div>';
+                        },
+                        targets: 11,
+                        defaultContent: "--"
+                    }
+                ]
+            });
+        }
+
+        function searchStart() {
+            oTable.fnDraw();
+        }
+
+        function resetSearch() {
+            $('#userName').val("");
+            $('#fullName').val("");
+            $('#email').val("");
+            $('#userRoleCode').val("");
+            $('#status').val("");
+            $('#mobileNumber').val("");
+
+            oTable.fnDraw();
+        }
+
+        function openAddModal() {
+            $('#modalAddSystemUser').modal('toggle');
+            $('#modalAddSystemUser').modal('show');
+        }
+    </script>
 </head>
 <!--begin::Content-->
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
@@ -71,7 +302,7 @@
                                         <label>Full Name:</label>
                                         <input id="fullName" name="fullName" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
-                                               maxlength="128" class="form-control "
+                                               maxlength="512" class="form-control "
                                                placeholder="Full Name">
                                         <span class="form-text text-muted">Please enter full name</span>
                                     </div>
@@ -91,7 +322,7 @@
                                         <span class="form-text text-muted">Please enter mobile number</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>User Role Code:</label>
+                                        <label>User Role:</label>
                                         <select id="userRoleCode" name="userRoleCode"
                                                 class="form-control">
                                             <option selected value="">Select User Role Code</option>
@@ -140,7 +371,6 @@
                     </div>
                     <div class="card-toolbar">
                         <!--begin::Button-->
-                        <c:if test="${systemuser.vadd}">
                             <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
 											<span class="svg-icon svg-icon-md">
 												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
@@ -148,15 +378,14 @@
                                                      width="24px"
                                                      height="24px" viewBox="0 0 24 24" version="1.1">
 													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-														<rect x="0" y="0" width="24" height="24"/>
-														<circle fill="#000000" cx="9" cy="15" r="6"/>
+														<rect x="0" y="0" width="24" height="24"></rect>
+														<circle fill="#000000" cx="9" cy="15" r="6"></circle>
 														<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
-                                                              fill="#000000" opacity="0.3"/>
+                                                              fill="#000000" opacity="0.3"></path>
 													</g>
 												</svg>
                                                 <!--end::Svg Icon-->
 											</span>New Record</a>
-                        </c:if>
                         <!--end::Button-->
                     </div>
                 </div>
@@ -172,7 +401,7 @@
                             <tr>
                                 <th>User Name</th>
                                 <th>Full Name</th>
-                                <th>User Role Code</th>
+                                <th>User Role</th>
                                 <th>Email</th>
                                 <th>Mobile Number</th>
                                 <th>Last Logged Date</th>
@@ -195,4 +424,5 @@
         </div>
     </div>
 </div>
+<jsp:include page="systemuser-mgt-add.jsp"/>
 </html>

@@ -9,6 +9,10 @@ public class CommonVarList {
     @Value("${system.username}")
     public String SYSTEMUSERNAME;
 
+    //-------------------------------system user password expiry period--------------------------------------------------------------//
+    @Value("${system.user.password.expire}")
+    public String PWDEXPIRYPERIOD;
+
     @Value("${system.password}")
     public String SYSTEMUSERPWD;
 

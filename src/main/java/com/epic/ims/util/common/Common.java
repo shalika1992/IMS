@@ -1,12 +1,5 @@
 package com.epic.ims.util.common;
 
-import com.epic.combanksms.bean.common.Status;
-import com.epic.combanksms.bean.session.SessionBean;
-import com.epic.combanksms.mapping.audittrace.Audittrace;
-import com.epic.combanksms.mapping.usermgt.PageTask;
-import com.epic.combanksms.mapping.usermgt.Task;
-import com.epic.combanksms.mapping.usermgt.User;
-import com.epic.combanksms.util.varlist.CommonVarList;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.util.varlist.CommonVarList;
@@ -16,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
