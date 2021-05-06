@@ -19,6 +19,7 @@ public class MessageVarList {
     public static final String LOGIN_STATUSTIMEOUT = "login.statustimeout";
     //-------------------------- end user login messages--------------------------------------------------------------//
 
+
     //-------------------------- system user mgt----------------------------------------------------------------------//
     public static final String SYSTEMUSER_MGT_EMPTY_USERNAME = "systemuser.empty.username";
     public static final String SYSTEMUSER_MGT_EMPTY_FULLNAME = "systemuser.empty.fullname";

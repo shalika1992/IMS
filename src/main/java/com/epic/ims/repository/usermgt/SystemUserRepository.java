@@ -45,7 +45,9 @@ public class SystemUserRepository {
 
 
     private final String SQL_GET_COUNT = "select count(*) from web_systemuser wu where ";
-    private final String SQL_INSERT_SYSTEMUSER="";
+    private final String SQL_INSERT_SYSTEMUSER="insert into " +
+            "web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) " +
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile," +
             "noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
 
@@ -205,8 +207,8 @@ public class SystemUserRepository {
             //set default values to system user input bean
             systemUserInputBean.setExpiryDate(userPasswordExpiryDate);
             systemUserInputBean.setInitialLoginStatus(0);
-            systemUserInputBean.setAd(0);
             //insert query
+            //username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime
             value = jdbcTemplate.update(SQL_INSERT_SYSTEMUSER,
                     systemUserInputBean.getUserName(),
                     systemUserInputBean.getPassword(),
@@ -216,11 +218,11 @@ public class SystemUserRepository {
                     systemUserInputBean.getEmail(),
                     systemUserInputBean.getMobileNumber(),
                     systemUserInputBean.getInitialLoginStatus(),
-                    systemUserInputBean.getAd(),
-                    commonVarList.STATUS_NEW,
+                    systemUserInputBean.getStatus(),
+                    "error",
+                    systemUserInputBean.getCreatedTime(),
                     systemUserInputBean.getLastUpdatedUser(),
-                    systemUserInputBean.getLastUpdatedTime(),
-                    systemUserInputBean.getCreatedTime()
+                    systemUserInputBean.getLastUpdatedTime()
             );
 
             if (value != 1) {

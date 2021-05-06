@@ -1,7 +1,7 @@
 package com.epic.ims.repository.login;
 
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.repository.CommonRepository;
+import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.varlist.CommonVarList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

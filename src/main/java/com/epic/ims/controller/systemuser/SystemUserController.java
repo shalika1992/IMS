@@ -13,6 +13,8 @@ import com.epic.ims.util.common.ResponseBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.StatusVarList;
+import com.epic.ims.validation.sysuser.SystemUserValidator;
+import com.epic.ims.validators.RequestBeanValidation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,7 +35,7 @@ import java.util.Locale;
 
 @Controller
 @Scope("request")
-public class SystemUserController {
+public class SystemUserController implements RequestBeanValidation<Object> {
     private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
@@ -53,6 +56,9 @@ public class SystemUserController {
     @Autowired
     Common common;
 
+    @Autowired
+    SystemUserValidator systemUserValidator;
+
     @GetMapping(value = "/viewSystemUser")
     public ModelAndView viewSysUserPage(ModelMap modelMap, Locale locale){
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER PAGE VIEW");
@@ -72,31 +78,29 @@ public class SystemUserController {
 
     }
 
-//    @PostMapping(value = "/addSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
-//    public @ResponseBody
-//    ResponseBean addSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
-//        logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER ADD");
-//        ResponseBean responseBean = null;
-//        try {
-//            BindingResult bindingResult = validateRequestBean(systemUserInputBean);
-//            if (bindingResult.hasErrors()) {
-//                String errorMessage = bindingResult.getFieldErrors().stream().findFirst().get().getDefaultMessage();
-//                //set error response bean
-//                responseBean = new ResponseBean(false, null, errorMessage);
-//            } else {
-//                String message = systemUserService.insertSystemUser(systemUserInputBean, locale);
-//                if (message.isEmpty()) {
-//                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_ADDED_SUCCESSFULLY, null, locale), null);
-//                } else {
-//                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-//                }
-//            }
-//        } catch (Exception e) {
-//            logger.error("Exception  :  ", e);
-//            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
-//        }
-//        return responseBean;
-//    }
+    @PostMapping(value = "/addSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean addSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER ADD");
+        ResponseBean responseBean = null;
+        try {
+            BindingResult bindingResult = validateRequestBean(systemUserInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(),new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()},Locale.US ));
+            } else {
+                String message = systemUserService.insertSystemUser(systemUserInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_ADDED_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
 
 
     @PostMapping(value = "/listSystemUser", headers = {"content-type=application/json"})
@@ -144,6 +148,14 @@ public class SystemUserController {
 
         //add values to model map
         map.addAttribute("systemuser", systemUserInputBean);
+    }
+
+    @Override
+    public BindingResult validateRequestBean(Object object) {
+        DataBinder dataBinder = new DataBinder(object);
+        dataBinder.setValidator(systemUserValidator);
+        dataBinder.validate();
+        return dataBinder.getBindingResult();
     }
 
 

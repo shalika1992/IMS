@@ -66,7 +66,7 @@ public class CommonRepository {
         Date formattedCurrentDate = null;
         try {
             Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
-            formattedCurrentDate = formatter.parse(currentDate.get("NOW").toString());
+            formattedCurrentDate = (Date) currentDate.get("now()");
         } catch (Exception e) {
             throw e;
         }

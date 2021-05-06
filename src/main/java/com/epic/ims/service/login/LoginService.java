@@ -2,8 +2,8 @@ package com.epic.ims.service.login;
 
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.user.User;
-import com.epic.ims.repository.CommonRepository;
+import com.epic.ims.mapping.user.usermgt.User;
+import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.login.LoginRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.security.SHA256Algorithm;
