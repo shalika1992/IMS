@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -31,7 +30,6 @@ public class Common {
 
     @Autowired
     SessionBean sessionBean;
-
 
     /**
      * @Author dilanka_w
@@ -86,40 +84,6 @@ public class Common {
         }
         return countMax;
     }
-
-    /**
-     * @Author dilanka_w
-     * @CreatedTime 2021-03-23 10:41:39 AM
-     * @Version V1.00
-     * @MethodName checkMethodAccess
-     * @MethodParams [taskcode, page, userRole, sessionBean]
-     * @MethodDescription - checks the accees to the method name passed
-     */
-//    public boolean checkMethodAccess(String taskcode, String page, String userRole, SessionBean sessionBean) {
-//        boolean access = false;
-//        if (taskcode == null || taskcode.isEmpty()) {
-//            access = false;
-//        } else {
-//
-//            Map<String, PageTask> pageTaskMap = sessionBean.getPageTaskMap();
-//            List<Task> taskList = pageTaskMap.get(page).getTaskList();
-//
-//            if (taskList == null) {
-//                access = false;
-//            } else if (taskList.size() < 1) {
-//                access = false;
-//            } else {
-//                for (Task task : taskList) {
-//                    if (task.getTaskCode().trim().equalsIgnoreCase(taskcode.trim())) {
-//                        access = true;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return access;
-//    }
-
 
     /**
      * @Author dilanka_w
