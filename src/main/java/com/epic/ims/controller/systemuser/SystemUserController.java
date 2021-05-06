@@ -41,7 +41,7 @@ public class SystemUserController {
     Common common;
 
     public ModelAndView viewSysUser(){
-
+        return null;
     }
 
     @ModelAttribute
@@ -50,11 +50,11 @@ public class SystemUserController {
         //get status list
         List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_USER);
         List<Status> statusActList = common.getActiveStatusList();
-        List<UserRole> userRoleList = commonRepository.getUserRoleListByUserRoleTypeCode(commonVarList.USERROLE_TYPE_WEB);
+        //List<UserRole> userRoleList = commonRepository.getUserRoleListByUserRoleTypeCode(commonVarList.USERROLE_TYPE_WEB);
         //set values to task bean
         systemUserInputBean.setStatusList(statusList);
         systemUserInputBean.setStatusActList(statusActList);
-        systemUserInputBean.setUserRoleList(userRoleList);
+        //systemUserInputBean.setUserRoleList(userRoleList);
 
         //add values to model map
         map.addAttribute("systemuser", systemUserInputBean);

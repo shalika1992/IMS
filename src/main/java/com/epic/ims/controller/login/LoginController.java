@@ -2,7 +2,9 @@ package com.epic.ims.controller.login;
 
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.user.Section;
 import com.epic.ims.service.login.LoginService;
+import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.validators.RequestBeanValidation;
 import com.epic.ims.validators.login.LoginValidator;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,6 +51,9 @@ public class LoginController implements RequestBeanValidation<Object> {
 
     @Autowired
     LoginService loginService;
+
+    @Autowired
+    CommonVarList commonVarList;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView getLogin(@RequestParam(value = "error", required = false) Integer error, ModelMap modelMap, Locale locale) {
@@ -75,6 +81,21 @@ public class LoginController implements RequestBeanValidation<Object> {
                 if (!message.isEmpty()) {
                     modelMap.put("msg", messageSource.getMessage(message, null, locale));
                     modelAndView = new ModelAndView("login/login", modelMap);
+                } else {
+                    if (loginBean.getUsername().equals(commonVarList.SYSTEMUSERNAME)) {
+                        //handle the user session
+                        //get user section list and page list and set to session bean
+                        List<Section> sectionList = loginService.getUserSectionListByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
+                        Map<String, List<Page>> pageList = loginService.getUserPageListByByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
+                        Map<String, PageTask> pageTaskList = loginService.getUserPageTaskListByByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
+                        sessionBean.setSectionList(sectionList);
+                        sessionBean.setPageMap(pageList);
+                        sessionBean.setPageTaskMap(pageTaskList);
+                        //redirect to home page
+                        modelAndView = new ModelAndView("home/home", modelMap);
+                    } else {
+                        User user = sessionBean.getUser();
+                    }
                 }
             }
         } catch (EmptyResultDataAccessException ex) {
