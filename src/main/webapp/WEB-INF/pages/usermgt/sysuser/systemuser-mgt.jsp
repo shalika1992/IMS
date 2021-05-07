@@ -14,28 +14,28 @@
 
 <html>
 <head>
-    <script>
-        let oTable;
+    <script type="text/javascript">
+        var oTable;
 
-        let token = $("meta[name='_csrf']").attr("content");
-        let header = $("meta[name='_csrf_header']").attr("content");
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
 
         $(document).ready(function () {
             loadDataTable();
         });
 
         function loadDataTable() {
-            let token = $("meta[name='_csrf']").attr("content");
-            let header = $("meta[name='_csrf_header']").attr("content");
-            let stringify_aoData = function (aoData) {
-                let o = {};
-                let modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var stringify_aoData = function (aoData) {
+                var o = {};
+                var modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];
                 jQuery.each(aoData, function (idx, obj) {
                     if (obj.name) {
-                        for (let i = 0; i < modifiers.length; i++) {
+                        for (var i = 0; i < modifiers.length; i++) {
                             if (obj.name.substring(0, modifiers[i].length) == modifiers[i]) {
-                                let index = parseInt(obj.name.substring(modifiers[i].length));
-                                let key = 'a' + modifiers[i].substring(0, modifiers[i].length - 1);
+                                var index = parseInt(obj.name.substring(modifiers[i].length));
+                                var key = 'a' + modifiers[i].substring(0, modifiers[i].length - 1);
                                 if (!o[key]) {
                                     o[key] = [];
                                 }
@@ -140,7 +140,7 @@
                         mDataProp: "status",
                         defaultContent: "--",
                         render: function (data, type, full, meta) {
-                            let status = {
+                            var status = {
                                 'Active': {
                                     'title': 'Active',
                                     'class': ' label-light-info'
@@ -206,8 +206,8 @@
                         className: "dt-center",
                         mRender: function (data, type, full) {
                             return '<div>\n\
-            <a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Update" id=' + full.userName + ' onclick="editSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a>\n\
-            \</div>';
+                            <a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Update" id=' + full.userName + ' onclick="editSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a>\n\
+                            \</div>';
                         },
                         targets: 10,
                         defaultContent: "--"
@@ -224,6 +224,45 @@
                     }
                 ]
             });
+        }
+
+        function deleteCommon() {
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/deleteSystemUser.json',
+                data: {userName: $('#deleteCodeCommon').val()},
+                beforeSend: function (xhr) {
+                    if (header && token) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function (res) {
+                    //close delete modal
+                    $('#modalDeleteCommon').modal('toggle');
+                    //open delete process modal
+                    $('#modalDeleteProcessCommon').modal('toggle');
+                    $('#modalDeleteProcessCommon').modal('show');
+                    if (res.flag) {
+                        //success
+                        $('#responseMsgDelete').show();
+                        $('#responseMsgDelete').addClass('success-response').text(res.successMessage);
+                        searchStart();
+                    } else {
+                        //Set error messages
+                        $('#responseMsgDelete').show();
+                        $('#responseMsgDelete').addClass('error-response').text(res.errorMessage);
+                    }
+                },
+                error: function (jqXHR) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
+        function deleteSystemUser(keyval) {
+            $('#deleteCodeCommon').val(keyval);
+            $('#modalDeleteCommon').modal('toggle');
+            $('#modalDeleteCommon').modal('show');
         }
 
         function searchStart() {
@@ -347,10 +386,12 @@
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <button type="button" class="btn btn-primary mr-2 btn-sm" onclick="searchStart()">
+                                        <button type="button" class="btn btn-primary mr-2 btn-sm"
+                                                onclick="searchStart()">
                                             Search
                                         </button>
-                                        <button type="reset" class="btn btn-secondary btn-sm" onclick="resetSearch()">Reset
+                                        <button type="reset" class="btn btn-secondary btn-sm" onclick="resetSearch()">
+                                            Reset
                                         </button>
                                     </div>
                                 </div>
@@ -371,7 +412,7 @@
                     </div>
                     <div class="card-toolbar">
                         <!--begin::Button-->
-                            <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
+                        <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
 											<span class="svg-icon svg-icon-md">
 												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 												<svg xmlns="http://www.w3.org/2000/svg"
@@ -424,5 +465,8 @@
         </div>
     </div>
 </div>
+<!-- start include jsp files -->
 <jsp:include page="systemuser-mgt-add.jsp"/>
+<jsp:include page="../../common/delete-modal.jsp"/>
+<!-- end include jsp files -->
 </html>

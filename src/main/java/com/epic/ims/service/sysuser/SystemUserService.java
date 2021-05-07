@@ -90,4 +90,8 @@ public class SystemUserService {
 
         return message;
     }
+
+    public String deleteSystemUser(String userName) {
+        return null;
+    }
 }

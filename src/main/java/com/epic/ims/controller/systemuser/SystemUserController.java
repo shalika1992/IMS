@@ -102,6 +102,25 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         return responseBean;
     }
 
+    @PostMapping(value = "/deleteSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean deleteSystemUser(@RequestParam String userName, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] DELETE SYSTEM USER");
+        ResponseBean responseBean;
+        try {
+            String message = systemUserService.deleteSystemUser(userName);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_DELETE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
 
     @PostMapping(value = "/listSystemUser", headers = {"content-type=application/json"})
     public @ResponseBody
