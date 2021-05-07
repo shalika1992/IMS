@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +18,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -53,6 +51,7 @@ public class SystemUserRepository {
     private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile," +
             "noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
     private final String SQL_UPDATE_SYSTEMUSER = "update web_systemuser set userrole = ? , fullname = ? , email = ? , mobile = ? , status = ? where username = ?";
+    private final String SQL_CHANGE_PASSWORD = "update web_systemuser set password = ? where username = ?";
 
 
     @Transactional(readOnly = true)
@@ -211,7 +210,6 @@ public class SystemUserRepository {
             systemUserInputBean.setExpiryDate(userPasswordExpiryDate);
             systemUserInputBean.setInitialLoginStatus(0);
             //insert query
-            //username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime
             value = jdbcTemplate.update(SQL_INSERT_SYSTEMUSER,
                     systemUserInputBean.getUserName(),
                     systemUserInputBean.getPassword(),
@@ -386,6 +384,47 @@ public class SystemUserRepository {
         } catch (Exception ex) {
             throw ex;
         }
+        return message;
+    }
+
+    @Transactional(readOnly = true)
+    public String checkForSamePassword(SystemUserInputBean systemUserInputBean) {
+        String message = "";
+
+        String GET_COUNT_BY_USERNAME_PWD = "select count(username) from web_systemuser where username=? and password=?";
+        long count = 0;
+
+        try{
+            String username = systemUserInputBean.getUserName();
+            String password = systemUserInputBean.getPassword();
+
+            count = jdbcTemplate.queryForObject(GET_COUNT_BY_USERNAME_PWD, new Object[]{username, password}, Long.class);
+
+            if (count!=0){
+                message = MessageVarList.PASSWORD_SAME_AS_PREVIOUS;
+            }
+
+        }catch (Exception exception){
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+
+        return message;
+    }
+
+    @Transactional
+    public String changePassword(SystemUserInputBean systemUserInputBean) {
+        String message = "";
+
+        try{
+            int value = jdbcTemplate.update(SQL_CHANGE_PASSWORD, systemUserInputBean.getPassword(), systemUserInputBean.getUserName());
+
+            if(value!=1){
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        }catch (Exception exception){
+            throw exception;
+        }
+
         return message;
     }
 }

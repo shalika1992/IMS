@@ -25,6 +25,7 @@ public class MessageVarList {
     public static final String PASSWORDRESET_CHANGEPWD = "passwordreset.changepwd";
     public static final String PASSWORDRESET_EXPPWD = "passwordreset.exppwd";
     public static final String PASSWORDRESET_SUCCESS = "passwordreset.changepwd.success";
+    public static final String PASSWORD_SAME_AS_PREVIOUS = "password.sameas.previous";
     //-------------------------- start password reset mgt-------------------------------------------------------------//
 
     //-------------------------- system user mgt----------------------------------------------------------------------//
@@ -44,6 +45,7 @@ public class MessageVarList {
     public static final String SYSTEMUSER_MGT_REJECT_SUCCESSFULLY = "systemuser.reject.success";
     public static final String SYSTEMUSER_MGT_ALREADY_EXISTS = "systemuser.already.exists";
     public static final String SYSTEMUSER_MGT_NORECORD_FOUND = "systemuser.norecord.found";
+    public static final String SYSTEMUSER_MGT_CHANGE_PASSWORD_SUCCESSFULLY = "systemuser.changed.password.success";
     //-------------------------- system user mgt----------------------------------------------------------------------//
 
     //-------------------------- start user password change ----------------------------------------------------------//

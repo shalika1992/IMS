@@ -134,6 +134,24 @@ public class SystemUserService {
         return message;
     }
 
+    public String changePasswordSystemUser(SystemUserInputBean systemUserInputBean, Locale locale){
+        String message = "";
+        try {
+            String password = systemUserInputBean.getPassword();
+            systemUserInputBean.setPassword(sha256Algorithm.makeHash(password));
+
+            message = systemUserRepository.checkForSamePassword(systemUserInputBean);
+
+            if (message.isEmpty()){
+                message = systemUserRepository.changePassword(systemUserInputBean);
+            }
+
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
     private String getSystemUserAsString(SystemUser systemUser, boolean checkChanges) {
         StringBuilder systemUserStringBuilder = new StringBuilder();
         try {

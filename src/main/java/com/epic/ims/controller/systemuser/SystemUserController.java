@@ -182,9 +182,9 @@ public class SystemUserController implements RequestBeanValidation<Object> {
             if (bindingResult.hasErrors()) {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
             } else {
-                String message = systemUserService.updateSystemUser(systemUserInputBean, locale);
+                String message = systemUserService.changePasswordSystemUser(systemUserInputBean, locale);
                 if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_CHANGE_PASSWORD_SUCCESSFULLY, null, locale), null);
                 } else {
                     responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
                 }

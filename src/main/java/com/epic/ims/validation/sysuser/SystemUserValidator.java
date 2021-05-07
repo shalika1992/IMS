@@ -31,16 +31,18 @@ public class SystemUserValidator implements Validator {
 
             if (o.getClass().equals(SystemUserInputBean.class)) {
 
-                //validate input fields for empty fields
-                ValidationUtils.rejectIfEmpty(errors,"userName", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERNAME,"Username can not be empty.");
-                ValidationUtils.rejectIfEmpty(errors,"fullName", MessageVarList.SYSTEMUSER_MGT_EMPTY_FULLNAME,"Full name can not be empty.");
-                ValidationUtils.rejectIfEmpty(errors,"email", MessageVarList.SYSTEMUSER_MGT_EMPTY_EMAIL, "Email can not be empty.");
-                ValidationUtils.rejectIfEmpty(errors,"userRoleCode", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERROLECODE, "Empty user role..");
-                ValidationUtils.rejectIfEmpty(errors,"userRoleCode", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERROLECODE, "Mt Port can not be empty.");
-                ValidationUtils.rejectIfEmpty(errors,"status", MessageVarList.SYSTEMUSER_MGT_EMPTY_STATUS, "Status can not be empty.");
-                ValidationUtils.rejectIfEmpty(errors,"mobileNumber", MessageVarList.SYSTEMUSER_MGT_EMPTY_MOBILENUMBER, "Mobile Number can not be empty.");
-
                 String userTask = ((SystemUserInputBean) o).getUserTask();
+
+                //validate input fields for empty fields
+                if (!userTask.equals(TaskVarList.CHANGE_USER_PASSWORD)){
+                    ValidationUtils.rejectIfEmpty(errors,"userName", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERNAME,"Username can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors,"fullName", MessageVarList.SYSTEMUSER_MGT_EMPTY_FULLNAME,"Full name can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors,"email", MessageVarList.SYSTEMUSER_MGT_EMPTY_EMAIL, "Email can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors,"userRoleCode", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERROLECODE, "Empty user role..");
+                    ValidationUtils.rejectIfEmpty(errors,"userRoleCode", MessageVarList.SYSTEMUSER_MGT_EMPTY_USERROLECODE, "Mt Port can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors,"status", MessageVarList.SYSTEMUSER_MGT_EMPTY_STATUS, "Status can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors,"mobileNumber", MessageVarList.SYSTEMUSER_MGT_EMPTY_MOBILENUMBER, "Mobile Number can not be empty.");
+                }
 
                 if (!userTask.equals(TaskVarList.UPDATE_TASK)){
                     ValidationUtils.rejectIfEmpty(errors,"password", MessageVarList.SYSTEMUSER_MGT_EMPTY_PASSWORD, "Password can not be empty.");
