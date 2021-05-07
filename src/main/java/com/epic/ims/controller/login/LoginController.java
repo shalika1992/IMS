@@ -1,13 +1,17 @@
 package com.epic.ims.controller.login;
 
 import com.epic.ims.bean.login.LoginBean;
+import com.epic.ims.bean.profile.PasswordChangeBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.user.Section;
+import com.epic.ims.mapping.user.usermgt.Page;
+import com.epic.ims.mapping.user.usermgt.Section;
+import com.epic.ims.mapping.user.usermgt.User;
 import com.epic.ims.service.login.LoginService;
+import com.epic.ims.service.passwordpolicy.PasswordPolicyService;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
-import com.epic.ims.validators.RequestBeanValidation;
-import com.epic.ims.validators.login.LoginValidator;
+import com.epic.ims.validation.RequestBeanValidation;
+import com.epic.ims.validation.login.LoginValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -51,6 +53,9 @@ public class LoginController implements RequestBeanValidation<Object> {
 
     @Autowired
     LoginService loginService;
+
+    @Autowired
+    PasswordPolicyService passwordPolicyService;
 
     @Autowired
     CommonVarList commonVarList;
@@ -87,14 +92,57 @@ public class LoginController implements RequestBeanValidation<Object> {
                         //get user section list and page list and set to session bean
                         List<Section> sectionList = loginService.getUserSectionListByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
                         Map<String, List<Page>> pageList = loginService.getUserPageListByByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
-                        Map<String, PageTask> pageTaskList = loginService.getUserPageTaskListByByUserRoleCode(commonVarList.USERROLE_CODE_ADMIN);
                         sessionBean.setSectionList(sectionList);
                         sessionBean.setPageMap(pageList);
-                        sessionBean.setPageTaskMap(pageTaskList);
                         //redirect to home page
                         modelAndView = new ModelAndView("home/home", modelMap);
                     } else {
                         User user = sessionBean.getUser();
+                        if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_NEW)) {
+                            //set section list and page list and to session bean
+                            sessionBean.setSectionList(new ArrayList<>());
+                            sessionBean.setPageMap(new HashMap<>());
+                            //redirect to change password page
+                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_NEWUSER, null, locale));
+                            modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+
+                        } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_RESET)) {
+                            //set section list and page list and to session bean
+                            sessionBean.setSectionList(new ArrayList<>());
+                            sessionBean.setPageMap(new HashMap<>());
+                            //redirect to change password page
+                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_RESETUSER, null, locale));
+                            modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+
+                        } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_CHANGED)) {
+                            //set section list and page list and to session bean
+                            sessionBean.setSectionList(new ArrayList<>());
+                            sessionBean.setPageMap(new HashMap<>());
+                            //redirect to change password page
+                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_CHANGEPWD, null, locale));
+                            modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+
+                        } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_EXPIRED)) {
+                            //set section list and page list and to session bean
+                            sessionBean.setSectionList(new ArrayList<>());
+                            sessionBean.setPageMap(new HashMap<>());
+                            //redirect to change password page
+                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_EXPPWD, null, locale));
+                            modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+
+                        } else {
+                            int daysToExpire = loginService.getPwdExpNotification();
+                            //handle the user session
+                            //get user section list and page list and set to session bean
+                            //get user page task list and set to session bean
+                            List<Section> sectionList = loginService.getUserSectionListByUserRoleCode(user.getUserRole());
+                            Map<String, List<Page>> pageList = loginService.getUserPageListByByUserRoleCode(user.getUserRole());
+                            sessionBean.setSectionList(sectionList);
+                            sessionBean.setPageMap(pageList);
+                            sessionBean.setDaysToExpire(daysToExpire);
+                            //redirect to home page
+                            modelAndView = new ModelAndView("home/home", "beanmap", new ModelMap());
+                        }
                     }
                 }
             }
@@ -226,6 +274,18 @@ public class LoginController implements RequestBeanValidation<Object> {
         sessionBean.setSectionList(null);
         sessionBean.setPageMap(null);
         sessionBean.setPasswordPolicy(null);
+    }
+
+    private PasswordChangeBean getPasswordPolicyBean() {
+        PasswordChangeBean passwordChangeBean = null;
+        try {
+            passwordChangeBean = new PasswordChangeBean();
+            //set the password policy to session bean
+            passwordPolicyService.getWebPasswordPolicy(commonVarList.DEFAULT_PASSWORDPOLICY);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return passwordChangeBean;
     }
 
     @Override

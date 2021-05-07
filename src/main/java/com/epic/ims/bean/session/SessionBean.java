@@ -1,9 +1,9 @@
 package com.epic.ims.bean.session;
 
 import com.epic.ims.mapping.passwordpolicy.PasswordPolicy;
-import com.epic.ims.mapping.user.Page;
-import com.epic.ims.mapping.user.Section;
-import com.epic.ims.mapping.user.User;
+import com.epic.ims.mapping.user.usermgt.Page;
+import com.epic.ims.mapping.user.usermgt.Section;
+import com.epic.ims.mapping.user.usermgt.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

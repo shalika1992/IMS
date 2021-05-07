@@ -1,4 +1,4 @@
-package com.epic.ims.mapping.user;
+package com.epic.ims.mapping.user.usermgt;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,6 @@ import java.util.List;
 public class UserRole {
     private String userroleCode;
     private String description;
-    private String userroleType;
     private String status;
     private String section;
     private String page;

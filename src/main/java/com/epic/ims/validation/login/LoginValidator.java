@@ -1,4 +1,4 @@
-package com.epic.ims.validators.login;
+package com.epic.ims.validation.login;
 
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.util.validation.Validation;

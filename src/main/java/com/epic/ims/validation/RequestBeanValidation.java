@@ -1,4 +1,4 @@
-package com.epic.ims.validators;
+package com.epic.ims.validation;
 
 import org.springframework.validation.BindingResult;
 
