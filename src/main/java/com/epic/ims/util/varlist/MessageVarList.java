@@ -19,6 +19,13 @@ public class MessageVarList {
     public static final String LOGIN_STATUSTIMEOUT = "login.statustimeout";
     //-------------------------- end user login messages--------------------------------------------------------------//
 
+    //-------------------------- start password reset mgt-------------------------------------------------------------//
+    public static final String PASSWORDRESET_NEWUSER = "passwordreset.newuser";
+    public static final String PASSWORDRESET_RESETUSER = "passwordreset.resetuser";
+    public static final String PASSWORDRESET_CHANGEPWD = "passwordreset.changepwd";
+    public static final String PASSWORDRESET_EXPPWD = "passwordreset.exppwd";
+    public static final String PASSWORDRESET_SUCCESS = "passwordreset.changepwd.success";
+    //-------------------------- start password reset mgt-------------------------------------------------------------//
 
     //-------------------------- system user mgt----------------------------------------------------------------------//
     public static final String SYSTEMUSER_MGT_EMPTY_USERNAME = "systemuser.empty.username";

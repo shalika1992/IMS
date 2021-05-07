@@ -5,19 +5,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonVarList {
+
     //-------------------------------system user details--------------------------------------------------------------//
     @Value("${system.username}")
     public String SYSTEMUSERNAME;
 
-    //-------------------------------system user password expiry period--------------------------------------------------------------//
-    @Value("${system.user.password.expire}")
-    public String PWDEXPIRYPERIOD;
-
     @Value("${system.password}")
     public String SYSTEMUSERPWD;
-
-    @Value("${system.userrole.superuser}")
-    public String SUPERUSER;
     //-------------------------------system user details--------------------------------------------------------------//
 
     //-------------------------------common validation codes----------------------------------------------------------//
@@ -49,6 +43,12 @@ public class CommonVarList {
     //-------------------------------status codes---------------------------------------------------------------------//
 
     //-------------------------------user role code-------------------------------------------------------------------//
+    @Value("${userrole.code.counterofficer}")
+    public String USERROLE_CODE_COUNTEROFFICER;
+
+    @Value("${userrole.code.medicalofficer}")
+    public String USERROLE_CODE_MEDICALOFFICER;
+
     @Value("${userrole.code.admin}")
     public String USERROLE_CODE_ADMIN;
     //-------------------------------user role code-------------------------------------------------------------------//
@@ -75,11 +75,6 @@ public class CommonVarList {
     public long TIMESTAMP_VALUE_PERDAY;
     //-------------------------------password param code--------------------------------------------------------------//
 
-    //-------------------------------enable ad authentication code----------------------------------------------------//
-    @Value("${enable.ad.authentication}")
-    public Byte ENABLE_AD_AUTHENTICATION;
-    //-------------------------------enable ad authentication code----------------------------------------------------//
-
     //-------------------------------password paramter default values ------------------------------------------------//
     @Value("${pwdparam.default.inacttime}")
     public int PWDPARAM_DEFAULT_INACTTIME;
@@ -91,11 +86,13 @@ public class CommonVarList {
     public int PWDPARAM_DEFAULT_PWDAGE;
     //-------------------------------password paramter default values ------------------------------------------------//
 
-    //-------------------------------category paramter default values ------------------------------------------------//
-    @Value("${category.isbulk.yes}")
-    public String CATEGORY_ISBULK_YES;
+    //-------------------------------default password policy ---------------------------------------------------------//
+    @Value("${default.passwordpolicy}")
+    public int DEFAULT_PASSWORDPOLICY;
+    //-------------------------------web password policy id-----------------------------------------------------------//
 
-    @Value("${category.isbulk.no}")
-    public String CATEGORY_ISBULK_NO;
-    //-------------------------------category paramter default values ------------------------------------------------//
+    //-------------------------------system user password expiry period-----------------------------------------------//
+    @Value("${system.user.password.expire}")
+    public String PWDEXPIRYPERIOD;
+    //-------------------------------system user details--------------------------------------------------------------//
 }

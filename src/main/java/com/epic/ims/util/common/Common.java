@@ -96,11 +96,12 @@ public class Common {
     public List<Status> getActiveStatusList() {
         List<Status> statusList = new ArrayList<>();
         Status status = new Status();
-        status.setStatusCode("ACT");
+        status.setStatusCode(commonVarList.STATUS_ACTIVE);
         status.setDescription("Active");
         statusList.add(status);
         return statusList;
     }
+
 
     /**
      * @Author dilanka_w

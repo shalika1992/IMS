@@ -13,8 +13,8 @@ import com.epic.ims.util.common.ResponseBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.StatusVarList;
+import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.sysuser.SystemUserValidator;
-import com.epic.ims.validators.RequestBeanValidation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,14 +60,14 @@ public class SystemUserController implements RequestBeanValidation<Object> {
     SystemUserValidator systemUserValidator;
 
     @GetMapping(value = "/viewSystemUser")
-    public ModelAndView viewSysUserPage(ModelMap modelMap, Locale locale){
+    public ModelAndView viewSysUserPage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER PAGE VIEW");
 
         ModelAndView modelAndView;
 
-        try{
+        try {
             modelAndView = new ModelAndView("systemuserview", "beanmap", new ModelMap());
-        }catch (Exception exception){
+        } catch (Exception exception) {
             logger.error(exception);
             //set the error message to model map
             modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
@@ -86,7 +86,7 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         try {
             BindingResult bindingResult = validateRequestBean(systemUserInputBean);
             if (bindingResult.hasErrors()) {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(),new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()},Locale.US ));
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
             } else {
                 String message = systemUserService.insertSystemUser(systemUserInputBean, locale);
                 if (message.isEmpty()) {
@@ -104,18 +104,18 @@ public class SystemUserController implements RequestBeanValidation<Object> {
 
     @PostMapping(value = "/listSystemUser", headers = {"content-type=application/json"})
     public @ResponseBody
-    DataTablesResponse<SystemUser> searchSystemUser(@RequestBody SystemUserInputBean systemUserInputBean){
+    DataTablesResponse<SystemUser> searchSystemUser(@RequestBody SystemUserInputBean systemUserInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER SEARCH");
         DataTablesResponse<SystemUser> responseBean = new DataTablesResponse<>();
 
         try {
             long count = systemUserService.getCount(systemUserInputBean);
 
-            if (count > 0){
+            if (count > 0) {
                 List<SystemUser> systemUserList = systemUserService.getSystemUserSearchResultList(systemUserInputBean);
                 //set data set to response bean
                 responseBean.data.addAll(systemUserList);
-            }else {
+            } else {
                 //set data set to response bean
                 responseBean.data.addAll(new ArrayList<>());
             }
@@ -125,7 +125,7 @@ public class SystemUserController implements RequestBeanValidation<Object> {
             responseBean.totalDisplayRecords = count;
 
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             logger.error("Exception " + exception);
         }
 
@@ -219,7 +219,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         dataBinder.validate();
         return dataBinder.getBindingResult();
     }
-
 
 
 }

@@ -12,25 +12,27 @@ public class Page {
     private String description;
     private String url;
     private int sortKey;
-    private String status;
+    private String statusCode;
+    private String sectionCode;
+    private String userRoleCode;
     private Date createdTime;
-    private Date createdUser;
-    private Date lastUpdatedTime;
     private String lastUpdatedUser;
+    private Date lastUpdatedTime;
 
     public Page() {
     }
 
-    public Page(String pageCode, String description, String url, int sortKey, String status, Date createdTime, Date createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public Page(String pageCode, String description, String url, int sortKey, String statusCode, String sectionCode, String userRoleCode, Date createdTime, String lastUpdatedUser, Date lastUpdatedTime) {
         this.pageCode = pageCode;
         this.description = description;
         this.url = url;
         this.sortKey = sortKey;
-        this.status = status;
+        this.statusCode = statusCode;
+        this.sectionCode = sectionCode;
+        this.userRoleCode = userRoleCode;
         this.createdTime = createdTime;
-        this.createdUser = createdUser;
-        this.lastUpdatedTime = lastUpdatedTime;
         this.lastUpdatedUser = lastUpdatedUser;
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     public String getPageCode() {
@@ -65,12 +67,28 @@ public class Page {
         this.sortKey = sortKey;
     }
 
-    public String getStatus() {
-        return status;
+    public String getStatusCode() {
+        return statusCode;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public String getSectionCode() {
+        return sectionCode;
+    }
+
+    public void setSectionCode(String sectionCode) {
+        this.sectionCode = sectionCode;
+    }
+
+    public String getUserRoleCode() {
+        return userRoleCode;
+    }
+
+    public void setUserRoleCode(String userRoleCode) {
+        this.userRoleCode = userRoleCode;
     }
 
     public Date getCreatedTime() {
@@ -81,12 +99,12 @@ public class Page {
         this.createdTime = createdTime;
     }
 
-    public Date getCreatedUser() {
-        return createdUser;
+    public String getLastUpdatedUser() {
+        return lastUpdatedUser;
     }
 
-    public void setCreatedUser(Date createdUser) {
-        this.createdUser = createdUser;
+    public void setLastUpdatedUser(String lastUpdatedUser) {
+        this.lastUpdatedUser = lastUpdatedUser;
     }
 
     public Date getLastUpdatedTime() {
@@ -95,13 +113,5 @@ public class Page {
 
     public void setLastUpdatedTime(Date lastUpdatedTime) {
         this.lastUpdatedTime = lastUpdatedTime;
-    }
-
-    public String getLastUpdatedUser() {
-        return lastUpdatedUser;
-    }
-
-    public void setLastUpdatedUser(String lastUpdatedUser) {
-        this.lastUpdatedUser = lastUpdatedUser;
     }
 }

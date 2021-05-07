@@ -37,7 +37,9 @@ public class CommonRepository {
 
     private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "select code, description from status where statuscategory=?";
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
-    private final String SQL_SYSTEM_TIME = "select now()";
+    private final String SQL_SYSTEM_TIME = "select CURDATE() as currentdate";
+    private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
+    private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
 
     @Transactional(readOnly = true)
     public List<Status> getStatusList(String statusCategory) throws Exception {
@@ -62,16 +64,17 @@ public class CommonRepository {
 
     @Transactional(readOnly = true)
     public Date getCurrentDate() throws Exception {
-        DateFormat formatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date formattedCurrentDate = null;
         try {
             Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
-            formattedCurrentDate = (Date) currentDate.get("now()");
+            formattedCurrentDate = formatter.parse(currentDate.get("currentdate").toString());
         } catch (Exception e) {
             throw e;
         }
         return formattedCurrentDate;
     }
+
 
     @Transactional(readOnly = true)
     public List<UserRole> getUserRoleList() throws Exception {
@@ -95,5 +98,36 @@ public class CommonRepository {
             throw e;
         }
         return userroleList;
+    }
+
+    public int getPasswordParam(String paramcode) {
+        int count = 0;
+        try {
+            Map<String, Object> map = jdbcTemplate.queryForMap(SQL_USERPARAM_BY_PARAMCODE, new Object[]{paramcode});
+            if (map.size() != 0) {
+                count = map.get("value") != null ? Integer.parseInt(map.get("value").toString()) : 0;
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            count = 0;
+        } catch (Exception e) {
+            throw e;
+        }
+        return count;
+    }
+
+    @Transactional(readOnly = true)
+    public String getUserRoleStatusCode(String userrole) {
+        String statusCode = "";
+        try {
+            Map<String, Object> map = jdbcTemplate.queryForMap(SQL_USERROLE_STATUS_BY_USERROLECODE, new Object[]{userrole});
+            if (map.size() != 0) {
+                statusCode = (String) map.get("status");
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            statusCode = "";
+        } catch (Exception e) {
+            throw e;
+        }
+        return statusCode;
     }
 }
