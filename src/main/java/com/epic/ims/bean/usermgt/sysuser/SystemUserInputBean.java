@@ -18,6 +18,7 @@ public class SystemUserInputBean extends DataTablesRequest {
     private String userName;
     private String fullName;
     private String email;
+    private String userTask;
     private String userRoleCode;
     private Date expiryDate;
     private String status;

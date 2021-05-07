@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -50,6 +52,7 @@ public class SystemUserRepository {
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile," +
             "noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
+    private final String SQL_UPDATE_SYSTEMUSER = "update web_systemuser set userrole = ? , fullname = ? , email = ? , mobile = ? , status = ? where username = ?";
 
 
     @Transactional(readOnly = true)
@@ -364,4 +367,25 @@ public class SystemUserRepository {
         return dynamicClause;
     }
 
+    @Transactional
+    public String updateSystemUser(SystemUserInputBean systemUserInputBean) {
+        String message = "";
+        try {
+            int value = jdbcTemplate.update(SQL_UPDATE_SYSTEMUSER,
+                            systemUserInputBean.getUserRoleCode(),
+                            systemUserInputBean.getFullName(),
+                            systemUserInputBean.getEmail(),
+                            systemUserInputBean.getMobileNumber(),
+                            systemUserInputBean.getStatus(),
+                            systemUserInputBean.getUserName()
+                    );
+
+            if (value != 1) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
 }

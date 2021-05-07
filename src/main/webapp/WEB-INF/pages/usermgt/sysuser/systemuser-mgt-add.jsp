@@ -26,6 +26,15 @@
                     <div class="card-body">
                         <div class="form-group"><span id="responseMsgAdd"></span></div>
 
+                        <div class="form-group row" hidden="true">
+                            <label for="userTask" class="col-sm-4 col-form-label">User Task<span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-8">
+                                <form:input path="userTask" name="userTask" type="text" class="form-control form-control-sm"
+                                            id="eUserTask" value="ADD" placeholder="User Task"/>
+                            </div>
+                        </div>
+
                         <div class="form-group row">
                             <div class="col-lg-4">
                                 <label>Username<span class="text-danger">*</span></label>

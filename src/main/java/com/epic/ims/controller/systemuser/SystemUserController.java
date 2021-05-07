@@ -102,26 +102,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         return responseBean;
     }
 
-    @PostMapping(value = "/deleteSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    ResponseBean deleteSystemUser(@RequestParam String userName, Locale locale) {
-        logger.info("[" + sessionBean.getSessionid() + "] DELETE SYSTEM USER");
-        ResponseBean responseBean;
-        try {
-            String message = systemUserService.deleteSystemUser(userName);
-            if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_DELETE_SUCCESSFULLY, null, locale), null);
-            } else {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-            }
-        } catch (Exception e) {
-            logger.error("Exception  :  ", e);
-            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
-        }
-        return responseBean;
-    }
-
-
     @PostMapping(value = "/listSystemUser", headers = {"content-type=application/json"})
     public @ResponseBody
     DataTablesResponse<SystemUser> searchSystemUser(@RequestBody SystemUserInputBean systemUserInputBean){
@@ -151,6 +131,45 @@ public class SystemUserController implements RequestBeanValidation<Object> {
 
         return responseBean;
 
+    }
+
+    @GetMapping(value = "/getSystemUser")
+    public @ResponseBody
+    SystemUser getSystemUser(@RequestParam String userName) {
+        logger.info("[" + sessionBean.getSessionid() + "]  GET SYSTEM USER");
+        SystemUser systemUser = new SystemUser();
+        try {
+            if (userName != null && !userName.isEmpty()) {
+                systemUser = systemUserService.getSystemUser(userName);
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return systemUser;
+    }
+
+    @PostMapping(value = "/updateSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean updateSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SYSTEM USER");
+        ResponseBean responseBean;
+        try {
+            BindingResult bindingResult = validateRequestBean(systemUserInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
+            } else {
+                String message = systemUserService.updateSystemUser(systemUserInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
     }
 
     @ModelAttribute
