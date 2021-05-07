@@ -37423,8 +37423,8 @@ button {
 
 .btn.btn-primary {
     color: #FFFFFF;
-    background-color: #3699FF;
-    border-color: #3699FF; }
+    background-color: #4d3b75;
+    border-color: #ffffff; }
 .btn.btn-primary i {
     color: #FFFFFF; }
 .btn.btn-primary .svg-icon svg g [fill] {
@@ -37437,9 +37437,9 @@ button {
 .btn.btn-primary.dropdown-toggle:after {
     color: #FFFFFF; }
 .btn.btn-primary:hover:not(.btn-text):not(:disabled):not(.disabled), .btn.btn-primary:focus:not(.btn-text), .btn.btn-primary.focus:not(.btn-text) {
-    color: #FFFFFF;
-    background-color: #187DE4;
-    border-color: #187DE4; }
+    color: #7e8299;
+    background-color: #f5edfa;
+    border-color: #ffffff; }
 .btn.btn-primary:hover:not(.btn-text):not(:disabled):not(.disabled) i, .btn.btn-primary:focus:not(.btn-text) i, .btn.btn-primary.focus:not(.btn-text) i {
     color: #FFFFFF; }
 .btn.btn-primary:hover:not(.btn-text):not(:disabled):not(.disabled) .svg-icon svg g [fill], .btn.btn-primary:focus:not(.btn-text) .svg-icon svg g [fill], .btn.btn-primary.focus:not(.btn-text) .svg-icon svg g [fill] {

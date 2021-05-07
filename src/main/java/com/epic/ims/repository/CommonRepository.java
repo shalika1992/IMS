@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +31,7 @@ public class CommonRepository {
     @Autowired
     CommonVarList commonVarList;
 
-    private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "SELECT "
+    private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "SELECT ";
 
     @Transactional(readOnly = true)
     public List<Status> getStatusList(String statusCategory) throws Exception {
@@ -54,7 +53,7 @@ public class CommonRepository {
         return statusBeanList;
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public List<UserRole> getUserRoleListByUserRoleTypeCode(String userRoleTypeCode) throws Exception {
         List<UserRole> userroleList;
         try {
@@ -77,5 +76,5 @@ public class CommonRepository {
             throw e;
         }
         return userroleList;
-    }
+    }*/
 }

@@ -41,7 +41,7 @@ public class SystemUserController {
     Common common;
 
     public ModelAndView viewSysUser(){
-
+        return null;
     }
 
     @ModelAttribute
