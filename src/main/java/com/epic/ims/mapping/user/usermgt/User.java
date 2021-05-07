@@ -1,4 +1,4 @@
-package com.epic.ims.mapping.user;
+package com.epic.ims.mapping.user.usermgt;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

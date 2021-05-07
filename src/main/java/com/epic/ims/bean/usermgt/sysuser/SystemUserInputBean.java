@@ -1,7 +1,8 @@
 package com.epic.ims.bean.usermgt.sysuser;
 
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.mapping.user.UserRole;
+import com.epic.ims.mapping.user.usermgt.UserRole;
+import com.epic.ims.util.common.DataTablesRequest;
 import lombok.*;
 
 import java.util.Date;
@@ -11,12 +12,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
-public class SystemUserInputBean {
+public class SystemUserInputBean extends DataTablesRequest {
     private String userName;
     private String fullName;
     private String email;
+    private String userTask;
     private String userRoleCode;
     private Date expiryDate;
     private String status;
@@ -28,12 +30,6 @@ public class SystemUserInputBean {
     private Date createdTime;
     private Date lastUpdatedTime;
     private String lastUpdatedUser;
-
-    /*-------for access control-----------*/
-    private boolean vadd;
-    private boolean vupdate;
-    private boolean vdelete;
-    /*-------for access control-----------*/
 
     private List<Status> statusList;
     private List<Status> statusActList;

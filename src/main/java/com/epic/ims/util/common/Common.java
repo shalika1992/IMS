@@ -31,7 +31,6 @@ public class Common {
     @Autowired
     SessionBean sessionBean;
 
-
     /**
      * @Author dilanka_w
      * @CreatedTime 2021-01-22 12:20:25 PM
@@ -88,40 +87,6 @@ public class Common {
 
     /**
      * @Author dilanka_w
-     * @CreatedTime 2021-03-23 10:41:39 AM
-     * @Version V1.00
-     * @MethodName checkMethodAccess
-     * @MethodParams [taskcode, page, userRole, sessionBean]
-     * @MethodDescription - checks the accees to the method name passed
-     */
-//    public boolean checkMethodAccess(String taskcode, String page, String userRole, SessionBean sessionBean) {
-//        boolean access = false;
-//        if (taskcode == null || taskcode.isEmpty()) {
-//            access = false;
-//        } else {
-//
-//            Map<String, PageTask> pageTaskMap = sessionBean.getPageTaskMap();
-//            List<Task> taskList = pageTaskMap.get(page).getTaskList();
-//
-//            if (taskList == null) {
-//                access = false;
-//            } else if (taskList.size() < 1) {
-//                access = false;
-//            } else {
-//                for (Task task : taskList) {
-//                    if (task.getTaskCode().trim().equalsIgnoreCase(taskcode.trim())) {
-//                        access = true;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return access;
-//    }
-
-
-    /**
-     * @Author dilanka_w
      * @CreatedTime 2021-03-23 10:42:24 AM
      * @Version V1.00
      * @MethodName getActiveStatusList
@@ -131,11 +96,12 @@ public class Common {
     public List<Status> getActiveStatusList() {
         List<Status> statusList = new ArrayList<>();
         Status status = new Status();
-        status.setStatusCode("ACT");
+        status.setStatusCode(commonVarList.STATUS_ACTIVE);
         status.setDescription("Active");
         statusList.add(status);
         return statusList;
     }
+
 
     /**
      * @Author dilanka_w
