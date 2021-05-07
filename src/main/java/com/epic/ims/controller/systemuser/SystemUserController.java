@@ -62,9 +62,7 @@ public class SystemUserController implements RequestBeanValidation<Object> {
     @GetMapping(value = "/viewSystemUser")
     public ModelAndView viewSysUserPage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER PAGE VIEW");
-
         ModelAndView modelAndView;
-
         try {
             modelAndView = new ModelAndView("systemuserview", "beanmap", new ModelMap());
         } catch (Exception exception) {
@@ -73,7 +71,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
             modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
             modelAndView = new ModelAndView("systemuserview", modelMap);
         }
-
         return modelAndView;
 
     }
