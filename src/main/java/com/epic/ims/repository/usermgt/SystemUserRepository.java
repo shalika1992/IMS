@@ -347,10 +347,6 @@ public class SystemUserRepository {
                     dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
                 }
 
-                if (systemUserInputBean.getMobileNumber()!=null && !systemUserInputBean.getMobileNumber().isEmpty()){
-                    dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
-                }
-
                 if (systemUserInputBean.getUserRoleCode()!=null && !systemUserInputBean.getUserRoleCode().isEmpty()){
                     dynamicClause.append("and wu.userrole like '%").append(systemUserInputBean.getUserRoleCode()).append("%' ");
                 }

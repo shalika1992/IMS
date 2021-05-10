@@ -45,9 +45,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
     SessionBean sessionBean;
 
     @Autowired
-    SystemUserService systemUserService;
-
-    @Autowired
     CommonRepository commonRepository;
 
     @Autowired
@@ -55,6 +52,9 @@ public class SystemUserController implements RequestBeanValidation<Object> {
 
     @Autowired
     Common common;
+
+    @Autowired
+    SystemUserService systemUserService;
 
     @Autowired
     SystemUserValidator systemUserValidator;
