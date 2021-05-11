@@ -1,14 +1,13 @@
 package com.epic.ims.repository.usermgt;
 
-import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
-import com.epic.ims.service.common.CommonService;
+import com.epic.ims.service.sysuser.common.CommonService;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -27,7 +26,7 @@ import java.util.List;
 @Repository
 @Scope("request")
 public class SystemUserRepository {
-    private static Logger logger = LogManager.getLogger(SystemUserRepository.class);
+    private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -44,21 +43,28 @@ public class SystemUserRepository {
     @Autowired
     MessageSource messageSource;
 
+
     private final String SQL_GET_COUNT = "select count(*) from web_systemuser wu where ";
-    private final String SQL_INSERT_SYSTEMUSER = "insert into web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-    private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile,noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
+    private final String SQL_INSERT_SYSTEMUSER="insert into " +
+            "web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) " +
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile," +
+            "noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
     private final String SQL_UPDATE_SYSTEMUSER = "update web_systemuser set userrole = ? , fullname = ? , email = ? , mobile = ? , status = ? where username = ?";
+    private final String SQL_CHANGE_PASSWORD = "update web_systemuser set password = ? where username = ?";
 
-    @LogRepository
+
     @Transactional(readOnly = true)
     public long getCount(SystemUserInputBean systemUserInputBean) throws Exception {
         long count = 0;
+
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
             this.setDynamicClause(systemUserInputBean, dynamicClause);
+
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
-        } catch (Exception exception) {
+
+        }catch (Exception exception){
             logger.error(exception);
             throw exception;
         }
@@ -66,14 +72,17 @@ public class SystemUserRepository {
         return count;
     }
 
-    @LogRepository
     public List<SystemUser> getSystemUserSearchList(SystemUserInputBean systemUserInputBean) {
-        List<SystemUser> systemUserList = null;
-        try {
-            //create sorting order
-            String col = "";
+        List<SystemUser> systemUserList =  null;
+
+        try{
             StringBuilder dynamicClause = this.setDynamicClause(systemUserInputBean, new StringBuilder());
-            switch (systemUserInputBean.sortedColumns.get(0)) {
+
+            //create sorting order
+            String sortingStr = "";
+            String col="";
+
+            switch (systemUserInputBean.sortedColumns.get(0)){
                 case 0:
                     col = "wu.username";
                     break;
@@ -107,7 +116,7 @@ public class SystemUserRepository {
                 default:
                     col = "wu.createdtime";
             }
-            String sortingStr = " order by " + col + " " + systemUserInputBean.sortDirections.get(0);
+            sortingStr = " order by "+ col + " " + systemUserInputBean.sortDirections.get(0);
 
             String sql = "select wu.username as username, ur.description as userroledescription, wu.fullname as fullname, wu.email as email, wu.mobile as mobile, " +
                     "s.description as statusdescription, wu.lastloggeddate as lastloggeddate," +
@@ -115,7 +124,7 @@ public class SystemUserRepository {
                     "from web_systemuser wu " +
                     "left join userrole ur on ur.userrolecode = wu.userrole " +
                     "left join status s on s.code = wu.status where " +
-                    dynamicClause.toString() + sortingStr +
+                    dynamicClause.toString() + sortingStr+
                     " limit " + systemUserInputBean.displayLength + " offset " + systemUserInputBean.displayStart;
 
 
@@ -184,14 +193,13 @@ public class SystemUserRepository {
                 return systemUser;
             });
 
-        } catch (Exception exception) {
+        }catch (Exception exception){
             throw exception;
         }
 
         return systemUserList;
     }
 
-    @LogRepository
     @Transactional
     public String insertSystemUser(SystemUserInputBean systemUserInputBean) throws Exception {
         String message = "";
@@ -202,7 +210,6 @@ public class SystemUserRepository {
             systemUserInputBean.setExpiryDate(userPasswordExpiryDate);
             systemUserInputBean.setInitialLoginStatus(0);
             //insert query
-            //username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime
             value = jdbcTemplate.update(SQL_INSERT_SYSTEMUSER,
                     systemUserInputBean.getUserName(),
                     systemUserInputBean.getPassword(),
@@ -213,7 +220,7 @@ public class SystemUserRepository {
                     systemUserInputBean.getMobileNumber(),
                     systemUserInputBean.getInitialLoginStatus(),
                     systemUserInputBean.getStatus(),
-                    sessionBean.getUsername(),
+                    "error",
                     systemUserInputBean.getCreatedTime(),
                     systemUserInputBean.getLastUpdatedUser(),
                     systemUserInputBean.getLastUpdatedTime()
@@ -230,7 +237,6 @@ public class SystemUserRepository {
         return message;
     }
 
-    @LogRepository
     @Transactional(readOnly = true)
     public SystemUser getSystemUser(String userName) throws SQLException {
         SystemUser systemUser = null;
@@ -321,57 +327,52 @@ public class SystemUserRepository {
         return systemUser;
     }
 
-    private StringBuilder setDynamicClause(SystemUserInputBean systemUserInputBean, StringBuilder dynamicClause) {
+    private StringBuilder setDynamicClause(SystemUserInputBean systemUserInputBean, StringBuilder dynamicClause){
         dynamicClause.append("1=1 and wu.username != '").append(sessionBean.getUsername()).append("' ");
 
-        try {
-            if (systemUserInputBean.getUserName() != null && !systemUserInputBean.getUserName().isEmpty()) {
-                dynamicClause.append("and lower(wu.username) like lower('%").append(systemUserInputBean.getUserName()).append("%') ");
-            }
+            try{
+                if (systemUserInputBean.getUserName()!=null && !systemUserInputBean.getUserName().isEmpty()){
+                    dynamicClause.append("and lower(wu.username) like lower('%").append(systemUserInputBean.getUserName()).append("%') ");
+                }
 
-            if (systemUserInputBean.getFullName() != null && !systemUserInputBean.getFullName().isEmpty()) {
-                dynamicClause.append("and lower(wu.fullname) like lower('%").append(systemUserInputBean.getFullName()).append("%') ");
-            }
+                if (systemUserInputBean.getFullName()!=null && !systemUserInputBean.getFullName().isEmpty()){
+                    dynamicClause.append("and lower(wu.fullname) like lower('%").append(systemUserInputBean.getFullName()).append("%') ");
+                }
 
-            if (systemUserInputBean.getEmail() != null && !systemUserInputBean.getEmail().isEmpty()) {
-                dynamicClause.append("and lower(wu.email) like lower('%").append(systemUserInputBean.getEmail()).append("%') ");
-            }
+                if (systemUserInputBean.getEmail()!=null && !systemUserInputBean.getEmail().isEmpty()){
+                    dynamicClause.append("and lower(wu.email) like lower('%").append(systemUserInputBean.getEmail()).append("%') ");
+                }
 
-            if (systemUserInputBean.getMobileNumber() != null && !systemUserInputBean.getMobileNumber().isEmpty()) {
-                dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
-            }
+                if (systemUserInputBean.getMobileNumber()!=null && !systemUserInputBean.getMobileNumber().isEmpty()){
+                    dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
+                }
 
-            if (systemUserInputBean.getMobileNumber() != null && !systemUserInputBean.getMobileNumber().isEmpty()) {
-                dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
-            }
+                if (systemUserInputBean.getUserRoleCode()!=null && !systemUserInputBean.getUserRoleCode().isEmpty()){
+                    dynamicClause.append("and wu.userrole like '%").append(systemUserInputBean.getUserRoleCode()).append("%' ");
+                }
 
-            if (systemUserInputBean.getUserRoleCode() != null && !systemUserInputBean.getUserRoleCode().isEmpty()) {
-                dynamicClause.append("and wu.userrole like '%").append(systemUserInputBean.getUserRoleCode()).append("%' ");
+                if (systemUserInputBean.getStatus()!=null && !systemUserInputBean.getStatus().isEmpty()){
+                    dynamicClause.append("and wu.status like '%").append(systemUserInputBean.getStatus()).append("%' ");
+                }
+            }catch (Exception exception){
+                throw exception;
             }
-
-            if (systemUserInputBean.getStatus() != null && !systemUserInputBean.getStatus().isEmpty()) {
-                dynamicClause.append("and wu.status like '%").append(systemUserInputBean.getStatus()).append("%' ");
-            }
-        } catch (Exception exception) {
-            throw exception;
-        }
 
         return dynamicClause;
     }
 
-    @LogRepository
     @Transactional
     public String updateSystemUser(SystemUserInputBean systemUserInputBean) {
         String message = "";
         try {
             int value = jdbcTemplate.update(SQL_UPDATE_SYSTEMUSER,
-                    systemUserInputBean.getUserRoleCode(),
-                    systemUserInputBean.getFullName(),
-                    systemUserInputBean.getEmail(),
-                    systemUserInputBean.getMobileNumber(),
-                    systemUserInputBean.getStatus(),
-                    systemUserInputBean.getUserName()
-            );
+                            systemUserInputBean.getUserRoleCode(),
+                            systemUserInputBean.getFullName(),
+                            systemUserInputBean.getEmail(),
+                            systemUserInputBean.getMobileNumber(),
+                            systemUserInputBean.getStatus(),
+                            systemUserInputBean.getUserName()
+                    );
 
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
@@ -379,6 +380,47 @@ public class SystemUserRepository {
         } catch (Exception ex) {
             throw ex;
         }
+        return message;
+    }
+
+    @Transactional(readOnly = true)
+    public String checkForSamePassword(SystemUserInputBean systemUserInputBean) {
+        String message = "";
+
+        String GET_COUNT_BY_USERNAME_PWD = "select count(username) from web_systemuser where username=? and password=?";
+        long count = 0;
+
+        try{
+            String username = systemUserInputBean.getUserName();
+            String password = systemUserInputBean.getPassword();
+
+            count = jdbcTemplate.queryForObject(GET_COUNT_BY_USERNAME_PWD, new Object[]{username, password}, Long.class);
+
+            if (count!=0){
+                message = MessageVarList.PASSWORD_SAME_AS_PREVIOUS;
+            }
+
+        }catch (Exception exception){
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+
+        return message;
+    }
+
+    @Transactional
+    public String changePassword(SystemUserInputBean systemUserInputBean) {
+        String message = "";
+
+        try{
+            int value = jdbcTemplate.update(SQL_CHANGE_PASSWORD, systemUserInputBean.getPassword(), systemUserInputBean.getUserName());
+
+            if(value!=1){
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        }catch (Exception exception){
+            throw exception;
+        }
+
         return message;
     }
 }

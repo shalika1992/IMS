@@ -55,6 +55,11 @@
         <put-attribute name="body" value="/WEB-INF/pages/usermgt/sysuser/systemuser-mgt.jsp"/>
     </definition>
 
+    <!--institution management page-->
+    <definition name="institutionview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/institutionmgt/institution-mgt.jsp"/>
+    </definition>
+
     <!--sample file upload page-->
     <definition name="samplefileview" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/samplefile/fileupload.jsp"/>

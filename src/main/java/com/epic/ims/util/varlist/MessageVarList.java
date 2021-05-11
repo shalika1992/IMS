@@ -25,6 +25,7 @@ public class MessageVarList {
     public static final String PASSWORDRESET_CHANGEPWD = "passwordreset.changepwd";
     public static final String PASSWORDRESET_EXPPWD = "passwordreset.exppwd";
     public static final String PASSWORDRESET_SUCCESS = "passwordreset.changepwd.success";
+    public static final String PASSWORD_SAME_AS_PREVIOUS = "password.sameas.previous";
     //-------------------------- start password reset mgt-------------------------------------------------------------//
 
     //-------------------------- start user password change ----------------------------------------------------------//
@@ -64,7 +65,27 @@ public class MessageVarList {
     public static final String SYSTEMUSER_MGT_REJECT_SUCCESSFULLY = "systemuser.reject.success";
     public static final String SYSTEMUSER_MGT_ALREADY_EXISTS = "systemuser.already.exists";
     public static final String SYSTEMUSER_MGT_NORECORD_FOUND = "systemuser.norecord.found";
+    public static final String SYSTEMUSER_MGT_CHANGE_PASSWORD_SUCCESSFULLY = "systemuser.changed.password.success";
     //-------------------------- system user mgt----------------------------------------------------------------------//
+
+    //-------------------------- institution user mgt-----------------------------------------------------------------//
+    public static final String INSTITUTION_MGT_ALREADY_EXISTS = "institution.already.exists";
+    public static final String INSTITUTION_MGT_ADDED_SUCCESSFULLY = "institution.added.success";
+    public static final String INSTITUTION_MGT_EMPTY_CODE = "institution.empty.code";
+    public static final String INSTITUTION_MGT_EMPTY_NAME = "institution.empty.name";
+    public static final String INSTITUTION_MGT_EMPTY_ADDRESS = "institution.empty.address";
+    public static final String INSTITUTION_MGT_EMPTY_CONTACT_NUMBER = "institution.empty.contactNumber";
+    public static final String INSTITUTION_MGT_EMPTY_STATUS = "institution.empty.status";
+    public static final String INSTITUTION_MGT_EMPTY_MOBILENUMBER = "institution.empty.mobilenumber";
+    public static final String INSTITUTION_MGT_EMPTY_PASSWORD = "institution.empty.password";
+    public static final String INSTITUTION_MGT_EMPTY_CONFIRMPASSWORD = "institution.empty.confirmpassword";
+    public static final String INSTITUTION_MGT_PASSWORDS_MISMATCH = "institution.password.mismatch";
+    public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
+    public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
+    public static final String INSTITUTION_MGT_CONFIRM_SUCCESSFULLY = "institution.confirm.success";
+    public static final String INSTITUTION_MGT_REJECT_SUCCESSFULLY = "institution.reject.success";
+    public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
+    //-------------------------- institution user mgt-----------------------------------------------------------------//
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
     public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";

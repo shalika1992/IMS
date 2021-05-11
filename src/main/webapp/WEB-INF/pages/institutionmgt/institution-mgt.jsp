@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: akila_s
-  Date: 5/5/2021
-  Time: 2:33 PM
+  Date: 5/10/2021
+  Time: 9:58 AM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
@@ -11,10 +11,10 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
 <html>
 <head>
     <script type="text/javascript">
+
         var oTable;
 
         var token = $("meta[name='_csrf']").attr("content");
@@ -53,22 +53,20 @@
 
             oTable = $('#table').dataTable({
                 bServerSide: true,
-                sAjaxSource: "${pageContext.servletContext.contextPath}/listSystemUser.json",
+                sAjaxSource: "${pageContext.servletContext.contextPath}/listInstitution.json",
                 fnServerData: function (sSource, aoData, fnCallback) {
                     aoData.push(
                         {'name': 'csrf_token', 'value': token},
                         {'name': 'header', 'value': header},
-                        {'name': 'userName', 'value': $('#userName').val()},
-                        {'name': 'fullName', 'value': $('#fullName').val()},
-                        {'name': 'mobileNumber', 'value': $('#mobileNumber').val()},
-                        {'name': 'email', 'value': $('#email').val()},
-                        {'name': 'userRoleCode', 'value': $('#userRoleCode').val()},
+                        {'name': 'institutionCode', 'value': $('#institutionCode').val()},
+                        {'name': 'institutionName', 'value': $('#institutionName').val()},
+                        {'name': 'contactNumber', 'value': $('#contactNumber').val()},
                         {'name': 'status', 'value': $('#status').val()}
                     );
                     $.ajax({
                         dataType: 'json',
                         type: 'POST',
-                        url: "${pageContext.request.contextPath}/listSystemUser.json",
+                        url: "${pageContext.request.contextPath}/listInstitution.json",
                         contentType: "application/json",
                         data: stringify_aoData(aoData),
                         success: fnCallback,
@@ -95,48 +93,32 @@
                 },
                 columnDefs: [
                     {
-                        title: "User Name",
+                        title: "Institution Code",
                         targets: 0,
-                        mDataProp: "userName",
+                        mDataProp: "institutionCode",
                         defaultContent: "--"
                     },
                     {
-                        title: "Full Name",
+                        title: "Institution Name",
                         targets: 1,
-                        mDataProp: "fullName",
+                        mDataProp: "institutionName",
                         defaultContent: "--"
                     },
                     {
-                        title: "User Role",
+                        title: "Address",
                         targets: 2,
-                        mDataProp: "userRole",
+                        mDataProp: "address",
                         defaultContent: "--"
                     },
                     {
-                        title: "Email",
+                        title: "Contact Number",
                         targets: 3,
-                        mDataProp: "email",
+                        mDataProp: "contactNumber",
                         defaultContent: "--"
                     },
-                    {
-                        title: "Mobile Number",
-                        targets: 4,
-                        mDataProp: "mobileNumber",
-                        defaultContent: "--"
-                    },
-                    {
-                        title: "Last Logged Date",
-                        targets: 5,
-                        mDataProp: "lastLoggedDate",
-                        defaultContent: "--",
-                        render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
-                        }
-                    }
-                    ,
                     {
                         title: "Status",
-                        targets: 6,
+                        targets: 4,
                         mDataProp: "status",
                         defaultContent: "--",
                         render: function (data, type, full, meta) {
@@ -179,7 +161,7 @@
                     , {
                         label: 'Created Time',
                         name: 'createdTime',
-                        targets: 7,
+                        targets: 5,
                         mDataProp: "createdTime",
                         render: function (data) {
                             return moment(data).format("YYYY-MM-DD hh:mm a")
@@ -187,7 +169,7 @@
                     },
                     {
                         title: "Last Updated Time",
-                        targets: 8,
+                        targets: 6,
                         mDataProp: "lastUpdatedTime",
                         defaultContent: "--",
                         render: function (data) {
@@ -196,7 +178,7 @@
                     },
                     {
                         title: "Last Updated User",
-                        targets: 9,
+                        targets: 7,
                         mDataProp: "lastUpdatedUser",
                         defaultContent: "--"
                     },
@@ -205,61 +187,28 @@
                         sortable: false,
                         className: "dt-center",
                         mRender: function (data, type, full) {
-                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Update" id=' + full.userName + ' onclick="editSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a></div>';
+                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Update" id=' + full.institutionCode + ' onclick="editSystemUser(\'' + full.institutionCode + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a></div>';
                         },
-                        targets: 10,
+                        targets: 8,
                         defaultContent: "--"
                     },
                     {
-                        title: "Change password",
+                        title: "Delete",
                         sortable: false,
                         className: "dt-center",
                         mRender: function (data, type, full) {
-                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"  title="Change Password" id=' + full.userName + ' onclick="changePwdSystemUser(\'' + full.userName + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero"\ transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) "/><rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1"/></g></svg></span></a></div>';
+                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon" title="Delete" id=' + full.institutionCode + ' onclick="deleteSystemUser(\'' + full.institutionCode + '\')"><span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><path d="M6,8 L6,20.5 C6,21.3284271 6.67157288,22 7.5,22 L16.5,22 C17.3284271,22 18,21.3284271 18,20.5 L18,8 L6,8 Z" fill="#000000" fill-rule="nonzero"/><path d="M14,4.5 L14,4 C14,3.44771525 13.5522847,3 13,3 L11,3 C10.4477153,3 10,3.44771525 10,4 L10,4.5 L5.5,4.5 C5.22385763,4.5 5,4.72385763 5,5 L5,5.5 C5,5.77614237 5.22385763,6 5.5,6 L18.5,6 C18.7761424,6 19,5.77614237 19,5.5 L19,5 C19,4.72385763 18.7761424,4.5 18.5,4.5 L14,4.5 Z" fill="#000000" opacity="0.3"/></g></svg></span></a></div>';
                         },
-                        targets: 11,
+                        targets: 9,
                         defaultContent: "--"
                     }
                 ]
             });
         }
 
-        function editSystemUser(username) {
-            $.ajax({
-                url: "${pageContext.request.contextPath}/getSystemUser.json",
-                data: {
-                    userName: username
-                },
-                dataType: "json",
-                type: 'GET',
-                contentType: "application/json",
-                success: function (data) {
-                    $('#responseMsgUpdate').hide();
-
-                    $('#eUserName').val(data.userName);
-                    $('#eUserName').attr('readOnly', true);
-                    $('#eFullName').val(data.fullName);
-                    $('#eEmail').val(data.email);
-                    $('#eUserRoleCode').val(data.userRoleCode);
-                    $('#eStatus').val(data.status);
-                    $('#eMobileNumber').val(data.mobileNumber);
-
-                    $('#modalUpdateSystemUser').modal('toggle');
-                    $('#modalUpdateSystemUser').modal('show');
-                },
-                error: function (data) {
-                    window.location = "${pageContext.request.contextPath}/logout.htm";
-                }
-            });
-        }
-
-        function changePwdSystemUser(username) {
-            $('#responseMsgPwdChange').hide();
-            $('#cUserName').val(username);
-            $('#cUserName').attr('readOnly', true);
-
-            $('#modalPwdChangeSystemUser').modal('toggle');
-            $('#modalPwdChangeSystemUser').modal('show');
+        function openAddModal() {
+            $('#modalAddInstitution').modal('toggle');
+            $('#modalAddInstitution').modal('show');
         }
 
         function searchStart() {
@@ -267,19 +216,12 @@
         }
 
         function resetSearch() {
-            $('#userName').val("");
-            $('#fullName').val("");
-            $('#email').val("");
-            $('#userRoleCode').val("");
+            $('#institutionCode').val("");
+            $('#institutionName').val("");
+            $('#contactNumber').val("");
             $('#status').val("");
-            $('#mobileNumber').val("");
 
             oTable.fnDraw();
-        }
-
-        function openAddModal() {
-            $('#modalAddSystemUser').modal('toggle');
-            $('#modalAddSystemUser').modal('show');
         }
     </script>
 </head>
@@ -293,7 +235,7 @@
                 <!--begin::Page Heading-->
                 <div class="d-flex align-items-baseline flex-wrap mr-5">
                     <!--begin::Page Title-->
-                    <h5 class="text-dark font-weight-bold my-1 mr-5">System User Management</h5>
+                    <h5 class="text-dark font-weight-bold my-1 mr-5">Institution Management</h5>
                     <!--end::Page Title-->
                 </div>
                 <!--end::Page Heading-->
@@ -311,73 +253,54 @@
                     <!--begin::Card-->
                     <div class="card card-custom gutter-b">
                         <div class="card-header">
-                            <h3 class="card-title">Search System User</h3>
+                            <h3 class="card-title">Search Institution</h3>
                         </div>
                         <!--begin::Form-->
-                        <form:form class="form" id="systemuserform" name="systemuserform" action=""
-                                   theme="simple" method="post" modelAttribute="systemuser">
+                        <form:form class="form" id="institutionform" name="institutionform" action=""
+                                   theme="simple" method="post" modelAttribute="institution">
                             <%--                        <form class="form">--%>
                             <div class="card-body">
                                 <div class="form-group row">
+
                                     <div class="col-lg-3">
-                                        <label>Username:</label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-																	<span class="input-group-text">
-																		<i class="la la-bookmark-o"></i>
-																	</span>
-                                            </div>
-                                            <input id="userName" name="userName" type="text"
-                                                   onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
-                                                   maxlength="16" class="form-control"
-                                                   placeholder="Username">
-                                        </div>
-                                        <span class="form-text text-muted">Please enter username</span>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label>Full Name:</label>
-                                        <input id="fullName" name="fullName" type="text"
+                                        <label>Institution Code:</label>
+                                        <input id="institutionCode" name="institutionCode" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
-                                               maxlength="512" class="form-control "
-                                               placeholder="Full Name">
-                                        <span class="form-text text-muted">Please enter full name</span>
+                                               maxlength="16" class="form-control "
+                                               placeholder="Institution Code">
+                                        <span class="form-text text-muted">Please enter institution Code</span>
                                     </div>
+
                                     <div class="col-lg-3">
-                                        <label>Email:</label>
-                                        <input id="email" name="email" type="text" onkeyup="" maxlength="128"
-                                               class="form-control" placeholder="Email">
-                                        <span class="form-text text-muted">Please enter email</span>
+                                        <label>Institution Name:</label>
+                                        <input id="institutionName" name="institutionName" type="text"
+                                               onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
+                                               maxlength="256" class="form-control "
+                                               placeholder="Institution Name">
+                                        <span class="form-text text-muted">Please enter institution name</span>
                                     </div>
+
                                     <div class="col-lg-3">
-                                        <label>Mobile Number:</label>
-                                        <input id="mobileNumber" name="mobileNumber" type="text"
+                                        <label>Contact Number:</label>
+                                        <input id="contactNumber" name="contactNumber" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                                maxlength="10"
-                                               class="form-control form-control-sm" placeholder="Mobile Number">
+                                               class="form-control form-control-sm" placeholder="Contact Number">
 
-                                        <span class="form-text text-muted">Please enter mobile number</span>
+                                        <span class="form-text text-muted">Please enter contact number</span>
                                     </div>
-                                    <div class="col-lg-3">
-                                        <label>User Role:</label>
-                                        <select id="userRoleCode" name="userRoleCode"
-                                                class="form-control">
-                                            <option selected value="">Select User Role Code</option>
-                                            <c:forEach items="${systemuser.userRoleList}" var="userRole">
-                                                <option value="${userRole.userroleCode}">${userRole.description}</option>
-                                            </c:forEach>
-                                        </select>
-                                        <span class="form-text text-muted">Please select user role code</span>
-                                    </div>
+
                                     <div class="col-lg-3">
                                         <label>Status:</label>
                                         <select id="status" name="status" class="form-control">
                                             <option selected value="">Select Status</option>
-                                            <c:forEach items="${systemuser.statusList}" var="status">
+                                            <c:forEach items="${institution.statusList}" var="status">
                                                 <option value="${status.statusCode}">${status.description}</option>
                                             </c:forEach>
                                         </select>
                                         <span class="form-text text-muted">Please select status</span>
                                     </div>
+
                                 </div>
                             </div>
                             <div class="card-footer">
@@ -404,8 +327,8 @@
             <div class="card card-custom gutter-b">
                 <div class="card-header flex-wrap border-0 pt-6 pb-0">
                     <div class="card-title">
-                        <h3 class="card-label">System User Management
-                            <span class="d-block text-muted pt-2 font-size-sm">System User list</span></h3>
+                        <h3 class="card-label">Institution Management
+                            <span class="d-block text-muted pt-2 font-size-sm">Institution list</span></h3>
                     </div>
                     <div class="card-toolbar">
                         <!--begin::Button-->
@@ -423,7 +346,25 @@
 													</g>
 												</svg>
                                                 <!--end::Svg Icon-->
-											</span>New Record</a>
+											</span>New Institution</a>
+                        <!--end::Button-->
+
+                        <!--begin::Button-->
+                        <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
+											<span class="svg-icon svg-icon-md">
+												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+												<svg xmlns="http://www.w3.org/2000/svg"
+                                                     width="24px"
+                                                     height="24px" viewBox="0 0 24 24" version="1.1">
+													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24"></rect>
+														<circle fill="#000000" cx="9" cy="15" r="6"></circle>
+														<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
+                                                              fill="#000000" opacity="0.3"></path>
+													</g>
+												</svg>
+                                                <!--end::Svg Icon-->
+											</span>New Institution Bulk</a>
                         <!--end::Button-->
                     </div>
                 </div>
@@ -437,18 +378,16 @@
                         <table class="table table-separate table-head-custom table-checkable" id="table">
                             <thead>
                             <tr>
-                                <th>User Name</th>
-                                <th>Full Name</th>
-                                <th>User Role</th>
-                                <th>Email</th>
-                                <th>Mobile Number</th>
-                                <th>Last Logged Date</th>
+                                <th>Institution Code</th>
+                                <th>Institution Name</th>
+                                <th>Address</th>
+                                <th>Contact Number</th>
                                 <th>Status</th>
                                 <th>Created Time</th>
                                 <th>Last Updated Time</th>
                                 <th>Last Updated User</th>
                                 <th>Update</th>
-                                <th>Change Password</th>
+                                <th>Delete</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -463,8 +402,6 @@
     </div>
 </div>
 <!-- start include jsp files -->
-<jsp:include page="systemuser-mgt-add.jsp"/>
-<jsp:include page="systemuser-mgt-update.jsp"/>
-<jsp:include page="systemuser-mgt-pwdchange.jsp"/>
+<jsp:include page="institution-mgt-add.jsp"/>
 <!-- end include jsp files -->
 </html>

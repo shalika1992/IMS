@@ -45,9 +45,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
     SessionBean sessionBean;
 
     @Autowired
-    SystemUserService systemUserService;
-
-    @Autowired
     CommonRepository commonRepository;
 
     @Autowired
@@ -55,6 +52,9 @@ public class SystemUserController implements RequestBeanValidation<Object> {
 
     @Autowired
     Common common;
+
+    @Autowired
+    SystemUserService systemUserService;
 
     @Autowired
     SystemUserValidator systemUserValidator;
@@ -166,6 +166,30 @@ public class SystemUserController implements RequestBeanValidation<Object> {
                 String message = systemUserService.updateSystemUser(systemUserInputBean, locale);
                 if (message.isEmpty()) {
                     responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @PostMapping(value = "/changePwdSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean changePasswordSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] CHANGE PASSWORD SYSTEM USER");
+        ResponseBean responseBean;
+        try {
+            BindingResult bindingResult = validateRequestBean(systemUserInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
+            } else {
+                String message = systemUserService.changePasswordSystemUser(systemUserInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SYSTEMUSER_MGT_CHANGE_PASSWORD_SUCCESSFULLY, null, locale), null);
                 } else {
                     responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
                 }
