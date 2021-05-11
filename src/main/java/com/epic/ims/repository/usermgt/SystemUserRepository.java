@@ -3,7 +3,7 @@ package com.epic.ims.repository.usermgt;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
-import com.epic.ims.service.sysuser.common.CommonService;
+import com.epic.ims.service.common.CommonService;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.commons.logging.Log;
@@ -45,7 +45,7 @@ public class SystemUserRepository {
 
 
     private final String SQL_GET_COUNT = "select count(*) from web_systemuser wu where ";
-    private final String SQL_INSERT_SYSTEMUSER="insert into " +
+    private final String SQL_INSERT_SYSTEMUSER = "insert into " +
             "web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile," +
@@ -64,7 +64,7 @@ public class SystemUserRepository {
 
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             logger.error(exception);
             throw exception;
         }
@@ -73,16 +73,16 @@ public class SystemUserRepository {
     }
 
     public List<SystemUser> getSystemUserSearchList(SystemUserInputBean systemUserInputBean) {
-        List<SystemUser> systemUserList =  null;
+        List<SystemUser> systemUserList = null;
 
-        try{
+        try {
             StringBuilder dynamicClause = this.setDynamicClause(systemUserInputBean, new StringBuilder());
 
             //create sorting order
             String sortingStr = "";
-            String col="";
+            String col = "";
 
-            switch (systemUserInputBean.sortedColumns.get(0)){
+            switch (systemUserInputBean.sortedColumns.get(0)) {
                 case 0:
                     col = "wu.username";
                     break;
@@ -116,7 +116,7 @@ public class SystemUserRepository {
                 default:
                     col = "wu.createdtime";
             }
-            sortingStr = " order by "+ col + " " + systemUserInputBean.sortDirections.get(0);
+            sortingStr = " order by " + col + " " + systemUserInputBean.sortDirections.get(0);
 
             String sql = "select wu.username as username, ur.description as userroledescription, wu.fullname as fullname, wu.email as email, wu.mobile as mobile, " +
                     "s.description as statusdescription, wu.lastloggeddate as lastloggeddate," +
@@ -124,7 +124,7 @@ public class SystemUserRepository {
                     "from web_systemuser wu " +
                     "left join userrole ur on ur.userrolecode = wu.userrole " +
                     "left join status s on s.code = wu.status where " +
-                    dynamicClause.toString() + sortingStr+
+                    dynamicClause.toString() + sortingStr +
                     " limit " + systemUserInputBean.displayLength + " offset " + systemUserInputBean.displayStart;
 
 
@@ -193,7 +193,7 @@ public class SystemUserRepository {
                 return systemUser;
             });
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw exception;
         }
 
@@ -327,36 +327,36 @@ public class SystemUserRepository {
         return systemUser;
     }
 
-    private StringBuilder setDynamicClause(SystemUserInputBean systemUserInputBean, StringBuilder dynamicClause){
+    private StringBuilder setDynamicClause(SystemUserInputBean systemUserInputBean, StringBuilder dynamicClause) {
         dynamicClause.append("1=1 and wu.username != '").append(sessionBean.getUsername()).append("' ");
 
-            try{
-                if (systemUserInputBean.getUserName()!=null && !systemUserInputBean.getUserName().isEmpty()){
-                    dynamicClause.append("and lower(wu.username) like lower('%").append(systemUserInputBean.getUserName()).append("%') ");
-                }
-
-                if (systemUserInputBean.getFullName()!=null && !systemUserInputBean.getFullName().isEmpty()){
-                    dynamicClause.append("and lower(wu.fullname) like lower('%").append(systemUserInputBean.getFullName()).append("%') ");
-                }
-
-                if (systemUserInputBean.getEmail()!=null && !systemUserInputBean.getEmail().isEmpty()){
-                    dynamicClause.append("and lower(wu.email) like lower('%").append(systemUserInputBean.getEmail()).append("%') ");
-                }
-
-                if (systemUserInputBean.getMobileNumber()!=null && !systemUserInputBean.getMobileNumber().isEmpty()){
-                    dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
-                }
-
-                if (systemUserInputBean.getUserRoleCode()!=null && !systemUserInputBean.getUserRoleCode().isEmpty()){
-                    dynamicClause.append("and wu.userrole like '%").append(systemUserInputBean.getUserRoleCode()).append("%' ");
-                }
-
-                if (systemUserInputBean.getStatus()!=null && !systemUserInputBean.getStatus().isEmpty()){
-                    dynamicClause.append("and wu.status like '%").append(systemUserInputBean.getStatus()).append("%' ");
-                }
-            }catch (Exception exception){
-                throw exception;
+        try {
+            if (systemUserInputBean.getUserName() != null && !systemUserInputBean.getUserName().isEmpty()) {
+                dynamicClause.append("and lower(wu.username) like lower('%").append(systemUserInputBean.getUserName()).append("%') ");
             }
+
+            if (systemUserInputBean.getFullName() != null && !systemUserInputBean.getFullName().isEmpty()) {
+                dynamicClause.append("and lower(wu.fullname) like lower('%").append(systemUserInputBean.getFullName()).append("%') ");
+            }
+
+            if (systemUserInputBean.getEmail() != null && !systemUserInputBean.getEmail().isEmpty()) {
+                dynamicClause.append("and lower(wu.email) like lower('%").append(systemUserInputBean.getEmail()).append("%') ");
+            }
+
+            if (systemUserInputBean.getMobileNumber() != null && !systemUserInputBean.getMobileNumber().isEmpty()) {
+                dynamicClause.append("and lower(wu.mobile) like lower('%").append(systemUserInputBean.getMobileNumber()).append("%') ");
+            }
+
+            if (systemUserInputBean.getUserRoleCode() != null && !systemUserInputBean.getUserRoleCode().isEmpty()) {
+                dynamicClause.append("and wu.userrole like '%").append(systemUserInputBean.getUserRoleCode()).append("%' ");
+            }
+
+            if (systemUserInputBean.getStatus() != null && !systemUserInputBean.getStatus().isEmpty()) {
+                dynamicClause.append("and wu.status like '%").append(systemUserInputBean.getStatus()).append("%' ");
+            }
+        } catch (Exception exception) {
+            throw exception;
+        }
 
         return dynamicClause;
     }
@@ -366,13 +366,13 @@ public class SystemUserRepository {
         String message = "";
         try {
             int value = jdbcTemplate.update(SQL_UPDATE_SYSTEMUSER,
-                            systemUserInputBean.getUserRoleCode(),
-                            systemUserInputBean.getFullName(),
-                            systemUserInputBean.getEmail(),
-                            systemUserInputBean.getMobileNumber(),
-                            systemUserInputBean.getStatus(),
-                            systemUserInputBean.getUserName()
-                    );
+                    systemUserInputBean.getUserRoleCode(),
+                    systemUserInputBean.getFullName(),
+                    systemUserInputBean.getEmail(),
+                    systemUserInputBean.getMobileNumber(),
+                    systemUserInputBean.getStatus(),
+                    systemUserInputBean.getUserName()
+            );
 
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
@@ -390,17 +390,17 @@ public class SystemUserRepository {
         String GET_COUNT_BY_USERNAME_PWD = "select count(username) from web_systemuser where username=? and password=?";
         long count = 0;
 
-        try{
+        try {
             String username = systemUserInputBean.getUserName();
             String password = systemUserInputBean.getPassword();
 
             count = jdbcTemplate.queryForObject(GET_COUNT_BY_USERNAME_PWD, new Object[]{username, password}, Long.class);
 
-            if (count!=0){
+            if (count != 0) {
                 message = MessageVarList.PASSWORD_SAME_AS_PREVIOUS;
             }
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
 
@@ -411,13 +411,13 @@ public class SystemUserRepository {
     public String changePassword(SystemUserInputBean systemUserInputBean) {
         String message = "";
 
-        try{
+        try {
             int value = jdbcTemplate.update(SQL_CHANGE_PASSWORD, systemUserInputBean.getPassword(), systemUserInputBean.getUserName());
 
-            if(value!=1){
+            if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw exception;
         }
 
