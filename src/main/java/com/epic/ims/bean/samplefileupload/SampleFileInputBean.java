@@ -12,11 +12,12 @@ import java.util.Date;
 @EqualsAndHashCode
 @ToString
 public class SampleFileInputBean extends DataTablesRequest {
-    private String receivedDate;
     private String referenceNo;
+    private String receivedDate;
     private String institutionCode;
     private String name;
     private String age;
+    private String gender;
     private String symptomatic;
     private String contactType;
     private String nic;

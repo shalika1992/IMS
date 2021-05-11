@@ -123,8 +123,7 @@ public class SystemUserRepository {
                     "wu.createdtime as createdtime, wu.lastupdateduser as lastupdateduser, wu.lastupdatedtime as lastupdatedtime " +
                     "from web_systemuser wu " +
                     "left join userrole ur on ur.userrolecode = wu.userrole " +
-                    "left join status s on s.code = wu.status where " +
-                    dynamicClause.toString() + sortingStr +
+                    "left join status s on s.code = wu.status where " + dynamicClause.toString() + sortingStr +
                     " limit " + systemUserInputBean.displayLength + " offset " + systemUserInputBean.displayStart;
 
 

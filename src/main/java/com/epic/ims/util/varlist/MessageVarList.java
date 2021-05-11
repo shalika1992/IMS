@@ -89,5 +89,6 @@ public class MessageVarList {
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
     public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
+    public static final String SAMPLE_FILE_RECORD_NORECORD_FOUND = "samplefilerecord.norecord.found";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 }
