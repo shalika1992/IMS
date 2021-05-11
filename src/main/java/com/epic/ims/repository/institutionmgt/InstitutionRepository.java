@@ -1,6 +1,6 @@
 package com.epic.ims.repository.institutionmgt;
 
-import com.epic.ims.bean.institutionmgt.InstitutinInputBean;
+import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.institutionmgt.Institution;
 import com.epic.ims.service.sysuser.common.CommonService;
@@ -49,14 +49,52 @@ public class InstitutionRepository {
             "institution(institutioncode, name, address, contactno, status, createduser, createdtime," +
             " lastupdateduser, lastupdatedtime) " +
             "VALUES (?,?,?,?,?,?,?,?,?)";
+    private final String SQL_UPDATE_INSTITUTION = "update institution set name = ?, address = ?, contactno = ?, status = ? where institutioncode = ?";
+    private final String SQL_DELETE_INSTITUTION = "delete from institution where institutioncode = ?";
+
+    @Transactional
+    public String deleteInstitution(String institutionCode) {
+        String message = "";
+        try {
+            int value = jdbcTemplate.update(SQL_DELETE_INSTITUTION,institutionCode);
+
+            if (value != 1) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
+
+    @Transactional
+    public String updateInstitution(InstitutionInputBean institutionInputBean) {
+        String message = "";
+        try {
+            int value = jdbcTemplate.update(SQL_UPDATE_INSTITUTION,
+                    institutionInputBean.getInstitutionName(),
+                    institutionInputBean.getAddress(),
+                    institutionInputBean.getContactNumber(),
+                    institutionInputBean.getStatus(),
+                    institutionInputBean.getInstitutionCode()
+            );
+
+            if (value != 1) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
 
     @Transactional(readOnly = true)
-    public long getCount(InstitutinInputBean institutinInputBean) throws Exception {
+    public long getCount(InstitutionInputBean institutionInputBean) throws Exception {
         long count = 0;
 
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
-            this.setDynamicClause(institutinInputBean, dynamicClause);
+            this.setDynamicClause(institutionInputBean, dynamicClause);
 
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
 
@@ -69,22 +107,22 @@ public class InstitutionRepository {
     }
 
     @Transactional
-    public String insertInstitution(InstitutinInputBean institutinInputBean) throws Exception {
+    public String insertInstitution(InstitutionInputBean institutionInputBean) throws Exception {
         String message = "";
         try {
             int value = 0;
 
             //insert query
             value = jdbcTemplate.update(SQL_INSERT_INSTITUTION,
-                    institutinInputBean.getInstitutionCode(),
-                    institutinInputBean.getInstitutionName(),
-                    institutinInputBean.getAddress(),
-                    institutinInputBean.getContactNumber(),
-                    institutinInputBean.getStatus(),
+                    institutionInputBean.getInstitutionCode(),
+                    institutionInputBean.getInstitutionName(),
+                    institutionInputBean.getAddress(),
+                    institutionInputBean.getContactNumber(),
+                    institutionInputBean.getStatus(),
                     "error",
-                    institutinInputBean.getCreatedTime(),
-                    institutinInputBean.getLastUpdatedUser(),
-                    institutinInputBean.getLastUpdatedTime()
+                    institutionInputBean.getCreatedTime(),
+                    institutionInputBean.getLastUpdatedUser(),
+                    institutionInputBean.getLastUpdatedTime()
             );
 
             if (value != 1) {
@@ -165,17 +203,17 @@ public class InstitutionRepository {
     }
 
     @Transactional(readOnly = true)
-    public List<Institution> getInstitutionSearchList(InstitutinInputBean institutinInputBean) {
+    public List<Institution> getInstitutionSearchList(InstitutionInputBean institutionInputBean) {
         List<Institution> institutionList =  null;
 
         try{
-            StringBuilder dynamicClause = this.setDynamicClause(institutinInputBean, new StringBuilder());
+            StringBuilder dynamicClause = this.setDynamicClause(institutionInputBean, new StringBuilder());
 
             //create sorting order
             String sortingStr = "";
             String col="";
 
-            switch (institutinInputBean.sortedColumns.get(0)){
+            switch (institutionInputBean.sortedColumns.get(0)){
                 case 0:
                     col = "i.institutioncode";
                     break;
@@ -200,7 +238,7 @@ public class InstitutionRepository {
                 default:
                     col = "i.createdtime";
             }
-            sortingStr = " order by "+ col + " " + institutinInputBean.sortDirections.get(0);
+            sortingStr = " order by "+ col + " " + institutionInputBean.sortDirections.get(0);
 
             String sql = "select i.institutioncode as institutioncode, i.address as address, i.name as institutionname, i.contactno as contactnumber, " +
                     "s.description as statusdescription, " +
@@ -208,7 +246,7 @@ public class InstitutionRepository {
                     "from institution i " +
                     "left join status s on s.code = i.status where " +
                     dynamicClause.toString() + sortingStr+
-                    " limit " + institutinInputBean.displayLength + " offset " + institutinInputBean.displayStart;
+                    " limit " + institutionInputBean.displayLength + " offset " + institutionInputBean.displayStart;
 
 
             institutionList = jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -271,24 +309,24 @@ public class InstitutionRepository {
         return institutionList;
     }
 
-    private StringBuilder setDynamicClause(InstitutinInputBean institutinInputBean, StringBuilder dynamicClause){
+    private StringBuilder setDynamicClause(InstitutionInputBean institutionInputBean, StringBuilder dynamicClause){
         dynamicClause.append("1=1 ");
 
         try{
-            if (institutinInputBean.getInstitutionName()!=null && !institutinInputBean.getInstitutionName().isEmpty()){
-                dynamicClause.append("and lower(i.institutionName) like lower('%").append(institutinInputBean.getInstitutionName()).append("%') ");
+            if (institutionInputBean.getInstitutionName()!=null && !institutionInputBean.getInstitutionName().isEmpty()){
+                dynamicClause.append("and lower(i.institutionName) like lower('%").append(institutionInputBean.getInstitutionName()).append("%') ");
             }
 
-            if (institutinInputBean.getInstitutionCode()!=null && !institutinInputBean.getInstitutionCode().isEmpty()){
-                dynamicClause.append("and lower(i.institutionCode) like lower('%").append(institutinInputBean.getInstitutionCode()).append("%') ");
+            if (institutionInputBean.getInstitutionCode()!=null && !institutionInputBean.getInstitutionCode().isEmpty()){
+                dynamicClause.append("and lower(i.institutionCode) like lower('%").append(institutionInputBean.getInstitutionCode()).append("%') ");
             }
 
-            if (institutinInputBean.getContactNumber()!=null && !institutinInputBean.getContactNumber().isEmpty()){
-                dynamicClause.append("and lower(i.mobile) like lower('%").append(institutinInputBean.getContactNumber()).append("%') ");
+            if (institutionInputBean.getContactNumber()!=null && !institutionInputBean.getContactNumber().isEmpty()){
+                dynamicClause.append("and lower(i.mobile) like lower('%").append(institutionInputBean.getContactNumber()).append("%') ");
             }
 
-            if (institutinInputBean.getStatus()!=null && !institutinInputBean.getStatus().isEmpty()){
-                dynamicClause.append("and i.status like '%").append(institutinInputBean.getStatus()).append("%' ");
+            if (institutionInputBean.getStatus()!=null && !institutionInputBean.getStatus().isEmpty()){
+                dynamicClause.append("and i.status like '%").append(institutionInputBean.getStatus()).append("%' ");
             }
         }catch (Exception exception){
             throw exception;

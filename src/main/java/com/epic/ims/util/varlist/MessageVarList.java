@@ -56,16 +56,16 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_EMPTY_ADDRESS = "institution.empty.address";
     public static final String INSTITUTION_MGT_EMPTY_CONTACT_NUMBER = "institution.empty.contactNumber";
     public static final String INSTITUTION_MGT_EMPTY_STATUS = "institution.empty.status";
+    public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
+    public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
+    public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
 
     public static final String INSTITUTION_MGT_EMPTY_MOBILENUMBER = "institution.empty.mobilenumber";
     public static final String INSTITUTION_MGT_EMPTY_PASSWORD = "institution.empty.password";
     public static final String INSTITUTION_MGT_EMPTY_CONFIRMPASSWORD = "institution.empty.confirmpassword";
     public static final String INSTITUTION_MGT_PASSWORDS_MISMATCH = "institution.password.mismatch";
-    public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
-    public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
     public static final String INSTITUTION_MGT_CONFIRM_SUCCESSFULLY = "institution.confirm.success";
     public static final String INSTITUTION_MGT_REJECT_SUCCESSFULLY = "institution.reject.success";
-    public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
     //-------------------------- institution user mgt----------------------------------------------------------------------//
 
     //-------------------------- start user password change ----------------------------------------------------------//
