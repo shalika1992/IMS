@@ -3,8 +3,9 @@ package com.epic.ims.util.common;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.util.varlist.CommonVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.aspectj.lang.JoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +25,7 @@ import java.util.zip.ZipOutputStream;
 @Component
 @Scope("prototype")
 public class Common {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(Common.class);
 
     @Autowired
     CommonVarList commonVarList;
@@ -197,5 +199,49 @@ public class Common {
             logger.error("Exception", e);
         }
         return strDate;
+    }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-10 12:45:47 AM
+     * @Version V1.00
+     * @MethodName writeLog
+     * @MethodParams [joinPoint, object]
+     * @MethodDescription - This method pass object to write log
+     */
+    public void writeLog(JoinPoint joinPoint, Object object) {
+        try {
+            if (object != null) {
+                this.logObjectContent(joinPoint, object);
+            }
+        } catch (IllegalAccessException iae) {
+            logger.error("IllegalAccessException : ", iae);
+        } catch (Exception e) {
+            logger.error("Exception : ", e);
+        }
+    }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-10 12:46:07 AM
+     * @Version V1.00
+     * @MethodName logObjectContent
+     * @MethodParams [joinPoint, o]
+     * @MethodDescription - This method write log in interceptor
+     */
+    public void logObjectContent(JoinPoint joinPoint, Object o) throws IllegalAccessException {
+        String result = "";
+        String className = joinPoint.getTarget().getClass().getName();
+        String methodName = joinPoint.getSignature().getName();
+        logger.info("------------------------------------------------------------");
+        logger.info("className and methodName : " + className + "  " + methodName);
+        for (Field field : o.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            String name = field.getName();
+            Object value = field.get(o);
+            result += "  " + name + " : " + value;
+        }
+        logger.info("object attributes :" + result);
+        logger.info("------------------------------------------------------------");
     }
 }

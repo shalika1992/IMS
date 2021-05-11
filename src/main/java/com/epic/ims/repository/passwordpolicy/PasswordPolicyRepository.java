@@ -1,9 +1,12 @@
 package com.epic.ims.repository.passwordpolicy;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.passwordpolicy.PasswordPolicy;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Scope("prototype")
 public class PasswordPolicyRepository {
+    private static Logger logger = LogManager.getLogger(PasswordPolicyRepository.class);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -29,6 +33,7 @@ public class PasswordPolicyRepository {
 
     private final String SQL_FIND_WEB_PASSWORDPOLICY = "select passwordpolicyid , minimumlength , maximumlength , minimumspecialcharacters , minimumuppercasecharacters , minimumnumericalcharacters , minimumlowercasecharacters ,createduser,createdtime, lastupdateduser , lastupdatedtime from web_passwordpolicy where passwordpolicyid=?";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public PasswordPolicy getWebPasswordPolicy(int passwordPolicyCode) {
         PasswordPolicy passwordPolicy = null;

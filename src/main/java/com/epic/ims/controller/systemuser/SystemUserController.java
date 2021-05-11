@@ -1,5 +1,7 @@
 package com.epic.ims.controller.systemuser;
 
+import com.epic.ims.annotation.accesscontrol.AccessControl;
+import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
@@ -10,13 +12,11 @@ import com.epic.ims.service.sysuser.SystemUserService;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.common.ResponseBean;
-import com.epic.ims.util.varlist.CommonVarList;
-import com.epic.ims.util.varlist.MessageVarList;
-import com.epic.ims.util.varlist.StatusVarList;
+import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.sysuser.SystemUserValidator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -36,7 +36,7 @@ import java.util.Locale;
 @Controller
 @Scope("request")
 public class SystemUserController implements RequestBeanValidation<Object> {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(SystemUserController.class);
 
     @Autowired
     MessageSource messageSource;
@@ -59,6 +59,8 @@ public class SystemUserController implements RequestBeanValidation<Object> {
     @Autowired
     SystemUserValidator systemUserValidator;
 
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @GetMapping(value = "/viewSystemUser")
     public ModelAndView viewSysUserPage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER PAGE VIEW");
@@ -75,6 +77,8 @@ public class SystemUserController implements RequestBeanValidation<Object> {
 
     }
 
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @PostMapping(value = "/addSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ResponseBean addSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
@@ -99,37 +103,39 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         return responseBean;
     }
 
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @PostMapping(value = "/listSystemUser", headers = {"content-type=application/json"})
     public @ResponseBody
     DataTablesResponse<SystemUser> searchSystemUser(@RequestBody SystemUserInputBean systemUserInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM USER SEARCH");
         DataTablesResponse<SystemUser> responseBean = new DataTablesResponse<>();
-
         try {
             long count = systemUserService.getCount(systemUserInputBean);
-
             if (count > 0) {
                 List<SystemUser> systemUserList = systemUserService.getSystemUserSearchResultList(systemUserInputBean);
                 //set data set to response bean
                 responseBean.data.addAll(systemUserList);
+                responseBean.echo = systemUserInputBean.echo;
+                responseBean.columns = systemUserInputBean.columns;
+                responseBean.totalRecords = count;
+                responseBean.totalDisplayRecords = count;
             } else {
                 //set data set to response bean
                 responseBean.data.addAll(new ArrayList<>());
+                responseBean.echo = systemUserInputBean.echo;
+                responseBean.columns = systemUserInputBean.columns;
+                responseBean.totalRecords = count;
+                responseBean.totalDisplayRecords = count;
             }
-            responseBean.echo = systemUserInputBean.echo;
-            responseBean.columns = systemUserInputBean.columns;
-            responseBean.totalRecords = count;
-            responseBean.totalDisplayRecords = count;
-
-
         } catch (Exception exception) {
             logger.error("Exception " + exception);
         }
-
         return responseBean;
-
     }
 
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @GetMapping(value = "/getSystemUser")
     public @ResponseBody
     SystemUser getSystemUser(@RequestParam String userName) {
@@ -145,6 +151,8 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         return systemUser;
     }
 
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @PostMapping(value = "/updateSystemUser", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ResponseBean updateSystemUser(@ModelAttribute("systemuser") SystemUserInputBean systemUserInputBean, Locale locale) {
@@ -180,7 +188,6 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         systemUserInputBean.setStatusList(statusList);
         systemUserInputBean.setStatusActList(statusActList);
         systemUserInputBean.setUserRoleList(userRoleList);
-
         //add values to model map
         map.addAttribute("systemuser", systemUserInputBean);
     }
@@ -192,6 +199,4 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         dataBinder.validate();
         return dataBinder.getBindingResult();
     }
-
-
 }

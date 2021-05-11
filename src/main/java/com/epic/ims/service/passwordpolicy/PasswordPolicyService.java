@@ -1,10 +1,13 @@
 package com.epic.ims.service.passwordpolicy;
 
+import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.passwordpolicy.PasswordPolicy;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.passwordpolicy.PasswordPolicyRepository;
 import com.epic.ims.util.common.Common;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope("prototype")
 public class PasswordPolicyService {
+    private static Logger logger = LogManager.getLogger(PasswordPolicyService.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -29,6 +33,7 @@ public class PasswordPolicyService {
     @Autowired
     PasswordPolicyRepository passwordPolicyRepository;
 
+    @LogService
     public PasswordPolicy getWebPasswordPolicy(int passwordPolicyCode) {
         PasswordPolicy passwordPolicy = null;
         try {

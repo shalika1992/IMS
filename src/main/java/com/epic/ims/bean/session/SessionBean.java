@@ -22,6 +22,20 @@ public class SessionBean {
     private Map<String, List<Page>> pageMap = new HashMap<String, List<Page>>();
     private PasswordPolicy passwordPolicy;
 
+    public SessionBean() {
+    }
+
+    public SessionBean(String sessionid, String username, User user, boolean changePwdMode, int daysToExpire, List<Section> sectionList, Map<String, List<Page>> pageMap, PasswordPolicy passwordPolicy) {
+        this.sessionid = sessionid;
+        this.username = username;
+        this.user = user;
+        this.changePwdMode = changePwdMode;
+        this.daysToExpire = daysToExpire;
+        this.sectionList = sectionList;
+        this.pageMap = pageMap;
+        this.passwordPolicy = passwordPolicy;
+    }
+
     public String getSessionid() {
         return sessionid;
     }

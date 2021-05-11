@@ -1,5 +1,6 @@
 package com.epic.ims.repository.login;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.user.usermgt.Page;
@@ -7,8 +8,8 @@ import com.epic.ims.mapping.user.usermgt.Section;
 import com.epic.ims.mapping.user.usermgt.User;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.varlist.CommonVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,7 +22,7 @@ import java.util.*;
 @Repository
 @Scope("prototype")
 public class LoginRepository {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(LoginRepository.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -42,6 +43,7 @@ public class LoginRepository {
     private final String SQL_GET_USER_SECTIONLIST = "select distinct distinct sp.section as section,s.description as description,  sp.userrole as userrole, s.sortkey as sortkey, s.status as status,s.createdtime as createdtime ,s.lastupdateduser as lastupdateduser, s.lastupdatedtime as lastupdatedtime  from web_sectionpage sp inner join web_section s on sp.section = s.sectioncode where s.status=? and sp.userrole=? order by s.sortkey";
     private final String SQL_GET_USER_PAGELIST = "select p.description as description,p.pagecode as pagecode ,p.url as url,p.sortkey as sortkey,p.status as status ,sp.section as section ,sp.userrole as userrole,p.lastupdateduser as lastupdateduser , p.createdtime as createtime ,p.lastupdatedtime as lastupdatedtime from web_sectionpage sp inner join web_page p on sp.page = p.pagecode where p.status = ? and sp.userrole = ? order by p.sortkey";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public User getUser(LoginBean loginBean) {
         User user = null;
@@ -153,6 +155,7 @@ public class LoginRepository {
         return user;
     }
 
+    @LogRepository
     @Transactional
     public int updateUser(LoginBean loginBean, boolean flag) throws Exception {
         int update;
@@ -169,6 +172,7 @@ public class LoginRepository {
         return update;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<Section> getUserSectionListByUserRoleCode(String userRole) {
         List<Section> sectionList = new ArrayList<>();
@@ -204,6 +208,7 @@ public class LoginRepository {
         return sectionList;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public Map<String, List<Page>> getUserPageListByUserRoleCode(String userRole) {
         Map<String, List<Page>> pageListMap = new HashMap<String, List<Page>>();
@@ -233,6 +238,16 @@ public class LoginRepository {
                     page.setCreatedTime(createdTime);
                     page.setLastUpdatedUser(lastUpdatedUser);
                     page.setLastUpdatedTime(lastUpdatedTime);
+                    //add the values map
+                    if (pageListMap.containsKey(page.getSectionCode())) {
+                        List<Page> pageList = pageListMap.get(page.getSectionCode());
+                        pageList.add(page);
+                        pageListMap.put(page.getSectionCode(), pageList);
+                    } else {
+                        List<Page> pageList = new ArrayList<Page>();
+                        pageList.add(page);
+                        pageListMap.put(page.getSectionCode(), pageList);
+                    }
                 }
             }
         } catch (EmptyResultDataAccessException ere) {

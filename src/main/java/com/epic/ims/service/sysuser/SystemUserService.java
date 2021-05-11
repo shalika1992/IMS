@@ -1,5 +1,6 @@
 package com.epic.ims.service.sysuser;
 
+import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
@@ -8,15 +9,15 @@ import com.epic.ims.repository.usermgt.SystemUserRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.security.SHA256Algorithm;
 import com.epic.ims.util.varlist.MessageVarList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +25,7 @@ import java.util.Locale;
 @Service
 @Scope("prototype")
 public class SystemUserService {
+    private static Logger logger = LogManager.getLogger(SystemUserService.class);
 
     @Autowired
     SystemUserRepository systemUserRepository;
@@ -43,38 +45,35 @@ public class SystemUserService {
     @Autowired
     Common common;
 
+    @LogService
     public long getCount(SystemUserInputBean systemUserInputBean) throws Exception {
         long count = 0;
-
-        try{
+        try {
             count = systemUserRepository.getCount(systemUserInputBean);
         } catch (Exception ere) {
             throw ere;
         }
-
         return count;
     }
 
+    @LogService
     public List<SystemUser> getSystemUserSearchResultList(SystemUserInputBean systemUserInputBean) {
         List<SystemUser> systemUserList;
-
-        try{
+        try {
             systemUserList = systemUserRepository.getSystemUserSearchList(systemUserInputBean);
-        }catch (Exception exception){
-            throw  exception;
+        } catch (Exception exception) {
+            throw exception;
         }
 
         return systemUserList;
     }
 
-    public String insertSystemUser(SystemUserInputBean systemUserInputBean, Locale locale){
+    @LogService
+    public String insertSystemUser(SystemUserInputBean systemUserInputBean, Locale locale) {
         String message = "";
-
         try {
             SystemUser existingUser = systemUserRepository.getSystemUser(systemUserInputBean.getUserName().trim());
-
-            if (existingUser == null){
-
+            if (existingUser == null) {
                 //set the other values to input bean
                 Date currentDate = commonRepository.getCurrentDate();
                 String lastUpdatedUser = sessionBean.getUsername();
@@ -86,18 +85,19 @@ public class SystemUserService {
                 systemUserInputBean.setPassword(sha256Algorithm.makeHash(password));
 
                 message = systemUserRepository.insertSystemUser(systemUserInputBean);
-            }else{
+            } else {
                 message = MessageVarList.SYSTEMUSER_MGT_ALREADY_EXISTS;
             }
-        }catch (DuplicateKeyException ex){
+        } catch (DuplicateKeyException ex) {
             message = MessageVarList.SYSTEMUSER_MGT_ALREADY_EXISTS;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
 
         return message;
     }
 
+    @LogService
     public String updateSystemUser(SystemUserInputBean systemUserInputBean, Locale locale) {
         String message = "";
         SystemUser existingSystemUser = null;
@@ -284,6 +284,7 @@ public class SystemUserService {
         return systemUserStringBuilder.toString();
     }
 
+    @LogService
     public SystemUser getSystemUser(String userName) throws Exception {
         SystemUser systemUser;
         try {

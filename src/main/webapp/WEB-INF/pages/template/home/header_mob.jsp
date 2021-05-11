@@ -8,7 +8,7 @@
 <div id="kt_header_mobile" class="header-mobile align-items-center header-mobile-fixed">
     <!--begin::Logo-->
     <a href="index.html">
-        <img alt="Logo" src="${pageContext.request.contextPath}/resources/assets/media/logos/combanklogo4.png" />
+        <!--<img alt="Logo" src="${pageContext.request.contextPath}/resources/assets/media/logos/combanklogo4.png" />-->
     </a>
     <!--end::Logo-->
     <!--begin::Toolbar-->

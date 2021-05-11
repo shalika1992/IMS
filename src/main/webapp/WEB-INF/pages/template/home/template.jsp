@@ -53,6 +53,7 @@
     <c:set var="sectionList" value="${sessionBean.sectionList}"/>
     <c:set var="pageMap" value="${sessionBean.pageMap}"/>
     <c:set var="daysToExpire" value="${sessionBean.daysToExpire}"/>
+    <c:set var="user" value="${sessionBean.user}"/>
 
     <%--datatable css--%>
     <link href="${pageContext.request.contextPath}/resources/assets/plugins/custom/datatables/datatables.bundle.css"
@@ -60,7 +61,6 @@
 
     <%--Used by all pages (dont put end of the page, not working)--%>
     <script src="${pageContext.request.contextPath}/resources/assets/plugins/global/plugins.bundle.js"></script>
-
 
 </head>
 
@@ -114,8 +114,8 @@
         <!--begin::Header-->
         <div class="d-flex align-items-center mt-5">
             <div class="d-flex flex-column">
-                <a href="#" class="font-weight-bold font-size-h5 text-dark-75 text-hover-primary">James Jones</a>
-                <div class="text-muted mt-1">Application Developer</div>
+                <a href="#" class="font-weight-bold font-size-h5 text-dark-75 text-hover-primary">${user.fullName}</a>
+                <div class="text-muted mt-1">${user.userRoleDescription}</div>
                 <div class="navi mt-2">
                     <a href="#" class="navi-item">
                             <span class="navi-link p-0 pb-2">
@@ -136,7 +136,7 @@
                                         <!--end::Svg Icon-->
 									</span>
                             </span>
-                            <span class="navi-text text-muted text-hover-primary">jm@softplus.com</span>
+                            <span class="navi-text text-muted text-hover-primary">${user.email}</span>
                             </span>
                     </a>
                     <a href="${pageContext.request.contextPath}/logout.htm?error=0"
@@ -752,7 +752,8 @@
     var HOST_URL = "https://preview.keenthemes.com/metronic/theme/html/tools/preview";
 </script>
 <!--begin::Global Config(global config for global JS scripts)-->
-<script>var KTAppSettings = {"breakpoints": {"sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400},
+<script>var KTAppSettings = {
+    "breakpoints": {"sm": 576, "md": 768, "lg": 992, "xl": 1200, "xxl": 1400},
     "colors": {
         "theme": {
             "base": {

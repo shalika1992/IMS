@@ -1,5 +1,6 @@
 package com.epic.ims.service.login;
 
+import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.user.usermgt.Page;
@@ -11,13 +12,13 @@ import com.epic.ims.util.common.Common;
 import com.epic.ims.util.security.SHA256Algorithm;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,7 +30,7 @@ import java.util.Map;
 @Service
 @Scope("prototype")
 public class LoginService {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(LoginService.class);
 
     @Autowired
     CommonVarList commonVarList;
@@ -52,6 +53,7 @@ public class LoginService {
     @Autowired
     ServletContext servletContext;
 
+    @LogService
     public String getUser(LoginBean loginBean, HttpServletRequest httpServletRequest) throws Exception {
         String message = "";
         try {
@@ -96,7 +98,20 @@ public class LoginService {
                     loginBean.setStatusCode(commonVarList.STATUS_DEACTIVE);
                     loginRepository.updateUser(loginBean, false);
                 } else {
-                    //update the user
+                    if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_NEW) || user.getStatus().equalsIgnoreCase(commonVarList.STATUS_RESET) || user.getStatus().equalsIgnoreCase(commonVarList.STATUS_CHANGED) || user.getStatus().equalsIgnoreCase(commonVarList.STATUS_EXPIRED)) {
+                        sessionBean.setChangePwdMode(true);
+                    }
+
+                    if (user.getUserRole().equals(commonVarList.USERROLE_CODE_MEDICALOFFICER)) {
+                        user.setUserRoleDescription(commonVarList.USERROLE_DESCRIPTION_MEDICALOFFICER);
+
+                    } else if (user.getUserRole().equals(commonVarList.USERROLE_CODE_COUNTEROFFICER)) {
+                        user.setUserRoleDescription(commonVarList.USERROLE_DESCRIPTION_COUNTEROFFICER);
+                    }
+                    if (user.getUserRole().equals(commonVarList.USERROLE_CODE_ADMIN)) {
+                        user.setUserRoleDescription(commonVarList.USERROLE_DESCRIPTION_ADMIN);
+                    }
+
                     loginBean.setAttempts(new Byte("0"));
                     loginBean.setStatusCode(user.getStatus());
                     loginRepository.updateUser(loginBean, true);
@@ -105,7 +120,7 @@ public class LoginService {
                     sessionBean.setSessionid(httpSession.getId());
                     sessionBean.setUsername(loginBean.getUsername());
                     sessionBean.setUser(user);
-                    sessionBean.setChangePwdMode(true);
+
                     //get the session map
                     Map<String, String> sessionMap = (Map<String, String>) servletContext.getAttribute("sessionMap");
                     if (sessionMap == null) {
@@ -124,6 +139,7 @@ public class LoginService {
         return message;
     }
 
+    @LogService
     public List<Section> getUserSectionListByUserRoleCode(String userRoleCode) {
         List<Section> userRoleSectionList = null;
         try {
@@ -134,6 +150,7 @@ public class LoginService {
         return userRoleSectionList;
     }
 
+    @LogService
     public Map<String, List<Page>> getUserPageListByByUserRoleCode(String userRoleCode) {
         Map<String, List<Page>> userRolePageList = null;
         try {
@@ -144,6 +161,7 @@ public class LoginService {
         return userRolePageList;
     }
 
+    @LogService
     public int getPwdExpNotification() throws Exception {
         int daysToExpire = 0;
         try {
@@ -172,6 +190,7 @@ public class LoginService {
         return daysToExpire;
     }
 
+    @LogService
     private boolean checkUserRoleDeactive(String userrole) throws Exception {
         boolean isUserRoleDeactive = false;
         try {
@@ -185,6 +204,7 @@ public class LoginService {
         return isUserRoleDeactive;
     }
 
+    @LogService
     private boolean checkUserIncative(User user) throws Exception {
         boolean isUserInactive = false;
         try {

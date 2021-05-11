@@ -11,6 +11,7 @@ public class User {
     private String userName;
     private String password;
     private String userRole;
+    private String userRoleDescription;
     private Date expiryDate;
     private String fullName;
     private String email;
@@ -27,10 +28,11 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String password, String userRole, Date expiryDate, String fullName, String email, String mobile, Byte noOfInvlidAttempt, Date loggedDate, String initialLoginStatus, String status, Date createdTime, Date createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public User(String userName, String password, String userRole, String userRoleDescription, Date expiryDate, String fullName, String email, String mobile, Byte noOfInvlidAttempt, Date loggedDate, String initialLoginStatus, String status, Date createdTime, Date createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
         this.userName = userName;
         this.password = password;
         this.userRole = userRole;
+        this.userRoleDescription = userRoleDescription;
         this.expiryDate = expiryDate;
         this.fullName = fullName;
         this.email = email;
@@ -67,6 +69,14 @@ public class User {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public String getUserRoleDescription() {
+        return userRoleDescription;
+    }
+
+    public void setUserRoleDescription(String userRoleDescription) {
+        this.userRoleDescription = userRoleDescription;
     }
 
     public Date getExpiryDate() {

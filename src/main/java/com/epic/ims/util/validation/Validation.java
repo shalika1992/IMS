@@ -1,8 +1,8 @@
 package com.epic.ims.util.validation;
 
 import com.epic.ims.util.varlist.CommonVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("prototype")
 public class Validation {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(Validation.class);
 
     @Autowired
     CommonVarList commonVarList;

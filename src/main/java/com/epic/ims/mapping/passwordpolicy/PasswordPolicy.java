@@ -15,14 +15,6 @@ public class PasswordPolicy {
     private long minimumUpperCaseCharacters;
     private long minimumNumericalCharacters;
     private long minimumLowerCaseCharacters;
-    private long noOfInvalidLoginAttempt;
-    private long repeatCharactersAllow;
-    private long initialPasswordExpiryStatus;
-    private long passwordExpiryPeriod;
-    private long noOfHistoryPassword;
-    private long minimumPasswordChangePeriod;
-    private long idleAccountExpiryPeriod;
-    private String description;
     private Date createdTime;
     private String createdUser;
     private String lastUpdatedUser;
@@ -31,7 +23,7 @@ public class PasswordPolicy {
     public PasswordPolicy() {
     }
 
-    public PasswordPolicy(long passwordPolicyId, long minimumLength, long maximumLength, long minimumSpecialCharacters, long minimumUpperCaseCharacters, long minimumNumericalCharacters, long minimumLowerCaseCharacters, long noOfInvalidLoginAttempt, long repeatCharactersAllow, long initialPasswordExpiryStatus, long passwordExpiryPeriod, long noOfHistoryPassword, long minimumPasswordChangePeriod, long idleAccountExpiryPeriod, String description, Date createdTime, String createdUser, String lastUpdatedUser, Date lastUpdatedTime) {
+    public PasswordPolicy(long passwordPolicyId, long minimumLength, long maximumLength, long minimumSpecialCharacters, long minimumUpperCaseCharacters, long minimumNumericalCharacters, long minimumLowerCaseCharacters, Date createdTime, String createdUser, String lastUpdatedUser, Date lastUpdatedTime) {
         this.passwordPolicyId = passwordPolicyId;
         this.minimumLength = minimumLength;
         this.maximumLength = maximumLength;
@@ -39,14 +31,6 @@ public class PasswordPolicy {
         this.minimumUpperCaseCharacters = minimumUpperCaseCharacters;
         this.minimumNumericalCharacters = minimumNumericalCharacters;
         this.minimumLowerCaseCharacters = minimumLowerCaseCharacters;
-        this.noOfInvalidLoginAttempt = noOfInvalidLoginAttempt;
-        this.repeatCharactersAllow = repeatCharactersAllow;
-        this.initialPasswordExpiryStatus = initialPasswordExpiryStatus;
-        this.passwordExpiryPeriod = passwordExpiryPeriod;
-        this.noOfHistoryPassword = noOfHistoryPassword;
-        this.minimumPasswordChangePeriod = minimumPasswordChangePeriod;
-        this.idleAccountExpiryPeriod = idleAccountExpiryPeriod;
-        this.description = description;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
         this.lastUpdatedUser = lastUpdatedUser;
@@ -107,70 +91,6 @@ public class PasswordPolicy {
 
     public void setMinimumLowerCaseCharacters(long minimumLowerCaseCharacters) {
         this.minimumLowerCaseCharacters = minimumLowerCaseCharacters;
-    }
-
-    public long getNoOfInvalidLoginAttempt() {
-        return noOfInvalidLoginAttempt;
-    }
-
-    public void setNoOfInvalidLoginAttempt(long noOfInvalidLoginAttempt) {
-        this.noOfInvalidLoginAttempt = noOfInvalidLoginAttempt;
-    }
-
-    public long getRepeatCharactersAllow() {
-        return repeatCharactersAllow;
-    }
-
-    public void setRepeatCharactersAllow(long repeatCharactersAllow) {
-        this.repeatCharactersAllow = repeatCharactersAllow;
-    }
-
-    public long getInitialPasswordExpiryStatus() {
-        return initialPasswordExpiryStatus;
-    }
-
-    public void setInitialPasswordExpiryStatus(long initialPasswordExpiryStatus) {
-        this.initialPasswordExpiryStatus = initialPasswordExpiryStatus;
-    }
-
-    public long getPasswordExpiryPeriod() {
-        return passwordExpiryPeriod;
-    }
-
-    public void setPasswordExpiryPeriod(long passwordExpiryPeriod) {
-        this.passwordExpiryPeriod = passwordExpiryPeriod;
-    }
-
-    public long getNoOfHistoryPassword() {
-        return noOfHistoryPassword;
-    }
-
-    public void setNoOfHistoryPassword(long noOfHistoryPassword) {
-        this.noOfHistoryPassword = noOfHistoryPassword;
-    }
-
-    public long getMinimumPasswordChangePeriod() {
-        return minimumPasswordChangePeriod;
-    }
-
-    public void setMinimumPasswordChangePeriod(long minimumPasswordChangePeriod) {
-        this.minimumPasswordChangePeriod = minimumPasswordChangePeriod;
-    }
-
-    public long getIdleAccountExpiryPeriod() {
-        return idleAccountExpiryPeriod;
-    }
-
-    public void setIdleAccountExpiryPeriod(long idleAccountExpiryPeriod) {
-        this.idleAccountExpiryPeriod = idleAccountExpiryPeriod;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Date getCreatedTime() {

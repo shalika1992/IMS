@@ -1,22 +1,25 @@
-
-<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <!--begin::Body-->
-<body id="kt_body" class="header-fixed header-mobile-fixed subheader-enabled subheader-fixed aside-enabled aside-fixed aside-minimize-hoverable page-loading">
+<body id="kt_body"
+      class="header-fixed header-mobile-fixed subheader-enabled subheader-fixed aside-enabled aside-fixed aside-minimize-hoverable page-loading">
 <!--begin::Main-->
 <div class="d-flex flex-column flex-root">
     <!--begin::Login-->
-    <div class="login login-1 login-signin-on d-flex flex-column flex-lg-row flex-column-fluid bg-white" id="kt_login" style="border: 15px solid #4d3b75;">
+    <div class="login login-1 login-signin-on d-flex flex-column flex-lg-row flex-column-fluid bg-white" id="kt_login"
+         style="border: 15px solid #4d3b75;">
         <!--begin::Aside-->
-        <div class="login-aside d-flex flex-row-auto bgi-size-cover bgi-no-repeat p-10 p-lg-10" style="background-image: url(${pageContext.request.contextPath}/resources/assets/media/bg/backg3.jpg);">
+        <div class="login-aside d-flex flex-row-auto bgi-size-cover bgi-no-repeat p-10 p-lg-10"
+             style="background-image: url(${pageContext.request.contextPath}/resources/assets/media/bg/backg3.jpg);">
             <!--begin: Aside Container-->
             <div class="d-flex flex-row-fluid flex-column justify-content-between">
                 <!--begin: Aside header-->
                 <a href="#" class="flex-column-auto mt-5 pb-lg-0 pb-10">
-                    <img src="${pageContext.request.contextPath}/resources/assets/media/logos/gov.png" class="max-h-70px" alt="" />
+                    <img src="${pageContext.request.contextPath}/resources/assets/media/logos/gov.png"
+                         class="max-h-70px" alt=""/>
                 </a>
                 <!--end: Aside header-->
                 <!--begin: Aside content-->
@@ -29,9 +32,6 @@
                 <div class="d-none flex-column-auto d-lg-flex justify-content-between mt-10">
                     <div class="opacity-70 font-weight-bold text-dark">&copy; 2021 Epic Lanka (PVT) LTD</div>
                     <div class="d-flex">
-<%--                        <a href="#" class="text-white">Privacy</a>--%>
-<%--                        <a href="#" class="text-white ml-10">Legal</a>--%>
-<%--                        <a href="#" class="text-white ml-10">Contact</a>--%>
                     </div>
                 </div>
                 <!--end: Aside footer for desktop-->
@@ -55,18 +55,37 @@
                         <h3 class="font-size-h1">Sign In</h3>
                         <p class="text-muted font-weight-bold">Enter your username and password</p>
                     </div>
+                    <div class="text-center mb-10 mb-lg-20">
+                        <c:set var="msg" value="${msg}"/>
+                        <c:if test="${not empty msg}">
+                            <div>
+                                <div class="icon">
+                                    <div class="tile-title message-error">
+                                        <c:out value="${msg}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+                    </div>
                     <!--begin::Form-->
-                    <form:form novalidate="novalidate" method="post" class="form" modelAttribute="loginform" action="checkuser.htm" id="kt_login_signin_form">
+                    <form:form novalidate="novalidate" method="post" class="form" modelAttribute="loginform"
+                               action="checkuser.htm" id="kt_login_signin_form">
                         <div class="form-group">
-                            <form:input path="username" name="username" class="form-control form-control-solid h-auto py-5 px-6" placeholder="Username" type="text" autocomplete="off" />
+                            <form:input path="username" name="username"
+                                        class="form-control form-control-solid h-auto py-5 px-6" placeholder="Username"
+                                        type="text" autocomplete="off"/>
                         </div>
                         <div class="form-group">
-                            <form:input path="password" name="password" class="form-control form-control-solid h-auto py-5 px-6" placeholder="Password" type="password"  autocomplete="off"/>
+                            <form:input path="password" name="password"
+                                        class="form-control form-control-solid h-auto py-5 px-6" placeholder="Password"
+                                        type="password" autocomplete="off"/>
                         </div>
                         <!--begin::Action-->
                         <div class="form-group d-flex flex-wrap justify-content-between align-items-center">
-                            <a href="javascript:;" class="text-dark-50 text-hover-primary my-3 mr-2" ></a>
-                            <button type="submit" id="kt_login_signin_submit" class="btn btn-primary font-weight-bold px-9 py-4 my-3">Sign In</button>
+                            <a href="javascript:;" class="text-dark-50 text-hover-primary my-3 mr-2"></a>
+                            <button type="submit" id="kt_login_signin_submit"
+                                    class="btn btn-primary font-weight-bold px-9 py-4 my-3">Sign In
+                            </button>
                         </div>
                         <!--end::Action-->
                     </form:form>
@@ -77,12 +96,9 @@
             <!--end::Content body-->
             <!--begin::Content footer for mobile-->
             <div class="d-flex d-lg-none flex-column-auto flex-column flex-sm-row justify-content-between align-items-center mt-5 p-5">
-                <div class="text-dark-50 font-weight-bold order-2 order-sm-1 my-2">&copy; 2021 Epic Lanka (PVT) LTD</div>
-                <div class="d-flex order-1 order-sm-2 my-2">
-<%--                    <a href="#" class="text-dark-75 text-hover-primary">Privacy</a>--%>
-<%--                    <a href="#" class="text-dark-75 text-hover-primary ml-4">Legal</a>--%>
-<%--                    <a href="#" class="text-dark-75 text-hover-primary ml-4">Contact</a>--%>
+                <div class="text-dark-50 font-weight-bold order-2 order-sm-1 my-2">&copy; 2021 Epic Lanka (PVT) LTD
                 </div>
+                <div class="d-flex order-1 order-sm-2 my-2"></div>
             </div>
             <!--end::Content footer for mobile-->
         </div>

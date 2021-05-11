@@ -51,6 +51,15 @@ public class CommonVarList {
 
     @Value("${userrole.code.admin}")
     public String USERROLE_CODE_ADMIN;
+
+    @Value("${userrole.description.counterofficer}")
+    public String USERROLE_DESCRIPTION_COUNTEROFFICER;
+
+    @Value("${userrole.description.medicalofficer}")
+    public String USERROLE_DESCRIPTION_MEDICALOFFICER;
+
+    @Value("${userrole.description.admin}")
+    public String USERROLE_DESCRIPTION_ADMIN;
     //-------------------------------user role code-------------------------------------------------------------------//
 
     //-------------------------------password param code--------------------------------------------------------------//

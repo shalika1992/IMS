@@ -1,11 +1,12 @@
 package com.epic.ims.repository.common;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.util.varlist.CommonVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @Repository
 @Scope("prototype")
 public class CommonRepository {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(CommonRepository.class);
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -37,10 +38,11 @@ public class CommonRepository {
 
     private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "select code, description from status where statuscategory=?";
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
-    private final String SQL_SYSTEM_TIME = "select CURDATE() as currentdate";
+    private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<Status> getStatusList(String statusCategory) throws Exception {
         List<Status> statusBeanList;
@@ -61,10 +63,10 @@ public class CommonRepository {
         return statusBeanList;
     }
 
-
+    @LogRepository
     @Transactional(readOnly = true)
     public Date getCurrentDate() throws Exception {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date formattedCurrentDate = null;
         try {
             Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
@@ -75,7 +77,7 @@ public class CommonRepository {
         return formattedCurrentDate;
     }
 
-
+    @LogRepository
     @Transactional(readOnly = true)
     public List<UserRole> getUserRoleList() throws Exception {
         List<UserRole> userroleList;
@@ -100,6 +102,8 @@ public class CommonRepository {
         return userroleList;
     }
 
+    @LogRepository
+    @Transactional(readOnly = true)
     public int getPasswordParam(String paramcode) {
         int count = 0;
         try {
@@ -115,6 +119,7 @@ public class CommonRepository {
         return count;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public String getUserRoleStatusCode(String userrole) {
         String statusCode = "";

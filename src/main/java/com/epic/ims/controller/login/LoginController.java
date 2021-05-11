@@ -1,5 +1,6 @@
 package com.epic.ims.controller.login;
 
+import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.login.LoginBean;
 import com.epic.ims.bean.profile.PasswordChangeBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -12,8 +13,8 @@ import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.login.LoginValidator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -37,7 +38,7 @@ import java.util.*;
 @Controller
 @Scope("request")
 public class LoginController implements RequestBeanValidation<Object> {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(LoginController.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -60,11 +61,23 @@ public class LoginController implements RequestBeanValidation<Object> {
     @Autowired
     CommonVarList commonVarList;
 
+    @LogController
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView getLogin(@RequestParam(value = "error", required = false) Integer error, ModelMap modelMap, Locale locale) {
-        return new ModelAndView("login/login", "loginform", new LoginBean());
+    public ModelAndView getLogin(ModelMap modelMap, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "]  LOGIN PAGE VIEW");
+        ModelAndView modelAndView = null;
+        try {
+            return new ModelAndView("login/login", "loginform", new LoginBean());
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            //set the error message to model map
+            modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+            modelAndView = new ModelAndView("login/login", modelMap);
+        }
+        return modelAndView;
     }
 
+    @LogController
     @RequestMapping(value = "/checkuser", method = RequestMethod.GET)
     public ModelAndView getUserLogin(ModelMap modelMap, Locale locale) {
         return new ModelAndView("login/login", "loginform", new LoginBean());

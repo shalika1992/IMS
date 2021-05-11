@@ -27,25 +27,6 @@ public class MessageVarList {
     public static final String PASSWORDRESET_SUCCESS = "passwordreset.changepwd.success";
     //-------------------------- start password reset mgt-------------------------------------------------------------//
 
-    //-------------------------- system user mgt----------------------------------------------------------------------//
-    public static final String SYSTEMUSER_MGT_EMPTY_USERNAME = "systemuser.empty.username";
-    public static final String SYSTEMUSER_MGT_EMPTY_FULLNAME = "systemuser.empty.fullname";
-    public static final String SYSTEMUSER_MGT_EMPTY_EMAIL = "systemuser.empty.email";
-    public static final String SYSTEMUSER_MGT_EMPTY_USERROLECODE = "systemuser.empty.userrolecode";
-    public static final String SYSTEMUSER_MGT_EMPTY_STATUS = "systemuser.empty.status";
-    public static final String SYSTEMUSER_MGT_EMPTY_MOBILENUMBER = "systemuser.empty.mobilenumber";
-    public static final String SYSTEMUSER_MGT_EMPTY_PASSWORD = "systemuser.empty.password";
-    public static final String SYSTEMUSER_MGT_EMPTY_CONFIRMPASSWORD = "systemuser.empty.confirmpassword";
-    public static final String SYSTEMUSER_MGT_PASSWORDS_MISMATCH = "systemuser.password.mismatch";
-    public static final String SYSTEMUSER_MGT_ADDED_SUCCESSFULLY = "systemuser.added.success";
-    public static final String SYSTEMUSER_MGT_UPDATE_SUCCESSFULLY = "systemuser.updated.success";
-    public static final String SYSTEMUSER_MGT_DELETE_SUCCESSFULLY = "systemuser.delete.success";
-    public static final String SYSTEMUSER_MGT_CONFIRM_SUCCESSFULLY = "systemuser.confirm.success";
-    public static final String SYSTEMUSER_MGT_REJECT_SUCCESSFULLY = "systemuser.reject.success";
-    public static final String SYSTEMUSER_MGT_ALREADY_EXISTS = "systemuser.already.exists";
-    public static final String SYSTEMUSER_MGT_NORECORD_FOUND = "systemuser.norecord.found";
-    //-------------------------- system user mgt----------------------------------------------------------------------//
-
     //-------------------------- start user password change ----------------------------------------------------------//
     public static final String USER_CURRENTPASSWORD_EMPTY = "user.currentpassword.empty";
     public static final String USER_CURRENTPASSWORD_INVALID = "user.currentpassword.invalid";
@@ -65,4 +46,27 @@ public class MessageVarList {
     public static final String USER_REQUESTED_PASSWORDCHANGE = "user.requested.passwordchange";
     public static final String USER_PRIVILEGE_INSUFFICIENT = "user.privilege.insufficient";
     //-------------------------- start user password change-----------------------------------------------------------//
+
+    //-------------------------- system user mgt----------------------------------------------------------------------//
+    public static final String SYSTEMUSER_MGT_EMPTY_USERNAME = "systemuser.empty.username";
+    public static final String SYSTEMUSER_MGT_EMPTY_FULLNAME = "systemuser.empty.fullname";
+    public static final String SYSTEMUSER_MGT_EMPTY_EMAIL = "systemuser.empty.email";
+    public static final String SYSTEMUSER_MGT_EMPTY_USERROLECODE = "systemuser.empty.userrolecode";
+    public static final String SYSTEMUSER_MGT_EMPTY_STATUS = "systemuser.empty.status";
+    public static final String SYSTEMUSER_MGT_EMPTY_MOBILENUMBER = "systemuser.empty.mobilenumber";
+    public static final String SYSTEMUSER_MGT_EMPTY_PASSWORD = "systemuser.empty.password";
+    public static final String SYSTEMUSER_MGT_EMPTY_CONFIRMPASSWORD = "systemuser.empty.confirmpassword";
+    public static final String SYSTEMUSER_MGT_PASSWORDS_MISMATCH = "systemuser.password.mismatch";
+    public static final String SYSTEMUSER_MGT_ADDED_SUCCESSFULLY = "systemuser.added.success";
+    public static final String SYSTEMUSER_MGT_UPDATE_SUCCESSFULLY = "systemuser.updated.success";
+    public static final String SYSTEMUSER_MGT_DELETE_SUCCESSFULLY = "systemuser.delete.success";
+    public static final String SYSTEMUSER_MGT_CONFIRM_SUCCESSFULLY = "systemuser.confirm.success";
+    public static final String SYSTEMUSER_MGT_REJECT_SUCCESSFULLY = "systemuser.reject.success";
+    public static final String SYSTEMUSER_MGT_ALREADY_EXISTS = "systemuser.already.exists";
+    public static final String SYSTEMUSER_MGT_NORECORD_FOUND = "systemuser.norecord.found";
+    //-------------------------- system user mgt----------------------------------------------------------------------//
+
+    //-------------------------- sample file upload mgt---------------------------------------------------------------//
+    public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
+    //-------------------------- sample file upload mgt---------------------------------------------------------------//
 }

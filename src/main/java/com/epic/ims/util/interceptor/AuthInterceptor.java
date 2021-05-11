@@ -1,8 +1,9 @@
 package com.epic.ims.util.interceptor;
 
 import com.epic.ims.bean.session.SessionBean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.epic.ims.mapping.user.usermgt.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,9 +15,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 public class AuthInterceptor implements HandlerInterceptor {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(AuthInterceptor.class);
 
     @Resource
     private SessionBean sessionBean;
@@ -49,7 +51,58 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.setDateHeader("Expires", 0);
             response.setHeader("X-Content-Type-Options", "nosniff");
 
-            status = true;
+            if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/checkuser.htm") && !request.getRequestURI().substring(request.getContextPath().length()).equals("/logout.htm")) {
+                logger.info("session id :" + httpSession.getId());
+                //check the session bean
+                if (sessionBean != null) {
+                    User user = sessionBean.getUser();
+                    //check the user object
+                    if (user != null) {
+                        Map<?, ?> sessionMap = (Map<?, ?>) servletContext.getAttribute("sessionMap");
+                        //check the session map
+                        if (sessionMap != null) {
+                            String userName = sessionBean.getUsername();
+                            if (sessionMap.get(userName).equals(httpSession.getId())) {
+                                //check the change password mode
+                                if (sessionBean.isChangePwdMode()) {
+                                    if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/passwordchange.htm")) {
+                                        //redirect to login page
+                                        requestDispatcher = request.getRequestDispatcher("logout.htm?error=5");
+                                        requestDispatcher.forward(request, response);
+                                        status = false;
+                                    } else {
+                                        status = true;
+                                    }
+                                } else {
+                                    status = true;
+                                }
+                            } else {
+                                //redirect to login page
+                                requestDispatcher = request.getRequestDispatcher("logout.htm?error=4");
+                                requestDispatcher.forward(request, response);
+                                status = false;
+                            }
+                        } else {
+                            //redirect to login page
+                            requestDispatcher = request.getRequestDispatcher("logout.htm?error=3");
+                            requestDispatcher.forward(request, response);
+                            status = false;
+                        }
+                    } else {
+                        //redirect to login page
+                        requestDispatcher = request.getRequestDispatcher("logout.htm?error=3");
+                        requestDispatcher.forward(request, response);
+                        status = false;
+                    }
+                } else {
+                    //redirect to login page
+                    requestDispatcher = request.getRequestDispatcher("logout.htm?error=3");
+                    requestDispatcher.forward(request, response);
+                    status = false;
+                }
+            } else {
+                status = true;
+            }
         } catch (Exception e) {
             logger.error("Interceptor perHandle Exception : ", e);
             if (!methodName.trim().equalsIgnoreCase("checkuser") && !methodName.trim().equalsIgnoreCase("logout")) {

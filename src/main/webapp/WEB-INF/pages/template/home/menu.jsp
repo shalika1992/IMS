@@ -29,7 +29,7 @@
     <div class="brand flex-column-auto" id="kt_brand">
         <!--begin::Logo-->
         <a href="${pageContext.request.contextPath}/home.htm" class="brand-logo" id="header-brand-logo">
-            <img alt="Logo" src="${pageContext.request.contextPath}/resources/assets/media/logos/combanklogo4.png"/>
+            <!--<img alt="Logo" src="${pageContext.request.contextPath}/resources/assets/media/logos/combanklogo4.png"/>-->
         </a>
         <!--end::Logo-->
         <!--begin::Toggle-->
