@@ -3,6 +3,7 @@ package com.epic.ims.repository.common;
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.util.varlist.CommonVarList;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,7 @@ public class CommonRepository {
 
     private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "select code, description from status where statuscategory=?";
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
+    private final String SQL_GET_DISTRICT_LIST = "select code, description from district order by description asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
@@ -61,6 +63,21 @@ public class CommonRepository {
             throw e;
         }
         return statusBeanList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String getCurrentDateAsString() throws Exception {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String currentDateAsString = "";
+        try {
+            Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
+            Date formattedCurrentDate = formatter.parse(currentDate.get("currentdate").toString());
+            currentDateAsString = formatter.format(formattedCurrentDate);
+        } catch (Exception e) {
+            throw e;
+        }
+        return currentDateAsString;
     }
 
     @LogRepository
@@ -134,5 +151,27 @@ public class CommonRepository {
             throw e;
         }
         return statusCode;
+    }
+
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<District> getDistrictList() throws Exception {
+        List<District> dList;
+        try {
+            List<Map<String, Object>> districtList = jdbcTemplate.queryForList(SQL_GET_DISTRICT_LIST);
+            dList = districtList.stream().map((record) -> {
+                District district = new District();
+                district.setCode(record.get("code").toString());
+                district.setDescription(record.get("description").toString());
+                return district;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            dList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return dList;
     }
 }

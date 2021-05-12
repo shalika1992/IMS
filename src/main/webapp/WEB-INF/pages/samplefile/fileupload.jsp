@@ -47,6 +47,19 @@
             $('#searchReceivedDate').val(today);
         }
 
+        function getReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return (date.getFullYear() + "-" + month + "-" + day);
+        }
+
         function loadDataTable() {
             var token = $("meta[name='_csrf']").attr("content");
             var header = $("meta[name='_csrf_header']").attr("content");
@@ -81,9 +94,11 @@
                     aoData.push(
                         {'name': 'csrf_token', 'value': token},
                         {'name': 'header', 'value': header},
-                        {'name': 'code', 'value': $('#code').val()},
-                        {'name': 'description', 'value': $('#description').val()},
-                        {'name': 'status', 'value': $('#status').val()}
+                        {'name': 'receivedDate', 'value': $('#searchReceivedDate').val()},
+                        {'name': 'referenceNo', 'value': $('#referenceNo').val()},
+                        {'name': 'institutionCode', 'value': $('#institutionCode').val()},
+                        {'name': 'name', 'value': $('#name').val()},
+                        {'name': 'nic', 'value': $('#nic').val()}
                     );
                     $.ajax({
                         dataType: 'json',
@@ -109,6 +124,9 @@
                 },
                 fnDrawCallback: function (oSettings) {
                     $(".table ").css({"width": "100%"});
+                },
+                fixedColumns:   {
+                    rightColumns: 1
                 },
                 columnDefs: [
                     {
@@ -182,7 +200,10 @@
                         title: "Received Date",
                         targets: 11,
                         mDataProp: "receivedDate",
-                        defaultContent: "--"
+                        defaultContent: "--",
+                        render: function (data) {
+                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                        }
                     },
                     {
                         title: "Status",
@@ -192,28 +213,43 @@
                     },
                     {
                         title: "Created User",
-                        targets: 12,
+                        targets: 13,
                         mDataProp: "createdUser",
                         defaultContent: "--"
                     },
                     {
                         title: "Created Time",
-                        targets: 5,
+                        targets: 14,
                         mDataProp: "createdTime",
                         defaultContent: "--",
                         render: function (data) {
                             return moment(data).format("YYYY-MM-DD hh:mm a")
                         }
+                    },
+                    {
+                        title: "Update",
+                        sortable: false,
+                        className: "dt-center",
+                        mRender: function (data, type, full) {
+                            return '<button id="editBtn" class="btn btn-default btn-sm"  onclick="editSampleFileRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-edit.svg" alt=""></button>';
+                        },
+                        targets: 15,
+                        defaultContent: "--"
                     }
                 ]
             });
         }
 
-        function editSampleFileRecord(code) {
+        function openAddModal() {
+            $('#modalUploadSampleFile').modal('toggle');
+            $('#modalUploadSampleFile').modal('show');
+        }
+
+        function editSampleFileRecord(id) {
             $.ajax({
                 url: "${pageContext.request.contextPath}/getSampleFileRecord.json",
                 data: {
-                    code: code
+                    id: id
                 },
                 dataType: "json",
                 type: 'GET',
@@ -221,6 +257,23 @@
                 success: function (data) {
                     $('#responseMsgUpdate').hide();
 
+                    $('#eid').val(data.id);
+                    $('#eid').attr('readOnly', true);
+
+                    $('#eReferenceNo').val(data.referenceNo);
+                    $('#eReferenceNo').attr('readOnly', true);
+
+                    $('#eName').val(data.name);
+                    $('#eAge').val(data.age);
+                    $('#eGender').val(data.gender);
+                    $('#eNic').val(data.nic);
+                    $('#eAddress').val(data.address);
+                    $('#eDistrict').val(data.residentDistrict);
+                    $('#eContactno').val(data.contactNumber);
+                    $('#eSecondaryContactNo').val(data.secondaryContactNumber);
+
+                    $('#modalUpdateSampleRecord').modal('toggle');
+                    $('#modalUpdateSampleRecord').modal('show');
                 },
                 error: function (data) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -234,6 +287,7 @@
 
         function resetSearch() {
             $("#searchReceivedDate").datepicker("setDate", new Date());
+            oTable.fnDraw();
         }
     </script>
 </head>
@@ -277,8 +331,8 @@
                                         <label>Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="searchReceivedDate"
-                                                   class="form-control" readonly="true" onkeydown="return false"
-                                                   autocomplete="off" type="text"/>
+                                                   class="form-control" readonly="true"
+                                                   autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
                                         <span class="form-text text-muted">Please select received date</span>
                                     </div>
@@ -388,8 +442,9 @@
                                 <th>Contact No</th>
                                 <th>Secondary Contact No</th>
                                 <th>Received Date</th>
-                                <th>Created Time</th>
+                                <th>Status</th>
                                 <th>Created User</th>
+                                <th>Created Time</th>
                                 <th>Update</th>
                             </tr>
                             </thead>
@@ -404,5 +459,6 @@
 </div>
 <!-- start include jsp files -->
 <jsp:include page="fileupload-update.jsp"/>
+<jsp:include page="fileupload-add.jsp"/>
 <!-- end include jsp files -->
 </html>

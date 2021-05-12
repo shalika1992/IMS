@@ -244,4 +244,46 @@ public class Common {
         logger.info("object attributes :" + result);
         logger.info("------------------------------------------------------------");
     }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-12 11:45:16 AM
+     * @Version V1.00
+     * @MethodName handleNullAndEmptyInExcelCell
+     * @MethodParams [stringCellValue]
+     * @MethodDescription - Handle the null and empty at cell value
+     */
+    public String handleNullAndEmptyInExcelCell(String stringCellValue) {
+        try {
+            if (stringCellValue != null && !stringCellValue.isEmpty()) {
+                return stringCellValue;
+            } else {
+                stringCellValue = "";
+            }
+        } catch (Exception e) {
+            stringCellValue = "";
+        }
+        return stringCellValue;
+    }
+
+    /**
+     *   @Author shalika_w
+     *   @CreatedTime 2021-05-12 02:04:35 PM				
+     *   @Version V1.00				
+     *   @MethodName handleNullAndEmptyValue			
+     *   @MethodParams [value]		
+     *   @MethodDescription - Handle null and empty in data grid
+     */
+    public String handleNullAndEmptyValue(String value) {
+        try {
+            if (value != null && !value.isEmpty()) {
+                return value;
+            } else {
+                value = "--";
+            }
+        } catch (Exception e) {
+            value = "--";
+        }
+        return value;
+    }
 }

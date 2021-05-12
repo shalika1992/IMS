@@ -40,6 +40,28 @@ public class CommonVarList {
 
     @Value("${statuscode.expired}")
     public String STATUS_EXPIRED;
+
+    @Value("${statuscode.received}")
+    public String STATUS_RECEIVED;
+
+    @Value("${statuscode.validated}")
+    public String STATUS_VALIDATED;
+
+    @Value("${statuscode.invalid}")
+    public String STATUS_INVALID;
+
+    @Value("${statuscode.plateassigned}")
+    public String STATUS_PLATEASSIGNED;
+
+    @Value("${statuscode.reported}")
+    public String STATUS_REPORTED;
+
+    @Value("${statuscode.repeated}")
+    public String STATUS_REPEATED;
+
+    @Value("${statuscode.completed}")
+    public String STATUS_COMPLETED;
+
     //-------------------------------status codes---------------------------------------------------------------------//
 
     //-------------------------------user role code-------------------------------------------------------------------//
@@ -104,4 +126,9 @@ public class CommonVarList {
     @Value("${system.user.password.expire}")
     public String PWDEXPIRYPERIOD;
     //-------------------------------system user details--------------------------------------------------------------//
+
+    //-------------------------------sample file upload batch size----------------------------------------------------//
+    @Value("${bulkupload.batch.size}")
+    public int BULKUPLOAD_BATCH_SIZE;
+    //-------------------------------sample file upload batch size----------------------------------------------------//
 }

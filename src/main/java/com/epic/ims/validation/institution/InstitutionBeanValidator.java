@@ -1,6 +1,6 @@
 package com.epic.ims.validation.institution;
 
-import com.epic.ims.bean.institutionmgt.InstitutinInputBean;
+import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.commons.logging.Log;
@@ -19,14 +19,14 @@ public class InstitutionBeanValidator implements Validator {
     CommonVarList commonVarList;
     @Override
     public boolean supports(Class<?> aClass) {
-        return InstitutinInputBean.class.isAssignableFrom(aClass);
+        return InstitutionInputBean.class.isAssignableFrom(aClass);
     }
 
     @Override
     public void validate(Object o, Errors errors) {
         try {
 
-            if (o.getClass().equals(InstitutinInputBean.class)) {
+            if (o.getClass().equals(InstitutionInputBean.class)) {
 
                 //validate input fields for empty fields
                     ValidationUtils.rejectIfEmpty(errors,"institutionCode", MessageVarList.INSTITUTION_MGT_EMPTY_CODE,"Institution Code can not be empty.");

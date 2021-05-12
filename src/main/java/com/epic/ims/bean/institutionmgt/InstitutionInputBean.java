@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class InstitutinInputBean  extends DataTablesRequest {
+public class InstitutionInputBean extends DataTablesRequest {
     private String institutionCode;
     private String name;
     private String institutionName;

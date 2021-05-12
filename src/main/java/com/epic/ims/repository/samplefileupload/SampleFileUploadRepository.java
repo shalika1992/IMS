@@ -1,22 +1,30 @@
 package com.epic.ims.repository.samplefileupload;
 
+import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
+import com.epic.ims.util.common.Common;
+import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
 @Scope("prototype")
 public class SampleFileUploadRepository {
+
     @Autowired
     SessionBean sessionBean;
 
@@ -26,9 +34,16 @@ public class SampleFileUploadRepository {
     @Autowired
     CommonRepository commonRepository;
 
+    @Autowired
+    CommonVarList commonVarList;
+
+    @Autowired
+    Common common;
+
     private final String SQL_GET_LIST_DATA_COUNT = "select count(*) from sample_data sd left outer join status s on s.code=sd.status where";
-    private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate , sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.referenceno = ?";
-    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.referenceno = ?";
+    private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate , sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.id = ?";
+    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.id = ?";
+    private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser,createdtime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     @Transactional(readOnly = true)
     public long getDataCount(SampleFileInputBean sampleFileInputBean) {
@@ -71,105 +86,99 @@ public class SampleFileUploadRepository {
             sampleFileList = jdbcTemplate.query(sql, (rs, id) -> {
                 SampleFile sampleFile = new SampleFile();
                 try {
-                    sampleFile.setId(rs.getInt("code"));
+                    sampleFile.setId(rs.getInt("id"));
                 } catch (Exception e) {
                     sampleFile.setId(0);
                 }
 
                 try {
-                    sampleFile.setReferenceNo(rs.getString("referenceno"));
+                    sampleFile.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
                 } catch (Exception e) {
-                    sampleFile.setReferenceNo(null);
+                    sampleFile.setReferenceNo("--");
                 }
 
                 try {
-                    sampleFile.setInstitutionCode(rs.getString("institutioncode"));
+                    sampleFile.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
                 } catch (Exception e) {
-                    sampleFile.setInstitutionCode(null);
+                    sampleFile.setInstitutionCode("--");
                 }
 
                 try {
-                    sampleFile.setName(rs.getString("name"));
+                    sampleFile.setName(common.handleNullAndEmptyValue(rs.getString("name")));
                 } catch (Exception e) {
-                    sampleFile.setName(null);
+                    sampleFile.setName("--");
                 }
 
                 try {
-                    sampleFile.setAge(rs.getString("age"));
+                    sampleFile.setAge(common.handleNullAndEmptyValue(rs.getString("age")));
                 } catch (Exception e) {
-                    sampleFile.setAge(null);
+                    sampleFile.setAge("--");
                 }
 
                 try {
-                    sampleFile.setGender(rs.getString("gender"));
+                    sampleFile.setGender(common.handleNullAndEmptyValue(rs.getString("gender")));
                 } catch (Exception e) {
-                    sampleFile.setGender(null);
+                    sampleFile.setGender("--");
                 }
 
                 try {
-                    sampleFile.setContactType(rs.getString("contacttype"));
+                    sampleFile.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
                 } catch (Exception e) {
-                    sampleFile.setContactType(null);
+                    sampleFile.setContactType("--");
                 }
 
                 try {
-                    sampleFile.setNic(rs.getString("nic"));
+                    sampleFile.setNic(common.handleNullAndEmptyValue(rs.getString("nic")));
                 } catch (Exception e) {
-                    sampleFile.setNic(null);
+                    sampleFile.setNic("--");
                 }
 
                 try {
-                    sampleFile.setAddress(rs.getString("address"));
+                    sampleFile.setAddress(common.handleNullAndEmptyValue(rs.getString("address")));
                 } catch (Exception e) {
-                    sampleFile.setAddress(null);
+                    sampleFile.setAddress("--");
                 }
 
                 try {
-                    sampleFile.setStatus(rs.getString("statusdescription"));
+                    sampleFile.setStatus(common.handleNullAndEmptyValue(rs.getString("statusdescription")));
                 } catch (Exception e) {
-                    sampleFile.setStatus(null);
+                    sampleFile.setStatus("--");
                 }
 
                 try {
-                    sampleFile.setResidentDistrict(rs.getString("district"));
+                    sampleFile.setResidentDistrict(common.handleNullAndEmptyValue(rs.getString("district")));
                 } catch (Exception e) {
-                    sampleFile.setResidentDistrict(null);
+                    sampleFile.setResidentDistrict("--");
                 }
 
                 try {
-                    sampleFile.setContactNumber(rs.getString("contactno"));
+                    sampleFile.setContactNumber(common.handleNullAndEmptyValue(rs.getString("contactno")));
                 } catch (Exception e) {
-                    sampleFile.setContactNumber(null);
+                    sampleFile.setContactNumber("--");
                 }
 
                 try {
-                    sampleFile.setSecondaryContactNumber(rs.getString("secondarycontactno"));
+                    sampleFile.setSecondaryContactNumber(common.handleNullAndEmptyValue(rs.getString("secondarycontactno")));
                 } catch (Exception e) {
-                    sampleFile.setSecondaryContactNumber(null);
+                    sampleFile.setSecondaryContactNumber("--");
                 }
 
                 try {
-                    sampleFile.setSpecimenid(rs.getString("specimenid"));
+                    sampleFile.setSpecimenid(common.handleNullAndEmptyValue(rs.getString("specimenid")));
                 } catch (Exception e) {
-                    sampleFile.setSpecimenid(null);
+                    sampleFile.setSpecimenid("--");
                 }
 
                 try {
-                    sampleFile.setSpecimenid(rs.getString("specimenid"));
+                    sampleFile.setBarcode(common.handleNullAndEmptyValue(rs.getString("barcode")));
                 } catch (Exception e) {
-                    sampleFile.setSpecimenid(null);
+                    sampleFile.setBarcode("--");
                 }
 
                 try {
-                    sampleFile.setBarcode(rs.getString("barcode"));
+                    sampleFile.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
                 } catch (Exception e) {
-                    sampleFile.setBarcode(null);
-                }
-
-                try {
-                    sampleFile.setReceivedDate(rs.getString("receiveddate"));
-                } catch (Exception e) {
-                    sampleFile.setReceivedDate(null);
+                    sampleFile.setReceivedDate("--");
                 }
 
                 try {
@@ -179,9 +188,9 @@ public class SampleFileUploadRepository {
                 }
 
                 try {
-                    sampleFile.setCreatedUser(rs.getString("createduser"));
+                    sampleFile.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
                 } catch (Exception e) {
-                    sampleFile.setCreatedUser(null);
+                    sampleFile.setCreatedUser("--");
                 }
 
                 return sampleFile;
@@ -195,13 +204,13 @@ public class SampleFileUploadRepository {
     }
 
     @Transactional(readOnly = true)
-    public SampleFile getSampleRecord(String referenceNo) {
+    public SampleFile getSampleRecord(String id) {
         SampleFile sampleFile;
         try {
-            sampleFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEFILERECORD, new Object[]{referenceNo}, (rs, rowNum) -> {
+            sampleFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEFILERECORD, new Object[]{id}, (rs, rowNum) -> {
                 SampleFile s = new SampleFile();
                 try {
-                    s.setId(rs.getInt("code"));
+                    s.setId(rs.getInt("id"));
                 } catch (Exception e) {
                     s.setId(0);
                 }
@@ -337,7 +346,7 @@ public class SampleFileUploadRepository {
                     sampleFileInputBean.getResidentDistrict(),
                     sampleFileInputBean.getContactNumber(),
                     sampleFileInputBean.getSecondaryContactNumber(),
-                    sampleFileInputBean.getReferenceNo(),
+                    sampleFileInputBean.getId(),
             });
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
@@ -348,12 +357,56 @@ public class SampleFileUploadRepository {
         return message;
     }
 
+    @Transactional
+    public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {
+        String message = "";
+        try {
+            String currentDate = commonRepository.getCurrentDateAsString();
+            for (int j = 0; j < sampleDataList.size(); j += commonVarList.BULKUPLOAD_BATCH_SIZE) {
+                final List<SampleData> batchList = sampleDataList.subList(j, j + commonVarList.BULKUPLOAD_BATCH_SIZE > sampleDataList.size() ? sampleDataList.size() : j + commonVarList.BULKUPLOAD_BATCH_SIZE);
+                jdbcTemplate.batchUpdate(SQL_INSERT_SAMPLEFILERECORD, new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        SampleData sampleData = batchList.get(i);
+                        ps.setString(1, sampleData.getReferenceNo());
+                        ps.setString(2, sampleData.getMohArea());
+                        ps.setString(3, sampleData.getName());
+                        ps.setString(4, sampleData.getAge());
+                        ps.setString(5, sampleData.getGender());
+                        ps.setString(6, sampleData.getSymptomatic());
+                        ps.setString(7, sampleData.getContactType());
+                        ps.setString(8, sampleData.getNic());
+                        ps.setString(9, sampleData.getAddress());
+                        ps.setString(10, sampleData.getResidentDistrict());
+                        ps.setString(11, sampleData.getContactNumber());
+                        ps.setString(12, sampleData.getSecondaryContactNumber());
+                        ps.setString(13, receivedDate);
+                        ps.setString(14, commonVarList.STATUS_RECEIVED);
+                        ps.setString(15, sessionBean.getUsername());
+                        ps.setString(16, currentDate);
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return batchList.size();
+                    }
+                });
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException sqe) {
+            throw sqe;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
     private StringBuilder setDynamicClause(SampleFileInputBean sampleFileInputBean, StringBuilder dynamicClause) {
         dynamicClause.append(" 1=1 ");
         try {
             if (sampleFileInputBean.getReceivedDate() != null && !sampleFileInputBean.getReceivedDate().isEmpty()) {
-                //add to dynamic clause
-                dynamicClause.append(" and sd.receiveddate >='").append(sampleFileInputBean.getReceivedDate()).append("'");
+                dynamicClause.append(" and sd.receiveddate = '").append(sampleFileInputBean.getReceivedDate()).append("'");
             }
 
             if (sampleFileInputBean.getReferenceNo() != null && !sampleFileInputBean.getReferenceNo().isEmpty()) {
@@ -376,4 +429,6 @@ public class SampleFileUploadRepository {
         }
         return dynamicClause;
     }
+
+
 }

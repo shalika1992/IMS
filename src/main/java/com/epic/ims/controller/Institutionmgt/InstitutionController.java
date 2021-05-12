@@ -1,7 +1,7 @@
 package com.epic.ims.controller.Institutionmgt;
 
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.bean.institutionmgt.InstitutinInputBean;
+import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.institutionmgt.Institution;
 import com.epic.ims.repository.common.CommonRepository;
@@ -59,6 +59,49 @@ public class InstitutionController implements RequestBeanValidation<Object> {
     @Autowired
     InstitutionBeanValidator institutionBeanValidator;
 
+    @PostMapping(value = "/deleteInstitution", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean deleteDepartment(@RequestParam String code, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] DELETE INSTITUTION");
+        ResponseBean responseBean;
+        try {
+            String message = institutionService.deleteInstitution(code);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_DELETE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+
+    @PostMapping(value = "/updateInstitution", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean updateInstitution(@ModelAttribute("institution") InstitutionInputBean institutionInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE INSTITUTION");
+        ResponseBean responseBean;
+        try {
+            BindingResult bindingResult = validateRequestBean(institutionInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
+            } else {
+                String message = institutionService.updateInstitution(institutionInputBean);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
 
     @GetMapping(value = "/institutionMgt.htm")
     public ModelAndView viewInstitutionPage(ModelMap modelMap, Locale locale) {
@@ -77,23 +120,23 @@ public class InstitutionController implements RequestBeanValidation<Object> {
 
     @PostMapping(value = "/listInstitution", headers = {"content-type=application/json"})
     public @ResponseBody
-    DataTablesResponse<Institution> searchInstitution(@RequestBody InstitutinInputBean institutinInputBean) {
+    DataTablesResponse<Institution> searchInstitution(@RequestBody InstitutionInputBean institutionInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  INSTITUTION SEARCH");
         DataTablesResponse<Institution> responseBean = new DataTablesResponse<>();
 
         try {
-            long count = institutionService.getCount(institutinInputBean);
+            long count = institutionService.getCount(institutionInputBean);
 
             if (count > 0) {
-                List<Institution> institutionList = institutionService.getInstitutionSearchResultList(institutinInputBean);
+                List<Institution> institutionList = institutionService.getInstitutionSearchResultList(institutionInputBean);
                 //set data set to response bean
                 responseBean.data.addAll(institutionList);
             } else {
                 //set data set to response bean
                 responseBean.data.addAll(new ArrayList<>());
             }
-            responseBean.echo = institutinInputBean.echo;
-            responseBean.columns = institutinInputBean.columns;
+            responseBean.echo = institutionInputBean.echo;
+            responseBean.columns = institutionInputBean.columns;
             responseBean.totalRecords = count;
             responseBean.totalDisplayRecords = count;
 
@@ -108,15 +151,15 @@ public class InstitutionController implements RequestBeanValidation<Object> {
 
     @PostMapping(value = "/addInstitution", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    ResponseBean addInstitution(@ModelAttribute("institution") InstitutinInputBean institutinInputBean, Locale locale) {
+    ResponseBean addInstitution(@ModelAttribute("institution") InstitutionInputBean institutionInputBean, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  INSTITUTION ADD");
         ResponseBean responseBean = null;
         try {
-            BindingResult bindingResult = validateRequestBean(institutinInputBean);
+            BindingResult bindingResult = validateRequestBean(institutionInputBean);
             if (bindingResult.hasErrors()) {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
             } else {
-                String message = institutionService.insertInstitution(institutinInputBean, locale);
+                String message = institutionService.insertInstitution(institutionInputBean, locale);
                 if (message.isEmpty()) {
                     responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_ADDED_SUCCESSFULLY, null, locale), null);
                 } else {
@@ -129,7 +172,6 @@ public class InstitutionController implements RequestBeanValidation<Object> {
         }
         return responseBean;
     }
-
 
     @GetMapping(value = "/getInstitution")
     public @ResponseBody
@@ -148,16 +190,16 @@ public class InstitutionController implements RequestBeanValidation<Object> {
 
     @ModelAttribute
     public void getSystemUserBean(Model map) throws Exception {
-        InstitutinInputBean institutinInputBean = new InstitutinInputBean();
+        InstitutionInputBean institutionInputBean = new InstitutionInputBean();
         //get status list
         List<Status> statusActList = common.getActiveStatusList();
         List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_USER);
         //set values to task bean
-        institutinInputBean.setStatusList(statusList);
-        institutinInputBean.setStatusActList(statusActList);
+        institutionInputBean.setStatusList(statusList);
+        institutionInputBean.setStatusActList(statusActList);
 
         //add values to model map
-        map.addAttribute("institution", institutinInputBean);
+        map.addAttribute("institution", institutionInputBean);
     }
 
     @Override

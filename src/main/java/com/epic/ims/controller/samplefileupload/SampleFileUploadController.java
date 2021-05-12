@@ -4,9 +4,12 @@ import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.samplefile.SampleFile;
+import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.samplefile.SampleFileService;
 import com.epic.ims.util.common.DataTablesResponse;
+import com.epic.ims.util.common.ExcelHelper;
 import com.epic.ims.util.common.ResponseBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
@@ -26,9 +29,9 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -52,6 +55,12 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
 
     @Autowired
     SampleFileService sampleFileService;
+
+    @Autowired
+    ExcelHelper excelHelper;
+
+    @Autowired
+    CommonRepository commonRepository;
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
@@ -103,14 +112,39 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
+    @RequestMapping(value = "/sampleFileUpload", method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseBean postSampleFileUpload(@RequestParam("sampleFile") MultipartFile multipartFile, @RequestParam("receivedDate") String receivedDate, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE FILE RECORD");
+        ResponseBean responseBean;
+        try {
+            if (excelHelper.hasExcelFormat(multipartFile)) {
+                String message = sampleFileService.uploadSampleFile(multipartFile, receivedDate, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_FILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
     @GetMapping(value = "/getSampleFileRecord")
     public @ResponseBody
-    SampleFile getSampleFileRecord(@RequestParam String referenceNo) {
+    SampleFile getSampleFileRecord(@RequestParam String id) {
         logger.info("[" + sessionBean.getSessionid() + "]  GET SAMPLE FILE RECORD");
         SampleFile sampleFile = new SampleFile();
         try {
-            if (referenceNo != null && !referenceNo.isEmpty()) {
-                sampleFile = sampleFileService.getSampleFileRecord(referenceNo);
+            if (id != null && !id.isEmpty()) {
+                sampleFile = sampleFileService.getSampleFileRecord(id);
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
@@ -144,16 +178,15 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         return responseBean;
     }
 
-    @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
-    @RequestMapping(value = "/sampleFileUpload", method = RequestMethod.POST)
-    public ModelAndView postSampleFileUpload(ModelMap modelMap, HttpServletRequest httpServletRequest, Locale locale) {
-        return null;
-    }
 
     @ModelAttribute
     public void getSampleFileUploadBean(Model map) throws Exception {
-        map.addAttribute("samplefile", new SampleFileInputBean());
+        SampleFileInputBean sampleFileInputBean = new SampleFileInputBean();
+        //get district list
+        List<District> districtList = commonRepository.getDistrictList();
+        sampleFileInputBean.setDistrictList(districtList);
+        //add to model
+        map.addAttribute("samplefile", sampleFileInputBean);
     }
 
     @Override

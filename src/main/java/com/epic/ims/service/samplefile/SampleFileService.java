@@ -1,13 +1,16 @@
 package com.epic.ims.service.samplefile;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.samplefileupload.SampleFileUploadRepository;
 import com.epic.ims.util.common.Common;
+import com.epic.ims.util.common.ExcelHelper;
 import com.epic.ims.util.security.SHA256Algorithm;
+import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -44,6 +48,12 @@ public class SampleFileService {
     @Autowired
     SampleFileUploadRepository sampleFileUploadRepository;
 
+    @Autowired
+    ExcelHelper excelHelper;
+
+    @Autowired
+    CommonVarList commonVarList;
+
     @LogService
     public long getCount(SampleFileInputBean sampleFileInputBean) {
         long count = 0;
@@ -71,10 +81,10 @@ public class SampleFileService {
     }
 
     @LogService
-    public SampleFile getSampleFileRecord(String referenceNo) {
+    public SampleFile getSampleFileRecord(String id) {
         SampleFile sampleFile;
         try {
-            sampleFile = sampleFileUploadRepository.getSampleRecord(referenceNo);
+            sampleFile = sampleFileUploadRepository.getSampleRecord(id);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
@@ -88,7 +98,7 @@ public class SampleFileService {
         String message = "";
         SampleFile existingSampleFileRecord = null;
         try {
-            existingSampleFileRecord = sampleFileUploadRepository.getSampleRecord(sampleFileInputBean.getReferenceNo());
+            existingSampleFileRecord = sampleFileUploadRepository.getSampleRecord(sampleFileInputBean.getId());
             if (existingSampleFileRecord != null) {
                 //check changed values
                 String oldValueAsString = this.getSampleRecordAsString(existingSampleFileRecord, true);
@@ -363,5 +373,25 @@ public class SampleFileService {
             throw e;
         }
         return sampleFileRecordStringBuilder.toString();
+    }
+
+    public String uploadSampleFile(MultipartFile multipartFile, String receivedDate, Locale locale) {
+        String message = "";
+        try {
+            List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream());
+            //check the size of the sample file
+            if (sampleDataList != null && !sampleDataList.isEmpty() && sampleDataList.size() > 0) {
+                if(sampleDataList.size() <= commonVarList.BULKUPLOAD_BATCH_SIZE){
+                    message = sampleFileUploadRepository.insertSampleRecordBatch(sampleDataList, receivedDate);
+                }else{
+                    message = MessageVarList.SAMPLE_FILE_CONTAIN_MAXRECORDS;
+                }
+            } else {
+                message = MessageVarList.SAMPLE_FILE_INVALID_FILE;
+            }
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
     }
 }
