@@ -113,6 +113,8 @@
     }
 
     function add() {
+        resetAddInstitutionError();
+
         $.ajax({
             type: 'POST',
             url: '${pageContext.request.contextPath}/addInstitution.json',
@@ -138,5 +140,15 @@
                 window.location = "${pageContext.request.contextPath}/logout.htm";
             }
         });
+    }
+
+    function resetAddInstitutionError() {
+        if ($('#responseMsgAdd').hasClass('success-response')) {
+            $('#responseMsgAdd').removeClass('success-response');
+        }
+        if ($('#responseMsgAdd').hasClass('error-response')) {
+            $('#responseMsgAdd').removeClass('error-response');
+        }
+        $('#responseMsgAdd').hide();
     }
 </script>

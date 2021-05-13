@@ -14,6 +14,7 @@ import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.StatusVarList;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
+import com.epic.ims.validation.institution.InstitutionBulkValidation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,33 @@ public class InstitutionController implements RequestBeanValidation<Object> {
     @Autowired
     InstitutionBeanValidator institutionBeanValidator;
 
+    @Autowired
+    InstitutionBulkValidation institutionBulkValidation;
+
+    @PostMapping(value = "/addInstitutionBulk", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean addInstitutionBulk(@ModelAttribute("institution") InstitutionInputBean institutionInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "]  INSTITUTION BULK ADD");
+        ResponseBean responseBean = null;
+        try {
+            responseBean = institutionBulkValidation.validateInstitutionBulk(institutionInputBean, locale);
+
+            if (responseBean.isFlag()) {
+
+                String message = institutionService.insertInstitutionBulk(institutionInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_BULK_MGT_ADDED_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
     @PostMapping(value = "/deleteInstitution", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
     ResponseBean deleteDepartment(@RequestParam String code, Locale locale) {
@@ -77,7 +105,6 @@ public class InstitutionController implements RequestBeanValidation<Object> {
         }
         return responseBean;
     }
-
 
     @PostMapping(value = "/updateInstitution", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody

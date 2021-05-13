@@ -50,7 +50,9 @@ public class MessageVarList {
 
     //-------------------------- institution user mgt----------------------------------------------------------------------//
     public static final String INSTITUTION_MGT_ALREADY_EXISTS = "institution.already.exists";
+    public static final String INSTITUTION_BULK_MGT_ALREADY_EXISTS = "institutionbulk.already.exists";
     public static final String INSTITUTION_MGT_ADDED_SUCCESSFULLY = "institution.added.success";
+    public static final String INSTITUTION_BULK_MGT_ADDED_SUCCESSFULLY = "institutionbulk.added.success";
     public static final String INSTITUTION_MGT_EMPTY_CODE = "institution.empty.code";
     public static final String INSTITUTION_MGT_EMPTY_NAME = "institution.empty.name";
     public static final String INSTITUTION_MGT_EMPTY_ADDRESS = "institution.empty.address";
@@ -59,6 +61,10 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
     public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
     public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
+    public static final String INSTITUTION_MGT_INVALID_FILE = "institution.invalid.file";
+    public static final String INSTITUTION_MGT_INVALID_COLUMN_ORDER = "institution.invalid.columnorder";
+    public static final String INSTITUTION_MGT_EMPTY_SHEET = "institution.empty.sheet";
+    public static final String INSTITUTION_MGT_INVALID_DATA = "institution.invalid.data";
 
     public static final String INSTITUTION_MGT_EMPTY_MOBILENUMBER = "institution.empty.mobilenumber";
     public static final String INSTITUTION_MGT_EMPTY_PASSWORD = "institution.empty.password";

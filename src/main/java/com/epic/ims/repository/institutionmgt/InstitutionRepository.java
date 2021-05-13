@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,33 @@ public class InstitutionRepository {
             }
         } catch (Exception ex) {
             throw ex;
+        }
+        return message;
+    }
+
+    @Transactional
+    public String insertInstitutionBulk(List<InstitutionInputBean> institutionInputBeanList) throws Exception {
+        String message = "";
+        StringBuilder bulkInsertSql = new StringBuilder("insert into institution(institutioncode, name, address, contactno, status, createduser, createdtime, lastupdateduser, lastupdatedtime) " +
+                "values");
+        try {
+            int value = 0;
+            int listSize = institutionInputBeanList.size();
+
+            String SQL_INSERT_INSTITUTION_BULK = createBulkInsertClause(institutionInputBeanList, bulkInsertSql);
+
+            System.out.println(SQL_INSERT_INSTITUTION_BULK);
+
+            //insert query
+            value = jdbcTemplate.update(SQL_INSERT_INSTITUTION_BULK);
+
+            if (value != listSize) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (DuplicateKeyException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw e;
         }
         return message;
     }
@@ -333,5 +361,39 @@ public class InstitutionRepository {
         }
 
         return dynamicClause;
+    }
+
+    private String createBulkInsertClause(List<InstitutionInputBean> institutionInputBeanList, StringBuilder bulkInsertSql){
+        InstitutionInputBean institutionInputBean = institutionInputBeanList.get(0);
+        int listLength = institutionInputBeanList.size();
+        int count=0;
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
+        String formattedCCreatedTime = formatter.format(institutionInputBean.getCreatedTime());
+        String formattedCLastUpdatedTime = formatter.format(institutionInputBean.getLastUpdatedTime());
+
+        String status = institutionInputBean.getStatus();
+        String createdUser = "error";
+        String lastUpdatedUser = institutionInputBean.getLastUpdatedUser();
+
+        String commonValues = "'"+status+"', "+"'"+createdUser+"', "+"'"+formattedCCreatedTime+"', "+"'"+lastUpdatedUser+"', "+"'"+formattedCLastUpdatedTime+"'";
+
+        for (InstitutionInputBean inputBean : institutionInputBeanList){
+            count++;
+
+            bulkInsertSql.append("('");
+            bulkInsertSql.append(inputBean.getInstitutionCode()).append("', '");
+            bulkInsertSql.append(inputBean.getInstitutionName()).append("', '");
+            bulkInsertSql.append(inputBean.getAddress()).append("', '");
+            bulkInsertSql.append(inputBean.getContactNumber()).append("', ");
+            bulkInsertSql.append(commonValues);
+            bulkInsertSql.append(")");
+
+            if (count != listLength){
+                bulkInsertSql.append(",");
+            }
+        }
+
+        return bulkInsertSql.toString();
     }
 }
