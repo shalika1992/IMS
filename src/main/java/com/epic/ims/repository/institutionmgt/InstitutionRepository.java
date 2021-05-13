@@ -342,7 +342,7 @@ public class InstitutionRepository {
 
         try{
             if (institutionInputBean.getInstitutionName()!=null && !institutionInputBean.getInstitutionName().isEmpty()){
-                dynamicClause.append("and lower(i.institutionName) like lower('%").append(institutionInputBean.getInstitutionName()).append("%') ");
+                dynamicClause.append("and lower(i.name) like lower('%").append(institutionInputBean.getInstitutionName()).append("%') ");
             }
 
             if (institutionInputBean.getInstitutionCode()!=null && !institutionInputBean.getInstitutionCode().isEmpty()){
@@ -350,7 +350,7 @@ public class InstitutionRepository {
             }
 
             if (institutionInputBean.getContactNumber()!=null && !institutionInputBean.getContactNumber().isEmpty()){
-                dynamicClause.append("and lower(i.mobile) like lower('%").append(institutionInputBean.getContactNumber()).append("%') ");
+                dynamicClause.append("and lower(i.contactno) like lower('%").append(institutionInputBean.getContactNumber()).append("%') ");
             }
 
             if (institutionInputBean.getStatus()!=null && !institutionInputBean.getStatus().isEmpty()){
