@@ -89,9 +89,13 @@ public class MessageVarList {
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
     public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
-    public static final String SAMPLE_FILE_RECORD_NORECORD_FOUND = "samplefilerecord.norecord.found";
     public static final String SAMPLE_FILE_INVALID_FILE = "samplefile.invalid.file";
     public static final String SAMPLE_FILE_CONTAIN_MAXRECORDS = "samplefile.contain.maxrecords";
     public static final String SAMPLE_FILE_UPLOAD_SUCCESSFULLY = "samplefile.upload.success";
+    public static final String SAMPLERECORD_NORECORD_FOUND = "samplerecord.norecord.found";
+    public static final String SAMPLERECORD_REJECT_SUCCESSFULLY = "samplerecord.reject.success";
+    public static final String SAMPLERECORD_VERIFY_SUCCESSFULLY = "samplerecord.verify.success";
+    public static final String SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL = "samplerecord.mandatoryfield.validationfail";
+    public static final String SAMPLERECORD_DUPLICATE_RECORDFOUND = "samplerecord.duplicate.recordfound";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 }
