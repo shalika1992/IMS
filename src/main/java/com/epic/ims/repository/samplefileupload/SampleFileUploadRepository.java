@@ -267,7 +267,7 @@ public class SampleFileUploadRepository {
                         ps.setString(11, sampleData.getContactNumber());
                         ps.setString(12, sampleData.getSecondaryContactNumber());
                         ps.setString(13, receivedDate);
-                        ps.setString(14, commonVarList.STATUS_RECEIVED);
+                        ps.setString(14, commonVarList.STATUS_PENDING);
                         ps.setString(15, sessionBean.getUsername());
                         ps.setString(16, currentDate);
                     }
@@ -443,7 +443,7 @@ public class SampleFileUploadRepository {
     }
 
     private StringBuilder setDynamicClause(SampleFileInputBean sampleFileInputBean, StringBuilder dynamicClause) {
-        dynamicClause.append(" 1=1 ");
+        dynamicClause.append(" 1=1 and sd.status = '").append(commonVarList.STATUS_PENDING).append("'");
         try {
             if (sampleFileInputBean.getReceivedDate() != null && !sampleFileInputBean.getReceivedDate().isEmpty()) {
                 dynamicClause.append(" and sd.receiveddate = '").append(sampleFileInputBean.getReceivedDate()).append("'");

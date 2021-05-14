@@ -39,12 +39,4 @@ public class SampleVerifyFileRepository {
     public List<SampleVerifyFile> getSampleVerifyFileSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
         return null;
     }
-
-    public SampleVerifyFile getSampleVerifyRecord(String id) {
-        return null;
-    }
-
-    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
-        return null;
-    }
 }

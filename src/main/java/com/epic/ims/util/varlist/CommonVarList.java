@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonVarList {
-
     //-------------------------------system user details--------------------------------------------------------------//
     @Value("${system.username}")
     public String SYSTEMUSERNAME;
@@ -44,11 +43,17 @@ public class CommonVarList {
     @Value("${statuscode.received}")
     public String STATUS_RECEIVED;
 
+    @Value("${statuscode.pending}")
+    public String STATUS_PENDING;
+
     @Value("${statuscode.validated}")
     public String STATUS_VALIDATED;
 
     @Value("${statuscode.invalid}")
     public String STATUS_INVALID;
+
+    @Value("${statuscode.samplenotfound}")
+    public String STATUS_NOSAMPLEFOUND;
 
     @Value("${statuscode.plateassigned}")
     public String STATUS_PLATEASSIGNED;

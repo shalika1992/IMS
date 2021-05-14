@@ -19,10 +19,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -119,14 +119,14 @@ public class SampleFileService {
     }
 
     @LogService
-    public String checkDuplicate(List<SampleData> sampleDataList, String receivedDate, Locale locale) {
+    public String checkDuplicate(List<SampleData> sampleDataFileList, String receivedDate, Locale locale) {
         String message = "";
         try {
-            List<SampleData> list = sampleFileUploadRepository.getExistingSampleDataList(receivedDate);
-            if (list != null && !list.isEmpty() && list.size() > 0) {
-                List<SampleData> duplicateList = list.stream().filter(s -> sampleDataList.contains(s)).collect(Collectors.toList());
+            List<SampleData> sampleDataRepositoryList = sampleFileUploadRepository.getExistingSampleDataList(receivedDate);
+            if (sampleDataRepositoryList != null && !sampleDataRepositoryList.isEmpty() && sampleDataRepositoryList.size() > 0) {
+                List<SampleData> duplicateList = this.getDuplicateList(sampleDataFileList, sampleDataRepositoryList);
                 //check the duplicate list
-                if(duplicateList != null){
+                if (duplicateList != null && !duplicateList.isEmpty() && duplicateList.size() > 0) {
                     SampleData sampleData = duplicateList.get(0);
                     //get the reference no - moh area - date
                     String referenceNo = sampleData.getReferenceNo();
@@ -459,5 +459,23 @@ public class SampleFileService {
         return sampleFileRecordStringBuilder.toString();
     }
 
-
+    private List<SampleData> getDuplicateList(List<SampleData> sampleDataFileList, List<SampleData> sampleDataRepositoryList) {
+        List<SampleData> duplicateList = new ArrayList<>();
+        try {
+            outerLoop:
+            for (int i = 0; i < sampleDataRepositoryList.size(); i++) {
+                SampleData sampleData1 = sampleDataRepositoryList.get(i);
+                for (int j = 0; j < sampleDataFileList.size(); j++) {
+                    SampleData sampleData2 = sampleDataFileList.get(j);
+                    if (sampleData1.equals(sampleData2)) {
+                        duplicateList.add(sampleData2);
+                        break outerLoop;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return duplicateList;
+    }
 }

@@ -8,6 +8,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
+import com.epic.ims.service.plateassign.PlateAssignService;
 import com.epic.ims.service.samplefile.SampleFileService;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.common.ExcelHelper;
@@ -120,7 +121,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         ResponseBean responseBean;
         try {
             if (excelHelper.hasExcelFormat(multipartFile)) {
-                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream());
+                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(),receivedDate);
                 if (sampleDataList != null) {
                     //validate the sample data mandatory fields
                     String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
