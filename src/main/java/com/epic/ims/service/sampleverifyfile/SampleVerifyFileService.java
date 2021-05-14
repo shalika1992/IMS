@@ -45,7 +45,7 @@ public class SampleVerifyFileService {
     CommonVarList commonVarList;
 
     @LogService
-    public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
+    public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
         long count = 0;
         try {
             count = sampleVerifyFileRepository.getDataCount(sampleFileVerificationInputBean);
@@ -71,7 +71,7 @@ public class SampleVerifyFileService {
     }
 
     @LogService
-    public SampleVerifyFile getSampleVerifyRecord(String id) {
+    public SampleVerifyFile getSampleVerifyRecord(String id) throws Exception {
         SampleVerifyFile sampleVerifyFile;
         try {
             sampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(id);

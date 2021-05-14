@@ -22,6 +22,7 @@ public class SampleFileVerificationInputBean extends DataTablesRequest {
     private String symptomatic;
     private String contactType;
     private String nic;
+    private String status;
     private String address;
     private String residentDistrict;
     private String contactNumber;
