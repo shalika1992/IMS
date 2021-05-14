@@ -282,6 +282,11 @@
             $('#modalAddInstitution').modal('show');
         }
 
+        function openAddBulkModal() {
+            $('#modalAddInstitutionBulk').modal('toggle');
+            $('#modalAddInstitutionBulk').modal('show');
+        }
+
         function searchStart() {
             oTable.fnDraw();
         }
@@ -421,7 +426,8 @@
                         <!--end::Button-->
 
                         <!--begin::Button-->
-                        <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
+                        <a href="#" onclick="openAddBulkModal()" style="margin-left: 10px"
+                           class="btn btn-sm btn-primary font-weight-bolder">
 											<span class="svg-icon svg-icon-md">
 												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 												<svg xmlns="http://www.w3.org/2000/svg"
@@ -474,6 +480,7 @@
 </div>
 <!-- start include jsp files -->
 <jsp:include page="institution-mgt-add.jsp"/>
+<jsp:include page="institution-mgt-add-bulk.jsp"/>
 <jsp:include page="institution-mgt-update.jsp"/>
 <jsp:include page="../common/delete-modal.jsp"/>
 <!-- end include jsp files -->

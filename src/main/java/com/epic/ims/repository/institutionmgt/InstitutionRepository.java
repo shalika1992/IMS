@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class InstitutionRepository {
 
     private final String SQL_GET_COUNT = "select count(*) from institution i where ";
     private final String SQL_FIND_INSTITUTION = "select institutioncode, name, address, contactno, status,lastupdateduser,lastupdatedtime,createdtime from institution where institutioncode = ?";
-    private final String SQL_INSERT_INSTITUTION = "insert into " +
+    private final String SQL_INSERT_INSTITUTION="insert into " +
             "institution(institutioncode, name, address, contactno, status, createduser, createdtime," +
             " lastupdateduser, lastupdatedtime) " +
             "VALUES (?,?,?,?,?,?,?,?,?)";
@@ -56,13 +57,40 @@ public class InstitutionRepository {
     public String deleteInstitution(String institutionCode) {
         String message = "";
         try {
-            int value = jdbcTemplate.update(SQL_DELETE_INSTITUTION, institutionCode);
+            int value = jdbcTemplate.update(SQL_DELETE_INSTITUTION,institutionCode);
 
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
         } catch (Exception ex) {
             throw ex;
+        }
+        return message;
+    }
+
+    @Transactional
+    public String insertInstitutionBulk(List<InstitutionInputBean> institutionInputBeanList) throws Exception {
+        String message = "";
+        StringBuilder bulkInsertSql = new StringBuilder("insert into institution(institutioncode, name, address, contactno, status, createduser, createdtime, lastupdateduser, lastupdatedtime) " +
+                "values");
+        try {
+            int value = 0;
+            int listSize = institutionInputBeanList.size();
+
+            String SQL_INSERT_INSTITUTION_BULK = createBulkInsertClause(institutionInputBeanList, bulkInsertSql);
+
+            System.out.println(SQL_INSERT_INSTITUTION_BULK);
+
+            //insert query
+            value = jdbcTemplate.update(SQL_INSERT_INSTITUTION_BULK);
+
+            if (value != listSize) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (DuplicateKeyException ex) {
+            throw ex;
+        } catch (Exception e) {
+            throw e;
         }
         return message;
     }
@@ -98,7 +126,7 @@ public class InstitutionRepository {
 
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
 
-        } catch (Exception exception) {
+        }catch (Exception exception){
             logger.error(exception);
             throw exception;
         }
@@ -167,7 +195,7 @@ public class InstitutionRepository {
                     } catch (Exception e) {
                         institution.setContactNumber(null);
                     }
-
+                    
                     try {
                         institution.setStatus(rs.getString("status"));
                     } catch (Exception e) {
@@ -204,16 +232,16 @@ public class InstitutionRepository {
 
     @Transactional(readOnly = true)
     public List<Institution> getInstitutionSearchList(InstitutionInputBean institutionInputBean) {
-        List<Institution> institutionList = null;
+        List<Institution> institutionList =  null;
 
-        try {
+        try{
             StringBuilder dynamicClause = this.setDynamicClause(institutionInputBean, new StringBuilder());
 
             //create sorting order
             String sortingStr = "";
-            String col = "";
+            String col="";
 
-            switch (institutionInputBean.sortedColumns.get(0)) {
+            switch (institutionInputBean.sortedColumns.get(0)){
                 case 0:
                     col = "i.institutioncode";
                     break;
@@ -238,14 +266,14 @@ public class InstitutionRepository {
                 default:
                     col = "i.createdtime";
             }
-            sortingStr = " order by " + col + " " + institutionInputBean.sortDirections.get(0);
+            sortingStr = " order by "+ col + " " + institutionInputBean.sortDirections.get(0);
 
             String sql = "select i.institutioncode as institutioncode, i.address as address, i.name as institutionname, i.contactno as contactnumber, " +
                     "s.description as statusdescription, " +
                     "i.createdtime as createdtime, i.lastupdateduser as lastupdateduser, i.lastupdatedtime as lastupdatedtime " +
                     "from institution i " +
                     "left join status s on s.code = i.status where " +
-                    dynamicClause.toString() + sortingStr +
+                    dynamicClause.toString() + sortingStr+
                     " limit " + institutionInputBean.displayLength + " offset " + institutionInputBean.displayStart;
 
 
@@ -302,36 +330,70 @@ public class InstitutionRepository {
                 return institution;
             });
 
-        } catch (Exception exception) {
+        }catch (Exception exception){
             throw exception;
         }
 
         return institutionList;
     }
 
-    private StringBuilder setDynamicClause(InstitutionInputBean institutionInputBean, StringBuilder dynamicClause) {
+    private StringBuilder setDynamicClause(InstitutionInputBean institutionInputBean, StringBuilder dynamicClause){
         dynamicClause.append("1=1 ");
 
-        try {
-            if (institutionInputBean.getInstitutionName() != null && !institutionInputBean.getInstitutionName().isEmpty()) {
-                dynamicClause.append("and lower(i.institutionName) like lower('%").append(institutionInputBean.getInstitutionName()).append("%') ");
+        try{
+            if (institutionInputBean.getInstitutionName()!=null && !institutionInputBean.getInstitutionName().isEmpty()){
+                dynamicClause.append("and lower(i.name) like lower('%").append(institutionInputBean.getInstitutionName()).append("%') ");
             }
 
-            if (institutionInputBean.getInstitutionCode() != null && !institutionInputBean.getInstitutionCode().isEmpty()) {
+            if (institutionInputBean.getInstitutionCode()!=null && !institutionInputBean.getInstitutionCode().isEmpty()){
                 dynamicClause.append("and lower(i.institutionCode) like lower('%").append(institutionInputBean.getInstitutionCode()).append("%') ");
             }
 
-            if (institutionInputBean.getContactNumber() != null && !institutionInputBean.getContactNumber().isEmpty()) {
-                dynamicClause.append("and lower(i.mobile) like lower('%").append(institutionInputBean.getContactNumber()).append("%') ");
+            if (institutionInputBean.getContactNumber()!=null && !institutionInputBean.getContactNumber().isEmpty()){
+                dynamicClause.append("and lower(i.contactno) like lower('%").append(institutionInputBean.getContactNumber()).append("%') ");
             }
 
-            if (institutionInputBean.getStatus() != null && !institutionInputBean.getStatus().isEmpty()) {
+            if (institutionInputBean.getStatus()!=null && !institutionInputBean.getStatus().isEmpty()){
                 dynamicClause.append("and i.status like '%").append(institutionInputBean.getStatus()).append("%' ");
             }
-        } catch (Exception exception) {
+        }catch (Exception exception){
             throw exception;
         }
 
         return dynamicClause;
+    }
+
+    private String createBulkInsertClause(List<InstitutionInputBean> institutionInputBeanList, StringBuilder bulkInsertSql){
+        InstitutionInputBean institutionInputBean = institutionInputBeanList.get(0);
+        int listLength = institutionInputBeanList.size();
+        int count=0;
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
+        String formattedCCreatedTime = formatter.format(institutionInputBean.getCreatedTime());
+        String formattedCLastUpdatedTime = formatter.format(institutionInputBean.getLastUpdatedTime());
+
+        String status = institutionInputBean.getStatus();
+        String createdUser = "error";
+        String lastUpdatedUser = institutionInputBean.getLastUpdatedUser();
+
+        String commonValues = "'"+status+"', "+"'"+createdUser+"', "+"'"+formattedCCreatedTime+"', "+"'"+lastUpdatedUser+"', "+"'"+formattedCLastUpdatedTime+"'";
+
+        for (InstitutionInputBean inputBean : institutionInputBeanList){
+            count++;
+
+            bulkInsertSql.append("('");
+            bulkInsertSql.append(inputBean.getInstitutionCode()).append("', '");
+            bulkInsertSql.append(inputBean.getInstitutionName()).append("', '");
+            bulkInsertSql.append(inputBean.getAddress()).append("', '");
+            bulkInsertSql.append(inputBean.getContactNumber()).append("', ");
+            bulkInsertSql.append(commonValues);
+            bulkInsertSql.append(")");
+
+            if (count != listLength){
+                bulkInsertSql.append(",");
+            }
+        }
+
+        return bulkInsertSql.toString();
     }
 }
