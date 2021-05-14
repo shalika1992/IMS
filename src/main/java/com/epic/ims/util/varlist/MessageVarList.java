@@ -63,6 +63,7 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
     public static final String INSTITUTION_MGT_INVALID_FILE = "institution.invalid.file";
     public static final String INSTITUTION_MGT_INVALID_COLUMN_ORDER = "institution.invalid.columnorder";
+    public static final String INSTITUTION_MGT_DUPLICATE_RECORD = "institution.duplicate.record";
     public static final String INSTITUTION_MGT_EMPTY_SHEET = "institution.empty.sheet";
     public static final String INSTITUTION_MGT_INVALID_DATA = "institution.invalid.data";
 

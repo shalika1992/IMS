@@ -123,7 +123,6 @@ public class InstitutionService {
                         institution.setStatus(StatusVarList.STATUS_DFLT_ACT);
 
                         //set the other values to input bean
-
                         Date currentDate = commonRepository.getCurrentDate();
                         String lastUpdatedUser = sessionBean.getUsername();
 
