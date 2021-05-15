@@ -3,7 +3,6 @@ package com.epic.ims.repository.plateassign;
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
-import com.epic.ims.repository.login.LoginRepository;
 import com.epic.ims.util.varlist.CommonVarList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +20,7 @@ import java.util.Map;
 @Repository
 @Scope("prototype")
 public class PlateAssignRepository {
-    private static Logger logger = LogManager.getLogger(LoginRepository.class);
+    private static Logger logger = LogManager.getLogger(PlateAssignRepository.class);
 
     @Autowired
     SessionBean sessionBean;

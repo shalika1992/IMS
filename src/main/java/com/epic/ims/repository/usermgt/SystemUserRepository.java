@@ -6,8 +6,8 @@ import com.epic.ims.mapping.user.usermgt.SystemUser;
 import com.epic.ims.service.common.CommonService;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +26,7 @@ import java.util.List;
 @Repository
 @Scope("request")
 public class SystemUserRepository {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(SystemUserRepository.class);
 
     @Autowired
     JdbcTemplate jdbcTemplate;

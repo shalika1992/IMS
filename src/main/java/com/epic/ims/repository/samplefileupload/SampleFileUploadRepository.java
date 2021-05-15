@@ -8,6 +8,8 @@ import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
@@ -24,6 +26,7 @@ import java.util.List;
 @Repository
 @Scope("prototype")
 public class SampleFileUploadRepository {
+    private static Logger logger = LogManager.getLogger(SampleFileUploadRepository.class);
 
     @Autowired
     SessionBean sessionBean;
