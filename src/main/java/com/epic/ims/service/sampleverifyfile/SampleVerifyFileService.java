@@ -45,7 +45,7 @@ public class SampleVerifyFileService {
     CommonVarList commonVarList;
 
     @LogService
-    public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
+    public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
         long count = 0;
         try {
             count = sampleVerifyFileRepository.getDataCount(sampleFileVerificationInputBean);
@@ -68,5 +68,75 @@ public class SampleVerifyFileService {
             throw e;
         }
         return sampleVerifyFileList;
+    }
+
+    @LogService
+    public SampleVerifyFile getSampleVerifyRecord(String id) throws Exception {
+        SampleVerifyFile sampleVerifyFile;
+        try {
+            sampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(id);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return sampleVerifyFile;
+    }
+
+    @LogService
+    public String verifySampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+        String message = "";
+        try {
+            List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileSearchList(sampleFileVerificationInputBean);
+            //TODO
+        } catch (EmptyResultDataAccessException ere) {
+            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+    @LogService
+    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+        String message = "";
+        SampleVerifyFile existingSampleVerifyFile = null;
+        try {
+            existingSampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getId());
+            if (existingSampleVerifyFile != null) {
+                //set the other values to input bean
+                Date currentDate = commonRepository.getCurrentDate();
+                String lastUpdatedUser = sessionBean.getUsername();
+
+                sampleFileVerificationInputBean.setId(existingSampleVerifyFile.getId() + "");
+                sampleFileVerificationInputBean.setReferenceNo(existingSampleVerifyFile.getReferenceNo());
+                sampleFileVerificationInputBean.setReceivedDate(existingSampleVerifyFile.getReceivedDate());
+                sampleFileVerificationInputBean.setInstitutionCode(existingSampleVerifyFile.getInstitutionCode());
+                sampleFileVerificationInputBean.setName(existingSampleVerifyFile.getName());
+                sampleFileVerificationInputBean.setAge(existingSampleVerifyFile.getAge());
+                sampleFileVerificationInputBean.setGender(existingSampleVerifyFile.getGender());
+                sampleFileVerificationInputBean.setSymptomatic(existingSampleVerifyFile.getSymptomatic());
+                sampleFileVerificationInputBean.setContactType(existingSampleVerifyFile.getContactType());
+                sampleFileVerificationInputBean.setNic(existingSampleVerifyFile.getNic());
+                sampleFileVerificationInputBean.setAddress(existingSampleVerifyFile.getAddress());
+                sampleFileVerificationInputBean.setResidentDistrict(existingSampleVerifyFile.getResidentDistrict());
+                sampleFileVerificationInputBean.setContactNumber(existingSampleVerifyFile.getContactNumber());
+                sampleFileVerificationInputBean.setSecondaryContactNumber(existingSampleVerifyFile.getSecondaryContactNumber());
+                sampleFileVerificationInputBean.setCreatedTime(currentDate);
+                sampleFileVerificationInputBean.setCreatedUser(existingSampleVerifyFile.getCreatedUser());
+                sampleFileVerificationInputBean.setLastUpdatedTime(currentDate);
+                sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
+
+                //update the sample record
+                message = sampleVerifyFileRepository.rejectSampleRecord(sampleFileVerificationInputBean);
+            } else {
+                message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
     }
 }
