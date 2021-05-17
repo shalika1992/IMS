@@ -79,9 +79,6 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         return modelAndView;
     }
 
-
-
-
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
     @PostMapping(value = "/listSampleVerification", headers = {"content-type=application/json"})
