@@ -3,9 +3,7 @@ package com.epic.ims.repository.rejectedsample;
 
 import com.epic.ims.bean.rejectedsample.RejectedSampleDataInputBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
-import com.epic.ims.mapping.user.usermgt.SystemUser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +69,7 @@ public class RejectedSampleRepository {
                 dynamicClause.append("and lower(rd.nic) like lower('%").append(rejectedSampleDataInputBean.getNic()).append("%') ");
             }
 
-            if (rejectedSampleDataInputBean.getReceivedDate() != null ) {
+            if (rejectedSampleDataInputBean.getReceivedDate() != null) {
                 dynamicClause.append("and rd.receiveddate like '%").append(rejectedSampleDataInputBean.getReceivedDate()).append("%' ");
             }
 
@@ -252,7 +250,6 @@ public class RejectedSampleRepository {
 
         return rejectedSampleDataList;
     }
-
 
 
 }

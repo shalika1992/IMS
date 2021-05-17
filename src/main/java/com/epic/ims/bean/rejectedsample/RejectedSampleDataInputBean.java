@@ -1,6 +1,6 @@
 package com.epic.ims.bean.rejectedsample;
 
-import com.epic.ims.mapping.institutionmgt.Institution;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.util.common.DataTablesRequest;
 import lombok.*;
 

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -396,5 +397,9 @@ public class InstitutionRepository {
         }
 
         return bulkInsertSql.toString();
+    }
+
+    public List<Institution> getAllInstitutionList() {
+        return new ArrayList<>();
     }
 }

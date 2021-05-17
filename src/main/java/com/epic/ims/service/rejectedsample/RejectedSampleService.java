@@ -2,9 +2,7 @@ package com.epic.ims.service.rejectedsample;
 
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.rejectedsample.RejectedSampleDataInputBean;
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
-import com.epic.ims.mapping.user.usermgt.SystemUser;
 import com.epic.ims.repository.rejectedsample.RejectedSampleRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,11 +21,11 @@ public class RejectedSampleService {
     RejectedSampleRepository rejectedSampleRepository;
 
     @LogService
-    public long getCount(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception{
-        long count=0;
-        try{
-            count=rejectedSampleRepository.getCount(rejectedSampleDataInputBean);
-        }catch (Exception exception){
+    public long getCount(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception {
+        long count = 0;
+        try {
+            count = rejectedSampleRepository.getCount(rejectedSampleDataInputBean);
+        } catch (Exception exception) {
             throw exception;
         }
         return count;
