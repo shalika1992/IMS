@@ -1,6 +1,5 @@
 package com.epic.ims.service.institutionmgt;
 
-import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.institution.Institution;
@@ -10,8 +9,6 @@ import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.StatusVarList;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,8 +32,6 @@ import java.util.Locale;
 @Service
 @Scope("prototype")
 public class InstitutionService {
-    private static Logger logger = LogManager.getLogger(InstitutionService.class);
-
     @Autowired
     InstitutionRepository institutionRepository;
 
@@ -52,103 +47,6 @@ public class InstitutionService {
     @Autowired
     Common common;
 
-    @LogService
-    public long getCount(InstitutionInputBean institutionInputBean) throws Exception {
-        long count = 0;
-        try {
-            count = institutionRepository.getCount(institutionInputBean);
-        } catch (Exception ere) {
-            throw ere;
-        }
-        return count;
-    }
-
-    @LogService
-    public List<Institution> getInstitutionSearchResultList(InstitutionInputBean institutionInputBean) {
-        List<Institution> institutionList;
-        try {
-            institutionList = institutionRepository.getInstitutionSearchList(institutionInputBean);
-        } catch (Exception exception) {
-            throw exception;
-        }
-        return institutionList;
-    }
-
-    @LogService
-    public String insertInstitution(InstitutionInputBean institutionInputBean, Locale locale) {
-        String message = "";
-        try {
-            Institution existingInstitution = institutionRepository.getInstitution(institutionInputBean.getInstitutionCode().trim());
-            if (existingInstitution == null) {
-                //set the other values to input bean
-                Date currentDate = commonRepository.getCurrentDate();
-                String lastUpdatedUser = sessionBean.getUsername();
-                institutionInputBean.setCreatedTime(currentDate);
-                institutionInputBean.setLastUpdatedUser(lastUpdatedUser);
-                institutionInputBean.setLastUpdatedTime(currentDate);
-
-                message = institutionRepository.insertInstitution(institutionInputBean);
-            } else {
-                message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
-            }
-        } catch (DuplicateKeyException ex) {
-            message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
-        } catch (Exception exception) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
-        }
-        return message;
-    }
-
-    @LogService
-    public Institution getInstitution(String institutionCode) throws Exception {
-        Institution institution;
-        try {
-            institution = institutionRepository.getInstitution(institutionCode);
-        } catch (EmptyResultDataAccessException ere) {
-            throw ere;
-        } catch (Exception e) {
-            throw e;
-        }
-        return institution;
-    }
-
-    @LogService
-    public String updateInstitution(InstitutionInputBean institutionInputBean) {
-        String message = "";
-        Institution existingInstitution = null;
-        try {
-            existingInstitution = institutionRepository.getInstitution(institutionInputBean.getInstitutionCode());
-            if (existingInstitution != null) {
-                //check changed values
-                String oldValueAsString = this.getInstitutionAsString(existingInstitution, true);
-                String newValueAsString = this.getInstitutionAsString(institutionInputBean, true);
-                //check the old value and new value
-                if (oldValueAsString.equals(newValueAsString)) {
-                    message = MessageVarList.COMMON_ERROR_NO_VALUE_CHANGE;
-                } else {
-                    //set the other values to input bean
-                    Date currentDate = commonRepository.getCurrentDate();
-                    String lastUpdatedUser = sessionBean.getUsername();
-
-                    institutionInputBean.setCreatedTime(currentDate);
-                    institutionInputBean.setLastUpdatedTime(currentDate);
-                    institutionInputBean.setLastUpdatedUser(lastUpdatedUser);
-
-                    message = institutionRepository.updateInstitution(institutionInputBean);
-                }
-            } else {
-                message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
-            }
-        } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
-
-        } catch (Exception e) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
-        }
-        return message;
-    }
-
-    @LogService
     public String deleteInstitution(String institutionCode) {
         String message = "";
         Institution existingInstitution = null;
@@ -168,9 +66,9 @@ public class InstitutionService {
         return message;
     }
 
-    @LogService
     public String insertInstitutionBulk(InstitutionInputBean institutionInputBean, Locale locale) {
         String message = "";
+
         try {
             MultipartFile file = institutionInputBean.getInstitutionBulk();
             Workbook workbook = null;
@@ -196,6 +94,7 @@ public class InstitutionService {
                     String institutionName = null;
                     String address = null;
                     String contactNumber = null;
+
                     for (Cell cell : row) {
                         if (cell.getColumnIndex() == 0) {
                             institutionCode = cell.getStringCellValue();
@@ -210,22 +109,27 @@ public class InstitutionService {
                     }
 
                     Institution existingInstitution = institutionRepository.getInstitution(institutionCode.trim());
+
                     if (existingInstitution == null) {
+                        InstitutionInputBean institution = new InstitutionInputBean();
+
+                        institution.setInstitutionCode(institutionCode.trim().toUpperCase(Locale.ROOT));
+                        institution.setInstitutionName(institutionName.trim());
+                        institution.setAddress(address);
+                        institution.setContactNumber(contactNumber.trim());
+                        institution.setStatus(StatusVarList.STATUS_DFLT_ACT);
+
                         //set the other values to input bean
                         Date currentDate = commonRepository.getCurrentDate();
                         String lastUpdatedUser = sessionBean.getUsername();
 
-                        InstitutionInputBean institution = new InstitutionInputBean();
-                        institution.setInstitutionCode(institutionCode);
-                        institution.setInstitutionName(institutionName);
-                        institution.setAddress(address);
-                        institution.setContactNumber(contactNumber);
-                        institution.setStatus(StatusVarList.STATUS_DFLT_ACT);
                         institution.setCreatedTime(currentDate);
-                        institution.setLastUpdatedUser(lastUpdatedUser);
+                        institution.setLastUpdatedUser("error");
                         institution.setLastUpdatedTime(currentDate);
+
                         institutionInputBeanList.add(institution);
                     }
+
                 }
             }
 
@@ -234,6 +138,45 @@ public class InstitutionService {
             } else {
                 message = MessageVarList.INSTITUTION_BULK_MGT_ALREADY_EXISTS;
             }
+
+
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+
+        return message;
+    }
+
+    public String updateInstitution(InstitutionInputBean institutionInputBean) {
+        String message = "";
+        Institution existingInstitution = null;
+        try {
+            existingInstitution = institutionRepository.getInstitution(institutionInputBean.getInstitutionCode());
+            if (existingInstitution != null) {
+                //check changed values
+                String oldValueAsString = this.getInstitutionAsString(existingInstitution, true);
+                String newValueAsString = this.getInstitutionAsString(institutionInputBean, true);
+                //check the old value and new value
+                if (oldValueAsString.equals(newValueAsString)) {
+                    message = MessageVarList.COMMON_ERROR_NO_VALUE_CHANGE;
+                } else {
+                    //set the other values to input bean
+                    Date currentDate = commonRepository.getCurrentDate();
+                    String lastUpdatedUser = sessionBean.getUsername();
+
+                    institutionInputBean.setCreatedTime(currentDate);
+                    institutionInputBean.setLastUpdatedTime(currentDate);
+                    institutionInputBean.setLastUpdatedUser(lastUpdatedUser);
+
+                    message = institutionRepository.updateInstitution(institutionInputBean);
+
+                }
+            } else {
+                message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
@@ -290,6 +233,7 @@ public class InstitutionService {
         StringBuilder institutionStringBuilder = new StringBuilder();
         try {
             if (institutionInputBean != null) {
+
                 if (institutionInputBean.getInstitutionCode() != null && !institutionInputBean.getInstitutionCode().isEmpty()) {
                     institutionStringBuilder.append(institutionInputBean.getInstitutionCode());
                 } else {
@@ -323,10 +267,77 @@ public class InstitutionService {
                 } else {
                     institutionStringBuilder.append("--");
                 }
+
             }
         } catch (Exception e) {
             throw e;
         }
         return institutionStringBuilder.toString();
+    }
+
+    public long getCount(InstitutionInputBean institutionInputBean) throws Exception {
+        long count = 0;
+
+        try {
+            count = institutionRepository.getCount(institutionInputBean);
+        } catch (Exception ere) {
+            throw ere;
+        }
+
+        return count;
+    }
+
+    public List<Institution> getInstitutionSearchResultList(InstitutionInputBean institutionInputBean) {
+        List<Institution> institutionList;
+
+        try {
+            institutionList = institutionRepository.getInstitutionSearchList(institutionInputBean);
+        } catch (Exception exception) {
+            throw exception;
+        }
+
+        return institutionList;
+    }
+
+    public String insertInstitution(InstitutionInputBean institutionInputBean, Locale locale) {
+        String message = "";
+
+        try {
+            Institution existingInstitution = institutionRepository.getInstitution(institutionInputBean.getInstitutionCode().trim());
+
+            if (existingInstitution == null) {
+
+                //set the other values to input bean
+                Date currentDate = commonRepository.getCurrentDate();
+                String lastUpdatedUser = sessionBean.getUsername();
+
+                institutionInputBean.setCreatedTime(currentDate);
+                institutionInputBean.setLastUpdatedUser("error");
+                institutionInputBean.setLastUpdatedTime(currentDate);
+                institutionInputBean.setInstitutionCode(institutionInputBean.getInstitutionCode().trim().toUpperCase(Locale.ROOT));
+
+                message = institutionRepository.insertInstitution(institutionInputBean);
+            } else {
+                message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
+            }
+        } catch (DuplicateKeyException ex) {
+            message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
+        } catch (Exception exception) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+
+        return message;
+    }
+
+    public Institution getInstitution(String institutionCode) throws Exception {
+        Institution institution;
+        try {
+            institution = institutionRepository.getInstitution(institutionCode);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return institution;
     }
 }

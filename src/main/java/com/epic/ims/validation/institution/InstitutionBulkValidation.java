@@ -61,7 +61,7 @@ public class InstitutionBulkValidation {
                 excelFile.close();
             }
         } else {
-            responseBean = new ResponseBean(false, null, MessageVarList.COMMON_ERROR_PROCESS);
+            responseBean = new ResponseBean(false, null, MessageVarList.INSTITUTION_MGT_EMPTY_FILE);
         }
 
         return responseBean;
@@ -164,7 +164,7 @@ public class InstitutionBulkValidation {
 
         for (Cell cell : titleRow) {
             try {
-                columnOrder.append(cell.getRichStringCellValue());
+                columnOrder.append(cell.getRichStringCellValue().toString().trim());
             } catch (Exception e) {
                 columnOrder.append("--");
             } finally {
