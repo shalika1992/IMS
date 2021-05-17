@@ -4,7 +4,7 @@ import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
+import com.epic.ims.bean.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.repository.common.CommonRepository;

@@ -1,5 +1,6 @@
 package com.epic.ims.repository.samplefileupload;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -48,6 +49,7 @@ public class SampleFileUploadRepository {
     private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.id = ?";
     private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser,createdtime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public long getDataCount(SampleFileInputBean sampleFileInputBean) {
         long count = 0;
@@ -65,6 +67,7 @@ public class SampleFileUploadRepository {
         return count;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleFile> getSampleFileSearchList(SampleFileInputBean sampleFileInputBean) {
         List<SampleFile> sampleFileList = null;
@@ -206,6 +209,7 @@ public class SampleFileUploadRepository {
         return sampleFileList;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleData> getExistingSampleDataList(String receiveDate) {
         List<SampleData> sampleDataList = null;
@@ -246,6 +250,7 @@ public class SampleFileUploadRepository {
         return sampleDataList;
     }
 
+    @LogRepository
     @Transactional
     public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {
         String message = "";
@@ -291,6 +296,7 @@ public class SampleFileUploadRepository {
         return message;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public SampleFile getSampleRecord(String id) {
         SampleFile sampleFile;
@@ -421,6 +427,7 @@ public class SampleFileUploadRepository {
         return sampleFile;
     }
 
+    @LogRepository
     @Transactional
     public String updateSampleFileRecord(SampleFileInputBean sampleFileInputBean) {
         String message = "";

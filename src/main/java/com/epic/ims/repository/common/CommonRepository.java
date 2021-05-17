@@ -4,6 +4,8 @@ import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
+import com.epic.ims.mapping.institution.Institution;
+import com.epic.ims.mapping.plate.Plate;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.util.varlist.CommonVarList;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +42,8 @@ public class CommonRepository {
     private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "select code, description from status where statuscategory=?";
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
     private final String SQL_GET_DISTRICT_LIST = "select code, description from district order by description asc";
+    private final String SQL_GET_INSTITUTION_LIST = "select institutioncode as code, name from institution where status=? order by name asc";
+    private final String SQL_GET_PLATE_LIST = "select id , code , receiveddate , createddate from plate where receiveddate = ? order by id asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
@@ -68,7 +72,7 @@ public class CommonRepository {
     @LogRepository
     @Transactional(readOnly = true)
     public String getCurrentDateAsString() throws Exception {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String currentDateAsString = "";
         try {
             Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
@@ -153,7 +157,6 @@ public class CommonRepository {
         return statusCode;
     }
 
-
     @LogRepository
     @Transactional(readOnly = true)
     public List<District> getDistrictList() throws Exception {
@@ -173,5 +176,49 @@ public class CommonRepository {
             throw e;
         }
         return dList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<Institution> getInstitutionList() {
+        List<Institution> institutionList;
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_INSTITUTION_LIST, new Object[]{commonVarList.STATUS_ACTIVE});
+            institutionList = list.stream().map((record) -> {
+                Institution institution = new Institution();
+                institution.setInstitutionCode(record.get("code").toString());
+                institution.setInstitutionName(record.get("name").toString());
+                return institution;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            institutionList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return institutionList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<Plate> getPlateListList(String receivedDate) {
+        List<Plate> plateList;
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_PLATE_LIST, new Object[]{receivedDate});
+            plateList = list.stream().map((record) -> {
+                Plate plate = new Plate();
+                plate.setId(record.get("id").toString());
+                plate.setCode(record.get("code").toString());
+                plate.setReceivedDate(record.get("receiveddate") != null ? (Date) record.get("receiveddate") : null);
+                plate.setCreatedDate(record.get("createddate") != null ? (Date) record.get("createddate") : null);
+                return plate;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            plateList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return plateList;
     }
 }

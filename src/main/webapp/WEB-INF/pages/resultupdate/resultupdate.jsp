@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: shalika_w
-  Date: 5/9/2021
-  Time: 9:03 PM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -21,7 +14,7 @@
         var header = $("meta[name='_csrf_header']").attr("content");
 
         $(document).ready(function () {
-            $('#searchReceivedDate').datepicker({
+            $('#receivedDate').datepicker({
                 format: 'yyyy-mm-dd',
                 endDate: '+0d',
                 setDate: new Date(),
@@ -31,6 +24,10 @@
             });
             setReceivedDate();
             loadDataTable();
+
+            $('#receivedDate').datepicker().on('changeDate', function (ev) {
+                getCorrespondingPlateList();
+            });
         });
 
         function loadDataTable() {
@@ -62,21 +59,22 @@
 
             oTable = $('#table').dataTable({
                 bServerSide: true,
-                sAjaxSource: "${pageContext.servletContext.contextPath}/listSampleFile.json",
+                sAjaxSource: "${pageContext.servletContext.contextPath}/listResultUpdate.json",
                 fnServerData: function (sSource, aoData, fnCallback) {
                     aoData.push(
                         {'name': 'csrf_token', 'value': token},
                         {'name': 'header', 'value': header},
-                        {'name': 'receivedDate', 'value': $('#searchReceivedDate').val()},
+                        {'name': 'receivedDate', 'value': $('#receivedDate').val()},
                         {'name': 'referenceNo', 'value': $('#referenceNo').val()},
-                        {'name': 'institutionCode', 'value': $('#institutionCode').val()},
                         {'name': 'name', 'value': $('#name').val()},
-                        {'name': 'nic', 'value': $('#nic').val()}
+                        {'name': 'nic', 'value': $('#nic').val()},
+                        {'name': 'institutionCode', 'value': $('#institutionCode').val()},
+                        {'name': 'plateId', 'value': $('#plateId').val()}
                     );
                     $.ajax({
                         dataType: 'json',
                         type: 'POST',
-                        url: "${pageContext.request.contextPath}/listSampleFile.json",
+                        url: "${pageContext.request.contextPath}/listResultUpdate.json",
                         contentType: "application/json",
                         data: stringify_aoData(aoData),
                         success: fnCallback,
@@ -120,8 +118,7 @@
                         targets: 2,
                         mDataProp: "institutionCode",
                         defaultContent: "--"
-                    },
-                    {
+                    }, {
                         title: "Name",
                         targets: 3,
                         mDataProp: "name",
@@ -146,27 +143,27 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Address",
+                        title: "Plate Id",
                         targets: 7,
-                        mDataProp: "address",
+                        mDataProp: "",
                         defaultContent: "--"
                     },
                     {
-                        title: "District",
+                        title: "Block Value",
                         targets: 8,
-                        mDataProp: "residentDistrict",
+                        mDataProp: "",
                         defaultContent: "--"
                     },
                     {
-                        title: "Contact No",
+                        title: "Pool Or Un-Pool",
                         targets: 9,
-                        mDataProp: "contactNumber",
+                        mDataProp: "",
                         defaultContent: "--"
                     },
                     {
-                        title: "Secondary Contact No",
+                        title: "Pool Id",
                         targets: 10,
-                        mDataProp: "secondaryContactNumber",
+                        mDataProp: "",
                         defaultContent: "--"
                     },
                     {
@@ -185,42 +182,22 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Created User",
-                        targets: 13,
-                        mDataProp: "createdUser",
-                        defaultContent: "--"
-                    },
-                    {
-                        title: "Created Time",
-                        targets: 14,
-                        mDataProp: "createdTime",
-                        defaultContent: "--",
-                        render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
-                        }
-                    },
-                    {
-                        title: "Update",
+                        title: "View",
                         sortable: false,
                         className: "dt-center",
                         mRender: function (data, type, full) {
-                            return '<button id="editBtn" class="btn btn-default btn-sm"  onclick="editSampleFileRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-edit.svg" alt=""></button>';
+                            return '<button id=' + full.id + ' class="btn btn-default btn-sm"  onclick="viewRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-view.svg" alt=""></button>';
                         },
-                        targets: 15,
+                        targets: 13,
                         defaultContent: "--"
                     }
                 ]
             });
         }
 
-        function openAddModal() {
-            $('#modalUploadSampleFile').modal('toggle');
-            $('#modalUploadSampleFile').modal('show');
-        }
-
-        function editSampleFileRecord(id) {
+        function viewRecord(id) {
             $.ajax({
-                url: "${pageContext.request.contextPath}/getSampleFileRecord.json",
+                url: "${pageContext.request.contextPath}/getRecordResultUpdate.json",
                 data: {
                     id: id
                 },
@@ -228,25 +205,7 @@
                 type: 'GET',
                 contentType: "application/json",
                 success: function (data) {
-                    $('#responseMsgUpdate').hide();
-
-                    $('#eid').val(data.id);
-                    $('#eid').attr('readOnly', true);
-
-                    $('#eReferenceNo').val(data.referenceNo);
-                    $('#eReferenceNo').attr('readOnly', true);
-
-                    $('#eName').val(data.name);
-                    $('#eAge').val(data.age);
-                    $('#eGender').val(data.gender);
-                    $('#eNic').val(data.nic);
-                    $('#eAddress').val(data.address);
-                    $('#eDistrict').val(data.residentDistrict);
-                    $('#eContactno').val(data.contactNumber);
-                    $('#eSecondaryContactNo').val(data.secondaryContactNumber);
-
-                    $('#modalUpdateSampleRecord').modal('toggle');
-                    $('#modalUpdateSampleRecord').modal('show');
+                    alert('--TODO--');
                 },
                 error: function (data) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -259,8 +218,12 @@
         }
 
         function resetSearch() {
-            $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
+            //reset date value
+            $("#receivedDate").datepicker('setDate', getReceivedDate());
+            //reset grid
             oTable.fnDraw();
+            //reset plate list
+            getCorrespondingPlateList();
         }
 
         function setReceivedDate() {
@@ -274,7 +237,21 @@
                 month = '0' + month;
             }
             var today = (date.getFullYear() + "-" + month + "-" + day);
-            $('#searchReceivedDate').val(today);
+            $('#receivedDate').val(today);
+        }
+
+        function setReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            var today = (date.getFullYear() + "-" + month + "-" + day);
+            $('#receivedDate').val(today);
         }
 
         function getReceivedDate() {
@@ -289,6 +266,33 @@
             }
             return (date.getFullYear() + "-" + month + "-" + day);
         }
+
+        function getCorrespondingPlateList() {
+            var receivedDate = $("#receivedDate").val();
+            $.ajax({
+                url: "${pageContext.request.contextPath}/getPlateList.json",
+                data: {
+                    receivedDate: receivedDate
+                },
+                dataType: "json",
+                type: 'GET',
+                contentType: "application/json",
+                success: function (data) {
+                    $('#plateId')[0].options.length = 0;
+                    //append the new list
+                    var options = '<option selected value=""><strong>Select Plate</strong></option>';
+                    if (data && data.length > 0) {
+                        $(data).each(function (index, value) {
+                            options += '<option value="' + value.id + '">' + value.code + '</option>';
+                        });
+                    }
+                    $('#plateId').html(options);
+                },
+                error: function (data) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -301,7 +305,7 @@
                 <!--begin::Page Heading-->
                 <div class="d-flex align-items-baseline flex-wrap mr-5">
                     <!--begin::Page Title-->
-                    <h5 class="text-dark font-weight-bold my-1 mr-5">Sample File Upload</h5>
+                    <h5 class="text-dark font-weight-bold my-1 mr-5">Result Update</h5>
                     <!--end::Page Title-->
                 </div>
                 <!--end::Page Heading-->
@@ -319,18 +323,18 @@
                     <!--begin::Card-->
                     <div class="card card-custom gutter-b">
                         <div class="card-header">
-                            <h3 class="card-title">Search Sample File Record</h3>
+                            <h3 class="card-title">Search Sample Record</h3>
                         </div>
                         <!--begin::Form-->
-                        <form:form class="form" id="samplefileuploadform" name="samplefileuploadform"
-                                   action="addSampleFileRecord" theme="simple" method="post"
-                                   modelAttribute="samplefile">
+                        <form:form class="form" id="resultupdateform" name="resultupdateform"
+                                   action="addResultUpdate" theme="simple" method="post"
+                                   modelAttribute="resultupdate">
                             <div class="card-body">
                                 <div class="form-group row">
                                     <div class="col-lg-4">
                                         <label>Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
-                                            <input path="receivedDate" name="receivedDate" id="searchReceivedDate"
+                                            <input path="receivedDate" name="receivedDate" id="receivedDate"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
@@ -353,16 +357,6 @@
                                     </div>
 
                                     <div class="col-lg-4">
-                                        <label>Institution Code:</label>
-                                        <select id="institutionCode" name="institutionCode" class="form-control">
-                                            <option selected value="">Select Institution Code</option>
-                                            <c:forEach items="${samplefile.institutionList}" var="institution">
-                                                <option value="${institution.institutionCode}">${institution.institutionName}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-lg-4">
                                         <label>Name :</label>
                                         <input id="name" name="name" type="text"
                                                maxlength="128" class="form-control form-control-sm"
@@ -381,14 +375,36 @@
                                         <span class="form-text text-muted">Please enter nic</span>
                                     </div>
 
+                                    <div class="col-lg-4">
+                                        <label>Institution Code:</label>
+                                        <select id="institutionCode" name="institutionCode" class="form-control">
+                                            <option selected value="">Select Institution Code</option>
+                                            <c:forEach items="${resultupdate.institutionList}" var="institution">
+                                                <option value="${institution.institutionCode}">${institution.institutionName}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <label>Plate :</label>
+                                        <select id="plateId" name="plateId" class="form-control">
+                                            <option selected value="">Select Plate</option>
+                                            <c:forEach items="${resultupdate.plateList}" var="plate">
+                                                <option value="${plate.id}">${plate.code}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <button type="button" class="btn btn-primary mr-2" onclick="search()">Search
+                                        <button type="button" class="btn btn-primary mr-2" onclick="search()">
+                                            Search
                                         </button>
-                                        <button type="button" class="btn btn-secondary" onclick="resetSearch()">Reset
+                                        <button type="button" class="btn btn-secondary" onclick="resetSearch()">
+                                            Reset
                                         </button>
                                     </div>
                                 </div>
@@ -401,26 +417,8 @@
 
             <div class="card card-custom gutter-b">
                 <div class="card-header flex-wrap border-0 pt-1 pb-0">
-                    <div class="card-title">
-                    </div>
-                    <div class="card-toolbar">
-                        <a href="#" onclick="openAddModal()" class="btn btn-primary font-weight-bolder">
-                            <span class="svg-icon svg-icon-md">
-                                <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     width="24px"
-                                     height="24px" viewBox="0 0 24 24" version="1.1">
-                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <rect x="0" y="0" width="24" height="24"/>
-                                        <circle fill="#000000" cx="9" cy="15" r="6"/>
-                                        <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
-                                              fill="#000000" opacity="0.3"/>
-                                    </g>
-                                </svg>
-                                <!--end::Svg Icon-->
-                            </span>Bulk Upload</a>
-                        <!--end::Button-->
-                    </div>
+                    <div class="card-title"></div>
+                    <div class="card-toolbar"></div>
                 </div>
                 <div class="card-body">
                     <!--begin: Datatable-->
@@ -439,15 +437,13 @@
                                 <th>Age</th>
                                 <th>Gender</th>
                                 <th>NIC</th>
-                                <th>Address</th>
-                                <th>District</th>
-                                <th>Contact No</th>
-                                <th>Secondary Contact No</th>
+                                <th>Plate Id</th>
+                                <th>Block Value</th>
+                                <th>Is Pool</th>
+                                <th>Pool Id</th>
                                 <th>Received Date</th>
                                 <th>Status</th>
-                                <th>Created User</th>
-                                <th>Created Time</th>
-                                <th>Update</th>
+                                <th>View</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -459,8 +455,4 @@
         </div>
     </div>
 </div>
-<!-- start include jsp files -->
-<jsp:include page="fileupload-update.jsp"/>
-<jsp:include page="fileupload-add.jsp"/>
-<!-- end include jsp files -->
 </html>

@@ -1,6 +1,6 @@
 package com.epic.ims.validation.sysuser;
 
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
+import com.epic.ims.bean.sysuser.SystemUserInputBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.TaskVarList;

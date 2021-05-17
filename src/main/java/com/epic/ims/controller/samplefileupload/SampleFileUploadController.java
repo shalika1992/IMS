@@ -6,9 +6,9 @@ import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
-import com.epic.ims.service.plateassign.PlateAssignService;
 import com.epic.ims.service.samplefile.SampleFileService;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.common.ExcelHelper;
@@ -121,7 +121,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         ResponseBean responseBean;
         try {
             if (excelHelper.hasExcelFormat(multipartFile)) {
-                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(),receivedDate);
+                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(), receivedDate);
                 if (sampleDataList != null) {
                     //validate the sample data mandatory fields
                     String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
@@ -198,13 +198,15 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         return responseBean;
     }
 
-
     @ModelAttribute
     public void getSampleFileUploadBean(Model map) throws Exception {
         SampleFileInputBean sampleFileInputBean = new SampleFileInputBean();
-        //get district list
+        //get district and institution list
         List<District> districtList = commonRepository.getDistrictList();
+        List<Institution> institutionList = commonRepository.getInstitutionList();
+        //set list to input bean
         sampleFileInputBean.setDistrictList(districtList);
+        sampleFileInputBean.setInstitutionList(institutionList);
         //add to model
         map.addAttribute("samplefile", sampleFileInputBean);
     }

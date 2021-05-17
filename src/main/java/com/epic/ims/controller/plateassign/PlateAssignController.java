@@ -55,12 +55,12 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
-    @RequestMapping(value = "/generateDefaultPlate", method = RequestMethod.GET)
+    @RequestMapping(value = "/generateDefaultPlate", method = RequestMethod.POST)
     public @ResponseBody
     Map<String, String> getDefaultPlate(@RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
         Map<String, String> defaultPlateMap = new HashMap<>();
         try {
-            plateAssignService.getDefaultPlate(receivedDate);
+            defaultPlateMap = plateAssignService.getDefaultPlate(receivedDate);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }

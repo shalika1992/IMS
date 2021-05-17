@@ -2,7 +2,7 @@ package com.epic.ims.service.sysuser;
 
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
+import com.epic.ims.bean.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.usermgt.SystemUserRepository;
@@ -80,7 +80,7 @@ public class SystemUserService {
                 String password = systemUserInputBean.getPassword();
 
                 systemUserInputBean.setCreatedTime(currentDate);
-                systemUserInputBean.setLastUpdatedUser("error");
+                systemUserInputBean.setLastUpdatedUser(lastUpdatedUser);
                 systemUserInputBean.setLastUpdatedTime(currentDate);
                 systemUserInputBean.setPassword(sha256Algorithm.makeHash(password));
 

@@ -96,47 +96,4 @@ public class SampleVerifyFileService {
         }
         return message;
     }
-
-    @LogService
-    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
-        String message = "";
-        SampleVerifyFile existingSampleVerifyFile = null;
-        try {
-            existingSampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getId());
-            if (existingSampleVerifyFile != null) {
-                //set the other values to input bean
-                Date currentDate = commonRepository.getCurrentDate();
-                String lastUpdatedUser = sessionBean.getUsername();
-
-                sampleFileVerificationInputBean.setId(existingSampleVerifyFile.getId() + "");
-                sampleFileVerificationInputBean.setReferenceNo(existingSampleVerifyFile.getReferenceNo());
-                sampleFileVerificationInputBean.setReceivedDate(existingSampleVerifyFile.getReceivedDate());
-                sampleFileVerificationInputBean.setInstitutionCode(existingSampleVerifyFile.getInstitutionCode());
-                sampleFileVerificationInputBean.setName(existingSampleVerifyFile.getName());
-                sampleFileVerificationInputBean.setAge(existingSampleVerifyFile.getAge());
-                sampleFileVerificationInputBean.setGender(existingSampleVerifyFile.getGender());
-                sampleFileVerificationInputBean.setSymptomatic(existingSampleVerifyFile.getSymptomatic());
-                sampleFileVerificationInputBean.setContactType(existingSampleVerifyFile.getContactType());
-                sampleFileVerificationInputBean.setNic(existingSampleVerifyFile.getNic());
-                sampleFileVerificationInputBean.setAddress(existingSampleVerifyFile.getAddress());
-                sampleFileVerificationInputBean.setResidentDistrict(existingSampleVerifyFile.getResidentDistrict());
-                sampleFileVerificationInputBean.setContactNumber(existingSampleVerifyFile.getContactNumber());
-                sampleFileVerificationInputBean.setSecondaryContactNumber(existingSampleVerifyFile.getSecondaryContactNumber());
-                sampleFileVerificationInputBean.setCreatedTime(currentDate);
-                sampleFileVerificationInputBean.setCreatedUser(existingSampleVerifyFile.getCreatedUser());
-                sampleFileVerificationInputBean.setLastUpdatedTime(currentDate);
-                sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
-
-                //update the sample record
-                message = sampleVerifyFileRepository.rejectSampleRecord(sampleFileVerificationInputBean);
-            } else {
-                message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
-            }
-        } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
-        } catch (Exception e) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
-        }
-        return message;
-    }
 }

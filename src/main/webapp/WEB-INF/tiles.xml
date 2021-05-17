@@ -76,6 +76,11 @@
         <put-attribute name="body" value="/WEB-INF/pages/platemgt/plateassign.jsp"/>
     </definition>
 
+    <!--result update page-->
+    <definition name="resultupdateview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/resultupdate/resultupdate.jsp"/>
+    </definition>
+
     <!--404 page-->
     <definition name="404" extends="newuser-template">
         <put-attribute name="body" value="/errors/404.jsp"/>

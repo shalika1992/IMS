@@ -1,4 +1,4 @@
-package com.epic.ims.mapping.institutionmgt;
+package com.epic.ims.mapping.institution;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

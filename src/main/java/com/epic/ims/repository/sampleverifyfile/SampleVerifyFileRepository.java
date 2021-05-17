@@ -1,15 +1,14 @@
 package com.epic.ims.repository.sampleverifyfile;
 
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.institutionmgt.Institution;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,7 +25,7 @@ import java.util.List;
 @Repository
 @Scope("prototype")
 public class SampleVerifyFileRepository {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(SampleVerifyFileRepository.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -46,35 +45,36 @@ public class SampleVerifyFileRepository {
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
     private final String SQL_FIND_SAMPLEDATAVERIFICATION = "select referenceNo, receivedDate, institutionCode, status from sample_data where id = ?";
 
+    @LogRepository
+    @Transactional(readOnly = true)
     public long getDataCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
         long count = 0;
-
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
-            this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
-
+            //create the where clause
+            dynamicClause = this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
+            //create the query
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
-
-        }catch (Exception exception){
+        } catch (Exception exception) {
             logger.error(exception);
             throw exception;
         }
-
         return count;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleVerifyFile> getSampleVerifyFileSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
-        List<SampleVerifyFile> sampleVerifyFileList =  null;
+        List<SampleVerifyFile> sampleVerifyFileList = null;
 
-        try{
+        try {
             StringBuilder dynamicClause = this.setDynamicClause(sampleFileVerificationInputBean, new StringBuilder());
 
             //create sorting order
             String sortingStr = "";
-            String col="";
+            String col = "";
 
-            switch (sampleFileVerificationInputBean.sortedColumns.get(0)){
+            switch (sampleFileVerificationInputBean.sortedColumns.get(0)) {
                 case 0:
                     col = "i.id";
                     break;
@@ -132,7 +132,7 @@ public class SampleVerifyFileRepository {
                 default:
                     col = "i.createdtime";
             }
-            sortingStr = " order by "+ col + " " + sampleFileVerificationInputBean.sortDirections.get(0);
+            sortingStr = " order by " + col + " " + sampleFileVerificationInputBean.sortDirections.get(0);
 
             String sql = "select i.id as id, i.referenceno as referenceno, i.receiveddate as receiveddate, i.institutioncode as institutioncode, " +
                     "i.name as name, i.age = age, i.gender = gender,i.symptomatic = symptomatic, i.contacttype = contacttype, i.nic = nic " +
@@ -141,7 +141,7 @@ public class SampleVerifyFileRepository {
                     "i.createdtime as createdtime, i.createduser as createduser, i.barcode as barcode, i.specimenid =specimenid " +
                     "from sample_data i " +
                     "left join status s on s.code = i.status where " +
-                    dynamicClause.toString() + sortingStr+
+                    dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileVerificationInputBean.displayLength + " offset " + sampleFileVerificationInputBean.displayStart;
 
 
@@ -154,7 +154,7 @@ public class SampleVerifyFileRepository {
                     sampleVerifyFile.setReferenceNo(null);
                 }
 
-                try{
+                try {
                     sampleVerifyFile.setReceivedDate(rs.getString("receivedDate"));
                 } catch (Exception e) {
                     sampleVerifyFile.setReceivedDate(null);
@@ -269,16 +269,14 @@ public class SampleVerifyFileRepository {
                     sampleVerifyFile.setLastUpdatedUser(null);
                 }
                 return sampleVerifyFile;
-
             });
-
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw exception;
         }
-
         return sampleVerifyFileList;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public SampleVerifyFile getSampleVerifyRecord(String id) throws SQLException {
         SampleVerifyFile sampleVerifyFile = null;
@@ -294,7 +292,7 @@ public class SampleVerifyFileRepository {
                         sampleVerifyFile.setReferenceNo(null);
                     }
 
-                    try{
+                    try {
                         sampleVerifyFile.setReceivedDate(rs.getString("receivedDate"));
                     } catch (Exception e) {
                         sampleVerifyFile.setReceivedDate(null);
@@ -384,7 +382,6 @@ public class SampleVerifyFileRepository {
                         sampleVerifyFile.setBarcode(null);
                     }
 
-
                     try {
                         sampleVerifyFile.setCreatedTime(new Date(rs.getDate("createdTime").getTime()));
                     } catch (Exception e) {
@@ -419,33 +416,27 @@ public class SampleVerifyFileRepository {
         return sampleVerifyFile;
     }
 
-    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
-        return null;
-    }
-
-    private StringBuilder setDynamicClause(SampleFileVerificationInputBean sampleFileVerificationInputBean, StringBuilder dynamicClause){
+    private StringBuilder setDynamicClause(SampleFileVerificationInputBean sampleFileVerificationInputBean, StringBuilder dynamicClause) {
         dynamicClause.append("1=1 ");
-
-        try{
-            if (sampleFileVerificationInputBean.getReceivedDate()!=null && !sampleFileVerificationInputBean.getReceivedDate().isEmpty()){
+        try {
+            if (sampleFileVerificationInputBean.getReceivedDate() != null && !sampleFileVerificationInputBean.getReceivedDate().isEmpty()) {
                 dynamicClause.append("and lower(i.receivedDate) like lower('%").append(sampleFileVerificationInputBean.getReceivedDate()).append("%') ");
             }
 
-            if (sampleFileVerificationInputBean.getInstitutionCode()!=null && !sampleFileVerificationInputBean.getInstitutionCode().isEmpty()){
+            if (sampleFileVerificationInputBean.getInstitutionCode() != null && !sampleFileVerificationInputBean.getInstitutionCode().isEmpty()) {
                 dynamicClause.append("and i.institutionCode like '%").append(sampleFileVerificationInputBean.getInstitutionCode()).append("%') ");
             }
 
-            if (sampleFileVerificationInputBean.getReferenceNo()!=null && !sampleFileVerificationInputBean.getReferenceNo().isEmpty()){
+            if (sampleFileVerificationInputBean.getReferenceNo() != null && !sampleFileVerificationInputBean.getReferenceNo().isEmpty()) {
                 dynamicClause.append("and lower(i.referenceNo) like lower('%").append(sampleFileVerificationInputBean.getReferenceNo()).append("%') ");
             }
 
-            if (sampleFileVerificationInputBean.getStatus()!=null && !sampleFileVerificationInputBean.getStatus().isEmpty()){
+            if (sampleFileVerificationInputBean.getStatus() != null && !sampleFileVerificationInputBean.getStatus().isEmpty()) {
                 dynamicClause.append("and i.status like '%").append(sampleFileVerificationInputBean.getStatus()).append("%' ");
             }
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw exception;
         }
-
         return dynamicClause;
     }
 }
