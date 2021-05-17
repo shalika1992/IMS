@@ -4,6 +4,7 @@ import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.result.Result;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.resultupdate.ResultUpdateRepository;
 import com.epic.ims.service.profile.ProfileService;
@@ -56,16 +57,16 @@ public class ResultUpdateService {
     }
 
     @LogService
-    public List<Plate> getResultUpdateSearchResultList(ResultUpdateInputBean resultUpdateInputBean) {
-        List<Plate> plateList;
+    public List<Result> getResultUpdateSearchResultList(ResultUpdateInputBean resultUpdateInputBean) {
+        List<Result> resultList;
         try {
-            plateList = resultUpdateRepository.getResultUpdateSearchList(resultUpdateInputBean);
+            resultList = resultUpdateRepository.getResultUpdateSearchList(resultUpdateInputBean);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
             throw e;
         }
-        return plateList;
+        return resultList;
     }
 
     @LogService

@@ -464,7 +464,7 @@ public class SampleFileUploadRepository {
             }
 
             if (sampleFileInputBean.getInstitutionCode() != null && !sampleFileInputBean.getInstitutionCode().isEmpty()) {
-                dynamicClause.append(" and sd.institutioncode like '%").append(sampleFileInputBean.getInstitutionCode()).append("%'");
+                dynamicClause.append(" and sd.institutioncode = '").append(sampleFileInputBean.getInstitutionCode()).append("'");
             }
 
             if (sampleFileInputBean.getName() != null && !sampleFileInputBean.getName().isEmpty()) {

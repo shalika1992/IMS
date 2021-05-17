@@ -7,6 +7,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.result.Result;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.resultupdate.ResultUpdateService;
 import com.epic.ims.util.common.DataTablesResponse;
@@ -85,13 +86,13 @@ public class ResultUpdateController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
     @PostMapping(value = "/listResultUpdate", headers = {"content-type=application/json"})
     public @ResponseBody
-    DataTablesResponse<Plate> searchResultUpdate(@RequestBody ResultUpdateInputBean resultUpdateInputBean) {
+    DataTablesResponse<Result> searchResultUpdate(@RequestBody ResultUpdateInputBean resultUpdateInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  RESULT UPDATE SEARCH");
-        DataTablesResponse<Plate> responseBean = new DataTablesResponse<>();
+        DataTablesResponse<Result> responseBean = new DataTablesResponse<>();
         try {
             long count = resultUpdateService.getCount(resultUpdateInputBean);
             if (count > 0) {
-                List<Plate> list = resultUpdateService.getResultUpdateSearchResultList(resultUpdateInputBean);
+                List<Result> list = resultUpdateService.getResultUpdateSearchResultList(resultUpdateInputBean);
                 //set data set to response bean
                 responseBean.data.addAll(list);
                 responseBean.echo = resultUpdateInputBean.echo;
