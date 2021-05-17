@@ -93,13 +93,13 @@
                 },
                 columnDefs: [
                     {
-                        title: "Institution Code",
+                        title: "CommonInstitution Code",
                         targets: 0,
                         mDataProp: "institutionCode",
                         defaultContent: "--"
                     },
                     {
-                        title: "Institution Name",
+                        title: "CommonInstitution Name",
                         targets: 1,
                         mDataProp: "institutionName",
                         defaultContent: "--"

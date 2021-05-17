@@ -1,5 +1,7 @@
 package com.epic.ims.repository.common;
 
+import com.epic.ims.bean.common.CommonInstitution;
+import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.user.usermgt.UserRole;
@@ -9,10 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +46,8 @@ public class CommonRepository {
     private final String SQL_SYSTEM_TIME = "select CURDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
+    private final String SQL_GET_RESULT_LIST = "select * from result";
+    private final String SQL_GET_INSTITUTION_LIST = "select * from institution";
 
     @Transactional(readOnly = true)
     public List<Status> getStatusList(String statusCategory) throws Exception {
@@ -98,6 +106,54 @@ public class CommonRepository {
             throw e;
         }
         return userroleList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Result> getResultList() throws Exception {
+        List<Result> resultList;
+        try {
+            resultList = jdbcTemplate.query(SQL_GET_RESULT_LIST, new RowMapper<Result>() {
+                @Override
+                public Result mapRow(ResultSet resultSet, int i) throws SQLException {
+                    Result result = new Result();
+
+                    result.setCode(resultSet.getString("code"));
+                    result.setDescription(resultSet.getString("description"));
+
+                    return result;
+                }
+            });
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            resultList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return resultList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommonInstitution> getInstitutionList() throws Exception {
+        List<CommonInstitution> commonInstitutionList;
+        try {
+            commonInstitutionList = jdbcTemplate.query(SQL_GET_INSTITUTION_LIST, new RowMapper<CommonInstitution>() {
+                @Override
+                public CommonInstitution mapRow(ResultSet resultSet, int i) throws SQLException {
+                    CommonInstitution commonInstitution = new CommonInstitution();
+
+                    commonInstitution.setInstitutionCode(resultSet.getString("institutionCode"));
+                    commonInstitution.setInstitutionName(resultSet.getString("name"));
+
+                    return commonInstitution;
+                }
+            });
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            commonInstitutionList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return commonInstitutionList;
     }
 
     public int getPasswordParam(String paramcode) {

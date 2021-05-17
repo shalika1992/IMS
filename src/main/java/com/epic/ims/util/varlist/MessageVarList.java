@@ -58,6 +58,7 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_EMPTY_ADDRESS = "institution.empty.address";
     public static final String INSTITUTION_MGT_EMPTY_CONTACT_NUMBER = "institution.empty.contactNumber";
     public static final String INSTITUTION_MGT_EMPTY_STATUS = "institution.empty.status";
+    public static final String INSTITUTION_MGT_EMPTY_FILE = "institution.empty.file";
     public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
     public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
     public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";

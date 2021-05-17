@@ -211,7 +211,7 @@ public class SystemUserRepository {
             systemUserInputBean.setInitialLoginStatus(0);
             //insert query
             value = jdbcTemplate.update(SQL_INSERT_SYSTEMUSER,
-                    systemUserInputBean.getUserName(),
+                    systemUserInputBean.getUserName().trim(),
                     systemUserInputBean.getPassword(),
                     systemUserInputBean.getUserRoleCode(),
                     systemUserInputBean.getExpiryDate(),

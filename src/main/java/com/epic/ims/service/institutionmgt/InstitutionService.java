@@ -116,10 +116,10 @@ public class InstitutionService {
                     if (existingInstitution==null){
                         InstitutionInputBean institution = new InstitutionInputBean();
 
-                        institution.setInstitutionCode(institutionCode);
-                        institution.setInstitutionName(institutionName);
+                        institution.setInstitutionCode(institutionCode.trim().toUpperCase(Locale.ROOT));
+                        institution.setInstitutionName(institutionName.trim());
                         institution.setAddress(address);
-                        institution.setContactNumber(contactNumber);
+                        institution.setContactNumber(contactNumber.trim());
                         institution.setStatus(StatusVarList.STATUS_DFLT_ACT);
 
                         //set the other values to input bean
@@ -317,6 +317,7 @@ public class InstitutionService {
                 institutionInputBean.setCreatedTime(currentDate);
                 institutionInputBean.setLastUpdatedUser("error");
                 institutionInputBean.setLastUpdatedTime(currentDate);
+                institutionInputBean.setInstitutionCode(institutionInputBean.getInstitutionCode().trim().toUpperCase(Locale.ROOT));
 
                 message = institutionRepository.insertInstitution(institutionInputBean);
             }else{

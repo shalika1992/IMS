@@ -216,7 +216,7 @@ public class InstitutionController implements RequestBeanValidation<Object> {
     }
 
     @ModelAttribute
-    public void getSystemUserBean(Model map) throws Exception {
+    public void getInstitutionBean(Model map) throws Exception {
         InstitutionInputBean institutionInputBean = new InstitutionInputBean();
         //get status list
         List<Status> statusActList = common.getActiveStatusList();

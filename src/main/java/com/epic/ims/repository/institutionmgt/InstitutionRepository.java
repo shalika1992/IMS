@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Repository
 @Scope("request")
@@ -45,7 +46,7 @@ public class InstitutionRepository {
     MessageSource messageSource;
 
     private final String SQL_GET_COUNT = "select count(*) from institution i where ";
-    private final String SQL_FIND_INSTITUTION = "select institutioncode, name, address, contactno, status,lastupdateduser,lastupdatedtime,createdtime from institution where institutioncode = ?";
+    private final String SQL_FIND_INSTITUTION = "select institutioncode, name, address, contactno, status,lastupdateduser,lastupdatedtime,createdtime from institution where lower(institutioncode) = ?";
     private final String SQL_INSERT_INSTITUTION="insert into " +
             "institution(institutioncode, name, address, contactno, status, createduser, createdtime," +
             " lastupdateduser, lastupdatedtime) " +
@@ -168,7 +169,7 @@ public class InstitutionRepository {
     public Institution getInstitution(String institutionCode) throws SQLException {
         Institution institution = null;
         try {
-            institution = jdbcTemplate.queryForObject(SQL_FIND_INSTITUTION, new Object[]{institutionCode}, new RowMapper<Institution>() {
+            institution = jdbcTemplate.queryForObject(SQL_FIND_INSTITUTION, new Object[]{institutionCode.trim().toLowerCase(Locale.ROOT)}, new RowMapper<Institution>() {
                 @Override
                 public Institution mapRow(ResultSet rs, int rowNum) throws SQLException {
                     Institution institution = new Institution();
