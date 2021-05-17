@@ -2,16 +2,17 @@ package com.epic.ims.controller.samplefilevalidation;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
+import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.sampleverifyfile.SampleVerifyFileService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
-import com.epic.ims.util.varlist.CommonVarList;
-import com.epic.ims.util.varlist.MessageVarList;
-import com.epic.ims.util.varlist.PageVarList;
-import com.epic.ims.util.varlist.SectionVarList;
+import com.epic.ims.util.common.ResponseBean;
+import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.sampleverifyfile.SampleFileVerifyValidator;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -41,6 +43,12 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
 
     @Autowired
     MessageSource messageSource;
+
+    @Autowired
+    CommonRepository commonRepository;
+
+    @Autowired
+    Common common;
 
     @Autowired
     CommonVarList commonVarList;
@@ -100,6 +108,87 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         }
         return responseBean;
     }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @GetMapping(value = "/getSampleVerifyRecord")
+    public @ResponseBody
+    SampleVerifyFile getSampleVerifyRecord(@RequestParam String id) {
+        logger.info("[" + sessionBean.getSessionid() + "]  GET SAMPLE VERIFY RECORD");
+        SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
+        try {
+            if (id != null && !id.isEmpty()) {
+                sampleVerifyFile = sampleVerifyFileService.getSampleVerifyRecord(id);
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return sampleVerifyFile;
+    }
+
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @PostMapping(value = "/verifySampleRecord", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean verifySampleRecord(@ModelAttribute("sampleverify") SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] VERIFY SAMPLE RECORD");
+        ResponseBean responseBean;
+        try {
+            String message = sampleVerifyFileService.verifySampleRecord(sampleFileVerificationInputBean, locale);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_VERIFY_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @PostMapping(value = "/rejectSampleRecord", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public @ResponseBody
+    ResponseBean rejectSampleRecord(@ModelAttribute("sampleverify") SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] REJECT SAMPLE RECORD");
+        ResponseBean responseBean;
+        try {
+            BindingResult bindingResult = validateRequestBean(sampleFileVerificationInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, locale));
+            } else {
+                String message = sampleVerifyFileService.rejectSampleRecord(sampleFileVerificationInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_REJECT_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @ModelAttribute
+    public void getSystemUserBean(Model map) throws Exception {
+        SampleFileVerificationInputBean sampleFileVerificationInputBean = new SampleFileVerificationInputBean();
+        //get status list
+        List<Status> statusActList = common.getActiveStatusList();
+        List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_USER);
+        //set values to task bean
+        sampleFileVerificationInputBean.setStatusList(statusList);
+        sampleFileVerificationInputBean.setStatusActList(statusActList);
+
+        //add values to model map
+        map.addAttribute("sampleverify", sampleFileVerificationInputBean);
+    }
+
 
     @ModelAttribute
     public void getSampleVerifyBean(Model map) throws Exception {
