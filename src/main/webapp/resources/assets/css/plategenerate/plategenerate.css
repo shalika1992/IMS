@@ -1,0 +1,98 @@
+.first-elmt {
+    background: repeating-linear-gradient(
+            45deg
+            , #d6d6d6,
+            #d6d6d6 10px,
+            #eaeaea 10px,
+            #eaeaea 20px );
+    box-shadow: inset 0 0 0px 3px white;
+    padding: 15px 0;
+    text-align: center;
+    border: 1px solid #cacaca;
+}
+
+.horizontal-elmt {
+    box-shadow: inset 0 0 0px 3px white;
+    background: #f9f9f9;
+    color: #7e8299;
+    padding: 15px 0;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid #cacaca;
+    border-right: 1px solid #cacaca;
+    border-top: 1px solid #cacaca;
+}
+
+.vertical-elmt {
+    box-shadow: inset 0 0 0px 3px white;
+    background: #f9f9f9;
+    padding: 15px 0;
+    color: #7e8299;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #cacaca;
+    border-right: 1px solid #cacaca;
+    border-left: 1px solid #cacaca;
+}
+
+.cell-elmt {
+    background: #ffffff;
+    padding: 25px 5px 5px 5px;
+    text-align: right;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100px
+}
+
+.cell-elmt:before{
+    content: attr(data-cellNum);
+    font-size: 10px;
+    color: #ffffff;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #8950fc;
+    padding: 0 6px;
+    border-radius: 3px;
+}
+
+.plate-title{
+    padding: 9px;
+    background: #e2e2e2;
+    border-bottom: none;
+    font-size: 13px;
+    font-weight: bold;
+}
+.plate-title > span {
+    padding: 0px 8px;
+    background: #1bc5bd;
+    border-radius: 5px;
+    margin-left: 5px;
+    color: white;
+}
+
+.master-plate{
+    padding-bottom: 30px;
+}
+
+.cell-click{
+    cursor: pointer;
+}
+.cell-click.active{
+    background: #616161;
+    color: white;
+}
+.cell-click:hover{
+    box-shadow: inset 0 0 0px 1px #535353;
+}
+.cell-click:active{
+    box-shadow: inset 0 0 0px 1px #000000;
+}
+.cell-disable{
+    cursor: not-allowed;
+}
+.cell-swap{}
+.cell-merge{}

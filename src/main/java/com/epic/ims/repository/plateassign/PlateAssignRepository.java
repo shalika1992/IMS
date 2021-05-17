@@ -15,7 +15,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -35,16 +37,21 @@ public class PlateAssignRepository {
     @Autowired
     CommonVarList commonVarList;
 
-    private final String SQL_GET_DEFAULT_PLATE_LIST = "select @n := @n + 1 n,id from sample_data, (select @n := -1) m where status = ? and receiveddate=? order by id";
+    private final String SQL_GET_DEFAULT_PLATE_LIST = "select @n := @n + 1 n,id,referenceno,name,nic from sample_data, (select @n := -1) m where status = ? and receiveddate=? order by id";
 
     @LogRepository
     @Transactional(readOnly = true)
-    public Map<String, String> getDeafultPlateList(String receivedDate) {
-        Map<String, String> defaultPlateMap = new HashMap<>();
+    public Map<Integer, List<String>> getDefaultPlateList(String receivedDate) {
+        Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
         try {
             jdbcTemplate.query(SQL_GET_DEFAULT_PLATE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, receivedDate}, (ResultSet rs) -> {
                 while (rs.next()) {
-                    defaultPlateMap.put(rs.getString("n"), rs.getString("id"));
+                    defaultPlateMap.put(rs.getInt("n"), Arrays.asList(
+                            rs.getString("id"),
+                            rs.getString("referenceno"),
+                            rs.getString("name"),
+                            rs.getString("nic")
+                    ));
                 }
                 return defaultPlateMap;
             });
