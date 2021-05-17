@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -57,10 +55,15 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/generateDefaultPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<String, String> getDefaultPlate(@RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
-        Map<String, String> defaultPlateMap = new HashMap<>();
+    Map<Integer, List<String>> getDefaultPlate(@RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
         try {
             defaultPlateMap = plateAssignService.getDefaultPlate(receivedDate);
+
+//            defaultPlateMap.put(0, Arrays.asList("GOT/C/490","WICKRAMASINGHE","920445631V"));
+//            defaultPlateMap.put(1, Arrays.asList("GOT/C/493","A.G.R.ASANKA","920445632V"));
+//            defaultPlateMap.put(2, Arrays.asList("Pall/C/488","B.G.N.R.BANDA","920445633V"));
+//            defaultPlateMap.put(3, Arrays.asList("MUL/C/01","E.G.Swarnalatha","920445634V"));
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }

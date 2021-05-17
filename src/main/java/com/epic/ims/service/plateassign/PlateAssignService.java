@@ -16,6 +16,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -42,10 +43,10 @@ public class PlateAssignService {
     PlateAssignRepository plateAssignRepository;
 
     @LogService
-    public Map<String, String> getDefaultPlate(String receivedDate) {
-        Map<String, String> defaultPlateMap = new HashMap<>();
+    public Map<Integer, List<String>> getDefaultPlate(String receivedDate) {
+        Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
         try {
-            defaultPlateMap = plateAssignRepository.getDeafultPlateList(receivedDate);
+            defaultPlateMap = plateAssignRepository.getDefaultPlateList(receivedDate);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
