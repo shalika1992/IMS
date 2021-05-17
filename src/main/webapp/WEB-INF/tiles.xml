@@ -75,6 +75,7 @@
     <definition name="sampleverificationview" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/samplefileverify/fileverify.jsp"/>
     </definition>
+
     <!--master data management page-->
     <definition name="reportgenerationview" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/reportmgt/masterdata-mgt.jsp"/>

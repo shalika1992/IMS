@@ -48,6 +48,7 @@ public class CommonRepository {
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
     private final String SQL_GET_DISTRICT_LIST = "select code, description from district order by description asc";
     private final String SQL_GET_INSTITUTION_LIST = "select institutioncode as code, name from institution where status=? order by name asc";
+    private final String SQL_GETALL_INSTITUTION_LIST = "select * from institution";
     private final String SQL_GET_PLATE_LIST = "select id , code , receiveddate , createddate from plate where receiveddate = ? order by id asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
@@ -158,7 +159,7 @@ public class CommonRepository {
     public List<CommonInstitution> getCommonInstitutionList() throws Exception {
         List<CommonInstitution> commonInstitutionList;
         try {
-            commonInstitutionList = jdbcTemplate.query(SQL_GET_INSTITUTION_LIST, new RowMapper<CommonInstitution>() {
+            commonInstitutionList = jdbcTemplate.query(SQL_GETALL_INSTITUTION_LIST, new RowMapper<CommonInstitution>() {
                 @Override
                 public CommonInstitution mapRow(ResultSet resultSet, int i) throws SQLException {
                     CommonInstitution commonInstitution = new CommonInstitution();

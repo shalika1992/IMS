@@ -1,5 +1,7 @@
 package com.epic.ims.controller.reportmgt;
 
+import com.epic.ims.annotation.accesscontrol.AccessControl;
+import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
@@ -8,9 +10,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.institutionmgt.InstitutionService;
 import com.epic.ims.util.common.Common;
-import com.epic.ims.util.varlist.CommonVarList;
-import com.epic.ims.util.varlist.MessageVarList;
-import com.epic.ims.util.varlist.StatusVarList;
+import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
 import com.epic.ims.validation.institution.InstitutionBulkValidation;
 import org.apache.commons.logging.Log;
@@ -21,8 +21,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -57,7 +58,9 @@ public class MasterDataReportController {
     @Autowired
     InstitutionBulkValidation institutionBulkValidation;
 
-    @GetMapping(value = "/reportGeneration.htm")
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
+    @RequestMapping(value = "/viewReportGeneration", method = RequestMethod.GET)
     public ModelAndView viewReportGenerationPage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA PAGE VIEW");
         ModelAndView modelAndView;

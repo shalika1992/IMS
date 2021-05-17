@@ -133,11 +133,11 @@ public class SampleVerifyFileRepository {
             sortingStr = " order by " + col + " " + sampleFileVerificationInputBean.sortDirections.get(0);
 
             String sql = "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
-                    "i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic " +
-                    "i.address as address, i.district as residentdistrict, i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid" +
+                    " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic " +
+                    " i.address as address, i.district as residentdistrict, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid" +
                     " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.createduser as createduser, i.createdtime as createdtime" +
-                    "from sample_data i " +
-                    "left join status s on s.code = i.status where " +
+                    " from sample_data i " +
+                    " left join status s on s.code = i.status where " +
                     dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileVerificationInputBean.displayLength + " offset " + sampleFileVerificationInputBean.displayStart;
 
