@@ -1,0 +1,49 @@
+package com.epic.ims.service.rejectedsample;
+
+import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.rejectedsample.RejectedSampleDataInputBean;
+import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
+import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
+import com.epic.ims.mapping.user.usermgt.SystemUser;
+import com.epic.ims.repository.rejectedsample.RejectedSampleRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@Scope("prototype")
+public class RejectedSampleService {
+    private static Logger logger = LogManager.getLogger(RejectedSampleService.class);
+
+    @Autowired
+    RejectedSampleRepository rejectedSampleRepository;
+
+    @LogService
+    public long getCount(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception{
+        long count=0;
+        try{
+            count=rejectedSampleRepository.getCount(rejectedSampleDataInputBean);
+        }catch (Exception exception){
+            throw exception;
+        }
+        return count;
+    }
+
+
+    @LogService
+    public List<RejectedSampleData> getRejectedSampleSearchResultList(RejectedSampleDataInputBean rejectedSampleDataInputBean) {
+        List<RejectedSampleData> rejectedSampleDataList;
+        try {
+            rejectedSampleDataList = rejectedSampleRepository.getRejectedSampleSearchList(rejectedSampleDataInputBean);
+        } catch (Exception exception) {
+            throw exception;
+        }
+
+        return rejectedSampleDataList;
+    }
+
+}

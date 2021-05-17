@@ -51,6 +51,7 @@ public class InstitutionRepository {
             "VALUES (?,?,?,?,?,?,?,?,?)";
     private final String SQL_UPDATE_INSTITUTION = "update institution set name = ?, address = ?, contactno = ?, status = ? where institutioncode = ?";
     private final String SQL_DELETE_INSTITUTION = "delete from institution where institutioncode = ?";
+    private final String SQL_GET_ALL_INSTITUTION= "select institutioncode, name, address, contactno, status from institution ";
 
     @Transactional
     public String deleteInstitution(String institutionCode) {
@@ -334,4 +335,53 @@ public class InstitutionRepository {
 
         return dynamicClause;
     }
+
+    public List<Institution> getAllInstitutionList(){
+
+        try{
+            List<Institution> institutionList=jdbcTemplate.query(SQL_GET_ALL_INSTITUTION, new RowMapper<Institution>() {
+                @Override
+                public Institution mapRow(ResultSet rs, int i) throws SQLException {
+                    Institution institution=new Institution();
+
+                    try{
+                        institution.setInstitutionCode(rs.getString("institutioncode"));
+                    }catch (Exception exception){
+                        institution.setInstitutionCode(null);
+                    }
+
+                    try {
+                        institution.setInstitutionName(rs.getString("institutionname"));
+                    }catch (Exception exception){
+                        institution.setInstitutionName(null);
+                    }
+
+                    try{
+                        institution.setAddress(rs.getString("address"));
+                    }catch (Exception exception){
+                        institution.setAddress(null);
+                    }
+
+                    try{
+                        institution.setContactNumber(rs.getString("contactnumber"));
+                    }catch (Exception exception){
+                        institution.setContactNumber(null);
+                    }
+
+                    try {
+                        institution.setStatus(rs.getString("statusdescription"));
+                    }catch (Exception exception){
+                        institution.setStatus(null);
+                    }
+
+                    return institution;
+                }
+            });
+            return institutionList;
+        }catch (Exception exception){
+            return null;
+        }
+    }
+
+
 }

@@ -134,6 +134,8 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         return responseBean;
     }
 
+
+
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @GetMapping(value = "/getSystemUser")
