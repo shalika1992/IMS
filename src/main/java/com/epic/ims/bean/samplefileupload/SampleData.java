@@ -6,20 +6,33 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @ToString
 public class SampleData {
-    private String referenceNo;
+    private String referenceNo; //---------------> mandatory
     private String date;
-    private String mohArea;
-    private String name;
+    private String mohArea;//--------------------> mandatory
+    private String name;//-----------------------> mandatory
     private String age;
     private String gender;
     private String symptomatic;
     private String contactType;
-    private String nic;
+    private String nic;//------------------------> mandatory
     private String address;
     private String residentDistrict;
-    private String contactNumber;
+    private String contactNumber;//--------------> mandatory
     private String secondaryContactNumber;
+
+    @Override
+    public int hashCode() {
+        return referenceNo.hashCode() ^ mohArea.hashCode() ^ date.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SampleData) {
+            SampleData sampleData = (SampleData) obj;
+            return sampleData.referenceNo.equals(referenceNo) && sampleData.mohArea.equals(mohArea) && sampleData.date.equals(date);
+        }
+        return false;
+    }
 }

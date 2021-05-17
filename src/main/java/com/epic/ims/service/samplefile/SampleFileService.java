@@ -9,7 +9,6 @@ import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.samplefileupload.SampleFileUploadRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.ExcelHelper;
-import com.epic.ims.util.security.SHA256Algorithm;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.logging.log4j.LogManager;
@@ -19,8 +18,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -29,9 +28,6 @@ import java.util.Locale;
 @Scope("prototype")
 public class SampleFileService {
     private static Logger logger = LogManager.getLogger(SampleFileService.class);
-
-    @Autowired
-    SHA256Algorithm sha256Algorithm;
 
     @Autowired
     MessageSource messageSource;
@@ -81,6 +77,94 @@ public class SampleFileService {
     }
 
     @LogService
+    public String validateMandatoryFields(List<SampleData> sampleDataList, Locale locale) {
+        String message = "";
+        try {
+            for (int i = 0; i < sampleDataList.size(); i++) {
+                SampleData s = sampleDataList.get(i);
+                if (s != null) {
+                    int count = 0;
+                    if (s.getReferenceNo() == null || s.getReferenceNo().isEmpty()) {
+                        count++;
+                    }
+
+                    if (s.getMohArea() == null || s.getMohArea().isEmpty()) {
+                        count++;
+                    }
+
+                    if (s.getName() == null || s.getName().isEmpty()) {
+                        count++;
+                    }
+
+                    if (s.getNic() == null || s.getNic().isEmpty()) {
+                        count++;
+                    }
+
+                    if (s.getContactNumber() == null || s.getContactNumber().isEmpty()) {
+                        count++;
+                    }
+
+                    if (count < commonVarList.MINIMUM_MANDATORY_FIELDCOUNT) {
+                        message = messageSource.getMessage(MessageVarList.SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                        message = message + (s.getReferenceNo() != null && !s.getReferenceNo().isEmpty() ? "Reference No - " + s.getReferenceNo() : "");
+                    }
+                } else {
+                    message = messageSource.getMessage(MessageVarList.SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogService
+    public String checkDuplicate(List<SampleData> sampleDataFileList, String receivedDate, Locale locale) {
+        String message = "";
+        try {
+            List<SampleData> sampleDataRepositoryList = sampleFileUploadRepository.getExistingSampleDataList(receivedDate);
+            if (sampleDataRepositoryList != null && !sampleDataRepositoryList.isEmpty() && sampleDataRepositoryList.size() > 0) {
+                List<SampleData> duplicateList = this.getDuplicateList(sampleDataFileList, sampleDataRepositoryList);
+                //check the duplicate list
+                if (duplicateList != null && !duplicateList.isEmpty() && duplicateList.size() > 0) {
+                    SampleData sampleData = duplicateList.get(0);
+                    //get the reference no - moh area - date
+                    String referenceNo = sampleData.getReferenceNo();
+                    String mohArea = sampleData.getMohArea();
+                    String date = sampleData.getDate();
+                    //set the message
+                    message = messageSource.getMessage(MessageVarList.SAMPLERECORD_DUPLICATE_RECORDFOUND, null, locale);
+                    message = message + (referenceNo != null && !referenceNo.isEmpty() ? " Reference No - " + referenceNo : "");
+                    message = message + (mohArea != null && !mohArea.isEmpty() ? " MOH Area - " + mohArea : "");
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogService
+    public String uploadSampleFile(List<SampleData> sampleDataList, String receivedDate, Locale locale) {
+        String message = "";
+        try {
+            //check the size of the sample file
+            if (sampleDataList != null && !sampleDataList.isEmpty() && sampleDataList.size() > 0) {
+                if (sampleDataList.size() <= commonVarList.BULKUPLOAD_BATCH_SIZE) {
+                    message = sampleFileUploadRepository.insertSampleRecordBatch(sampleDataList, receivedDate);
+                } else {
+                    message = MessageVarList.SAMPLE_FILE_CONTAIN_MAXRECORDS;
+                }
+            } else {
+                message = MessageVarList.SAMPLE_FILE_INVALID_FILE;
+            }
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+    @LogService
     public SampleFile getSampleFileRecord(String id) {
         SampleFile sampleFile;
         try {
@@ -119,10 +203,10 @@ public class SampleFileService {
                     message = sampleFileUploadRepository.updateSampleFileRecord(sampleFileInputBean);
                 }
             } else {
-                message = MessageVarList.SAMPLE_FILE_RECORD_NORECORD_FOUND;
+                message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
             }
         } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.SAMPLE_FILE_RECORD_NORECORD_FOUND;
+            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
@@ -375,23 +459,23 @@ public class SampleFileService {
         return sampleFileRecordStringBuilder.toString();
     }
 
-    public String uploadSampleFile(MultipartFile multipartFile, String receivedDate, Locale locale) {
-        String message = "";
+    private List<SampleData> getDuplicateList(List<SampleData> sampleDataFileList, List<SampleData> sampleDataRepositoryList) {
+        List<SampleData> duplicateList = new ArrayList<>();
         try {
-            List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream());
-            //check the size of the sample file
-            if (sampleDataList != null && !sampleDataList.isEmpty() && sampleDataList.size() > 0) {
-                if(sampleDataList.size() <= commonVarList.BULKUPLOAD_BATCH_SIZE){
-                    message = sampleFileUploadRepository.insertSampleRecordBatch(sampleDataList, receivedDate);
-                }else{
-                    message = MessageVarList.SAMPLE_FILE_CONTAIN_MAXRECORDS;
+            outerLoop:
+            for (int i = 0; i < sampleDataRepositoryList.size(); i++) {
+                SampleData sampleData1 = sampleDataRepositoryList.get(i);
+                for (int j = 0; j < sampleDataFileList.size(); j++) {
+                    SampleData sampleData2 = sampleDataFileList.get(j);
+                    if (sampleData1.equals(sampleData2)) {
+                        duplicateList.add(sampleData2);
+                        break outerLoop;
+                    }
                 }
-            } else {
-                message = MessageVarList.SAMPLE_FILE_INVALID_FILE;
             }
         } catch (Exception e) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
+            throw e;
         }
-        return message;
+        return duplicateList;
     }
 }

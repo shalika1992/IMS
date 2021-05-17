@@ -442,3 +442,29 @@ insert into district(code,description) values('Monaragala','Monaragala');
 insert into district(code,description) values('Hambantota','Hambantota');
 insert into district(code,description) values('Matara','Matara');
 insert into district(code,description) values('Galle','Galle');
+
+create table reject_data(
+  id int not null auto_increment,
+  sampleid int not null,
+  referenceno varchar(64),
+  institutioncode varchar(16),
+  name varchar(256),
+  age varchar(8),
+  gender varchar(1),
+  symptomatic varchar(128),
+  contacttype varchar(64),
+  nic varchar(16),
+  address varchar(512),
+  district varchar(128),
+  contactno varchar(16),
+  secondarycontactno varchar(16),
+  receiveddate date,
+  status varchar(16) not null,
+  remark varchar(512) not null,
+  createduser varchar(64) not null,
+  createdtime timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  primary key (id),
+  foreign key (sampleid) references sample_data(id),
+  foreign key (institutioncode) references institution(institutioncode),
+  foreign key (status) references status(code)
+)

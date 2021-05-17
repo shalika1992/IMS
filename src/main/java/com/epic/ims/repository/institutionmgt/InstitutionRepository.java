@@ -51,7 +51,6 @@ public class InstitutionRepository {
             "VALUES (?,?,?,?,?,?,?,?,?)";
     private final String SQL_UPDATE_INSTITUTION = "update institution set name = ?, address = ?, contactno = ?, status = ? where institutioncode = ?";
     private final String SQL_DELETE_INSTITUTION = "delete from institution where institutioncode = ?";
-    private final String SQL_GET_ALL_INSTITUTION= "select institutioncode, name, address, contactno, status from institution ";
 
     @Transactional
     public String deleteInstitution(String institutionCode) {
@@ -384,4 +383,38 @@ public class InstitutionRepository {
     }
 
 
+
+    private String createBulkInsertClause(List<InstitutionInputBean> institutionInputBeanList, StringBuilder bulkInsertSql){
+        InstitutionInputBean institutionInputBean = institutionInputBeanList.get(0);
+        int listLength = institutionInputBeanList.size();
+        int count=0;
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
+        String formattedCCreatedTime = formatter.format(institutionInputBean.getCreatedTime());
+        String formattedCLastUpdatedTime = formatter.format(institutionInputBean.getLastUpdatedTime());
+
+        String status = institutionInputBean.getStatus();
+        String createdUser = "error";
+        String lastUpdatedUser = institutionInputBean.getLastUpdatedUser();
+
+        String commonValues = "'"+status+"', "+"'"+createdUser+"', "+"'"+formattedCCreatedTime+"', "+"'"+lastUpdatedUser+"', "+"'"+formattedCLastUpdatedTime+"'";
+
+        for (InstitutionInputBean inputBean : institutionInputBeanList){
+            count++;
+
+            bulkInsertSql.append("('");
+            bulkInsertSql.append(inputBean.getInstitutionCode()).append("', '");
+            bulkInsertSql.append(inputBean.getInstitutionName()).append("', '");
+            bulkInsertSql.append(inputBean.getAddress()).append("', '");
+            bulkInsertSql.append(inputBean.getContactNumber()).append("', ");
+            bulkInsertSql.append(commonValues);
+            bulkInsertSql.append(")");
+
+            if (count != listLength){
+                bulkInsertSql.append(",");
+            }
+        }
+
+        return bulkInsertSql.toString();
+    }
 }

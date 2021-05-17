@@ -204,6 +204,91 @@ public class SampleFileUploadRepository {
     }
 
     @Transactional(readOnly = true)
+    public List<SampleData> getExistingSampleDataList(String receiveDate) {
+        List<SampleData> sampleDataList = null;
+        try {
+            String sql = "" +
+                    " select s.referenceno, s.institutioncode , s.receiveddate" +
+                    " from sample_data s left join master_data m  on s.id = m.sampleid  " +
+                    " where (m.status != ?  or m.status is null) and (m.result != ? or m.result is null) and s.receiveddate = ?";
+
+            sampleDataList = jdbcTemplate.query(sql, new Object[]{commonVarList.STATUS_REPEATED, commonVarList.RESULT_CODE_PENDING, receiveDate}, (rs, id) -> {
+                SampleData sampleData = new SampleData();
+
+                try {
+                    sampleData.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
+                } catch (Exception e) {
+                    sampleData.setReferenceNo("--");
+                }
+
+                try {
+                    sampleData.setMohArea(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
+                } catch (Exception e) {
+                    sampleData.setMohArea("--");
+                }
+
+                try {
+                    sampleData.setDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
+                } catch (Exception e) {
+                    sampleData.setDate("--");
+                }
+                return sampleData;
+            });
+
+        } catch (EmptyResultDataAccessException ex) {
+            return sampleDataList;
+        } catch (Exception e) {
+            throw e;
+        }
+        return sampleDataList;
+    }
+
+    @Transactional
+    public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {
+        String message = "";
+        try {
+            String currentDate = commonRepository.getCurrentDateAsString();
+            for (int j = 0; j < sampleDataList.size(); j += commonVarList.BULKUPLOAD_BATCH_SIZE) {
+                final List<SampleData> batchList = sampleDataList.subList(j, j + commonVarList.BULKUPLOAD_BATCH_SIZE > sampleDataList.size() ? sampleDataList.size() : j + commonVarList.BULKUPLOAD_BATCH_SIZE);
+                jdbcTemplate.batchUpdate(SQL_INSERT_SAMPLEFILERECORD, new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        SampleData sampleData = batchList.get(i);
+                        ps.setString(1, sampleData.getReferenceNo());
+                        ps.setString(2, sampleData.getMohArea());
+                        ps.setString(3, sampleData.getName());
+                        ps.setString(4, sampleData.getAge());
+                        ps.setString(5, sampleData.getGender());
+                        ps.setString(6, sampleData.getSymptomatic());
+                        ps.setString(7, sampleData.getContactType());
+                        ps.setString(8, sampleData.getNic());
+                        ps.setString(9, sampleData.getAddress());
+                        ps.setString(10, sampleData.getResidentDistrict());
+                        ps.setString(11, sampleData.getContactNumber());
+                        ps.setString(12, sampleData.getSecondaryContactNumber());
+                        ps.setString(13, receivedDate);
+                        ps.setString(14, commonVarList.STATUS_PENDING);
+                        ps.setString(15, sessionBean.getUsername());
+                        ps.setString(16, currentDate);
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return batchList.size();
+                    }
+                });
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException sqe) {
+            throw sqe;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @Transactional(readOnly = true)
     public SampleFile getSampleRecord(String id) {
         SampleFile sampleFile;
         try {
@@ -357,53 +442,8 @@ public class SampleFileUploadRepository {
         return message;
     }
 
-    @Transactional
-    public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {
-        String message = "";
-        try {
-            String currentDate = commonRepository.getCurrentDateAsString();
-            for (int j = 0; j < sampleDataList.size(); j += commonVarList.BULKUPLOAD_BATCH_SIZE) {
-                final List<SampleData> batchList = sampleDataList.subList(j, j + commonVarList.BULKUPLOAD_BATCH_SIZE > sampleDataList.size() ? sampleDataList.size() : j + commonVarList.BULKUPLOAD_BATCH_SIZE);
-                jdbcTemplate.batchUpdate(SQL_INSERT_SAMPLEFILERECORD, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        SampleData sampleData = batchList.get(i);
-                        ps.setString(1, sampleData.getReferenceNo());
-                        ps.setString(2, sampleData.getMohArea());
-                        ps.setString(3, sampleData.getName());
-                        ps.setString(4, sampleData.getAge());
-                        ps.setString(5, sampleData.getGender());
-                        ps.setString(6, sampleData.getSymptomatic());
-                        ps.setString(7, sampleData.getContactType());
-                        ps.setString(8, sampleData.getNic());
-                        ps.setString(9, sampleData.getAddress());
-                        ps.setString(10, sampleData.getResidentDistrict());
-                        ps.setString(11, sampleData.getContactNumber());
-                        ps.setString(12, sampleData.getSecondaryContactNumber());
-                        ps.setString(13, receivedDate);
-                        ps.setString(14, commonVarList.STATUS_RECEIVED);
-                        ps.setString(15, sessionBean.getUsername());
-                        ps.setString(16, currentDate);
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return batchList.size();
-                    }
-                });
-            }
-        } catch (DataAccessException e) {
-            throw e;
-        } catch (SQLException sqe) {
-            throw sqe;
-        } catch (Exception e) {
-            throw e;
-        }
-        return message;
-    }
-
     private StringBuilder setDynamicClause(SampleFileInputBean sampleFileInputBean, StringBuilder dynamicClause) {
-        dynamicClause.append(" 1=1 ");
+        dynamicClause.append(" 1=1 and sd.status = '").append(commonVarList.STATUS_PENDING).append("'");
         try {
             if (sampleFileInputBean.getReceivedDate() != null && !sampleFileInputBean.getReceivedDate().isEmpty()) {
                 dynamicClause.append(" and sd.receiveddate = '").append(sampleFileInputBean.getReceivedDate()).append("'");

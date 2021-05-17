@@ -70,7 +70,9 @@ public class MessageVarList {
 
     //-------------------------- institution user mgt-----------------------------------------------------------------//
     public static final String INSTITUTION_MGT_ALREADY_EXISTS = "institution.already.exists";
+    public static final String INSTITUTION_BULK_MGT_ALREADY_EXISTS = "institutionbulk.already.exists";
     public static final String INSTITUTION_MGT_ADDED_SUCCESSFULLY = "institution.added.success";
+    public static final String INSTITUTION_BULK_MGT_ADDED_SUCCESSFULLY = "institutionbulk.added.success";
     public static final String INSTITUTION_MGT_EMPTY_CODE = "institution.empty.code";
     public static final String INSTITUTION_MGT_EMPTY_NAME = "institution.empty.name";
     public static final String INSTITUTION_MGT_EMPTY_ADDRESS = "institution.empty.address";
@@ -79,6 +81,12 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_NORECORD_FOUND = "institution.norecord.found";
     public static final String INSTITUTION_MGT_UPDATE_SUCCESSFULLY = "institution.updated.success";
     public static final String INSTITUTION_MGT_DELETE_SUCCESSFULLY = "institution.delete.success";
+    public static final String INSTITUTION_MGT_INVALID_FILE = "institution.invalid.file";
+    public static final String INSTITUTION_MGT_INVALID_COLUMN_ORDER = "institution.invalid.columnorder";
+    public static final String INSTITUTION_MGT_DUPLICATE_RECORD = "institution.duplicate.record";
+    public static final String INSTITUTION_MGT_EMPTY_SHEET = "institution.empty.sheet";
+    public static final String INSTITUTION_MGT_INVALID_DATA = "institution.invalid.data";
+
     public static final String INSTITUTION_MGT_EMPTY_MOBILENUMBER = "institution.empty.mobilenumber";
     public static final String INSTITUTION_MGT_EMPTY_PASSWORD = "institution.empty.password";
     public static final String INSTITUTION_MGT_EMPTY_CONFIRMPASSWORD = "institution.empty.confirmpassword";
@@ -89,9 +97,13 @@ public class MessageVarList {
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
     public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
-    public static final String SAMPLE_FILE_RECORD_NORECORD_FOUND = "samplefilerecord.norecord.found";
     public static final String SAMPLE_FILE_INVALID_FILE = "samplefile.invalid.file";
     public static final String SAMPLE_FILE_CONTAIN_MAXRECORDS = "samplefile.contain.maxrecords";
     public static final String SAMPLE_FILE_UPLOAD_SUCCESSFULLY = "samplefile.upload.success";
+    public static final String SAMPLERECORD_NORECORD_FOUND = "samplerecord.norecord.found";
+    public static final String SAMPLERECORD_REJECT_SUCCESSFULLY = "samplerecord.reject.success";
+    public static final String SAMPLERECORD_VERIFY_SUCCESSFULLY = "samplerecord.verify.success";
+    public static final String SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL = "samplerecord.mandatoryfield.validationfail";
+    public static final String SAMPLERECORD_DUPLICATE_RECORDFOUND = "samplerecord.duplicate.recordfound";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 }

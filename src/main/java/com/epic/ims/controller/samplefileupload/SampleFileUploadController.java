@@ -2,11 +2,13 @@ package com.epic.ims.controller.samplefileupload;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
+import com.epic.ims.service.plateassign.PlateAssignService;
 import com.epic.ims.service.samplefile.SampleFileService;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.common.ExcelHelper;
@@ -83,7 +85,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
     @PostMapping(value = "/listSampleFile", headers = {"content-type=application/json"})
     public @ResponseBody
-    DataTablesResponse<SampleFile> searchDepartment(@RequestBody SampleFileInputBean sampleFileInputBean) {
+    DataTablesResponse<SampleFile> searchSampleFileUpload(@RequestBody SampleFileInputBean sampleFileInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  SAMPLE FILE SEARCH");
         DataTablesResponse<SampleFile> responseBean = new DataTablesResponse<>();
         try {
@@ -119,11 +121,29 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         ResponseBean responseBean;
         try {
             if (excelHelper.hasExcelFormat(multipartFile)) {
-                String message = sampleFileService.uploadSampleFile(multipartFile, receivedDate, locale);
-                if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_FILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(),receivedDate);
+                if (sampleDataList != null) {
+                    //validate the sample data mandatory fields
+                    String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
+                    if (message.isEmpty()) {
+                        //validate the duplicate records
+                        message = sampleFileService.checkDuplicate(sampleDataList, receivedDate, locale);
+                        if (message.isEmpty()) {
+                            //upload sample file
+                            message = sampleFileService.uploadSampleFile(sampleDataList, receivedDate, locale);
+                            if (message.isEmpty()) {
+                                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_FILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                            } else {
+                                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                            }
+                        } else {
+                            responseBean = new ResponseBean(false, null, message);
+                        }
+                    } else {
+                        responseBean = new ResponseBean(false, null, message);
+                    }
                 } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLE_FILE_INVALID_FILE, null, locale));
                 }
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
@@ -156,7 +176,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
     @PostMapping(value = "/updateSampleFileRecord", produces = {MediaType.APPLICATION_JSON_VALUE})
     public @ResponseBody
-    ResponseBean updateDepartment(@ModelAttribute("samplefile") SampleFileInputBean sampleFileInputBean, Locale locale) {
+    ResponseBean updateSampleFileRecord(@ModelAttribute("samplefile") SampleFileInputBean sampleFileInputBean, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE FILE RECORD");
         ResponseBean responseBean;
         try {

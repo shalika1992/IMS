@@ -70,6 +70,12 @@
         <put-attribute name="body" value="/WEB-INF/pages/samplefile/fileupload.jsp"/>
     </definition>
 
+
+    <!--sample file upload page-->
+    <definition name="sampleverificationview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/samplefileverify/fileverify.jsp"/>
+    </definition>
+
     <!--plate assign page-->
     <definition name="plate/assign" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/platemgt/plateassign.jsp"/>

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonVarList {
-
     //-------------------------------system user details--------------------------------------------------------------//
     @Value("${system.username}")
     public String SYSTEMUSERNAME;
@@ -44,11 +43,17 @@ public class CommonVarList {
     @Value("${statuscode.received}")
     public String STATUS_RECEIVED;
 
+    @Value("${statuscode.pending}")
+    public String STATUS_PENDING;
+
     @Value("${statuscode.validated}")
     public String STATUS_VALIDATED;
 
     @Value("${statuscode.invalid}")
     public String STATUS_INVALID;
+
+    @Value("${statuscode.samplenotfound}")
+    public String STATUS_NOSAMPLEFOUND;
 
     @Value("${statuscode.plateassigned}")
     public String STATUS_PLATEASSIGNED;
@@ -127,8 +132,25 @@ public class CommonVarList {
     public String PWDEXPIRYPERIOD;
     //-------------------------------system user details--------------------------------------------------------------//
 
+    //-------------------------------mandatory field count------------------------------------------------------------//
+    @Value("${minimum.mandatory.fieldcount}")
+    public static int MINIMUM_MANDATORY_FIELDCOUNT;
+    //-------------------------------mandatory field count------------------------------------------------------------//
+
     //-------------------------------sample file upload batch size----------------------------------------------------//
     @Value("${bulkupload.batch.size}")
     public int BULKUPLOAD_BATCH_SIZE;
     //-------------------------------sample file upload batch size----------------------------------------------------//
+
+    //-------------------------------result codes---------------------------------------------------------------------//
+    @Value("${result.code.detected}")
+    public String RESULT_CODE_DETECTED;
+
+    @Value("${result.code.notdetected}")
+    public String RESULT_CODE_NOTDETECTED;
+
+    @Value("${result.code.pending}")
+    public String RESULT_CODE_PENDING;
+    //-------------------------------result codes---------------------------------------------------------------------//
 }
+

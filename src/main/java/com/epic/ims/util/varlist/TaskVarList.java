@@ -15,4 +15,5 @@ public class TaskVarList {
     public static final String DUAL_AUTH_REJECT_TASK = "REJT";
     public static final String PW_RESET_TASK = "RESETPW";
     public static final String DOWNLOAD_TASK = "DWLD";
+    public static final String ADD_BULK_TASK = "ADD_BULK";
 }
