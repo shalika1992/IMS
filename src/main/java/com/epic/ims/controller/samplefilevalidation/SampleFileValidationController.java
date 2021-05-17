@@ -2,19 +2,19 @@ package com.epic.ims.controller.samplefilevalidation;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.institutionmgt.Institution;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
+import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.sampleverifyfile.SampleVerifyFileService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.common.ResponseBean;
-import com.epic.ims.util.varlist.CommonVarList;
-import com.epic.ims.util.varlist.MessageVarList;
-import com.epic.ims.util.varlist.PageVarList;
-import com.epic.ims.util.varlist.SectionVarList;
+import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.sampleverifyfile.SampleFileVerifyValidator;
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +47,12 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
     MessageSource messageSource;
 
     @Autowired
+    CommonRepository commonRepository;
+
+    @Autowired
+    Common common;
+
+    @Autowired
     CommonVarList commonVarList;
 
     @Autowired
@@ -72,6 +78,8 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         }
         return modelAndView;
     }
+
+
 
 
     @LogController
@@ -170,6 +178,21 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         }
         return responseBean;
     }
+
+    @ModelAttribute
+    public void getSystemUserBean(Model map) throws Exception {
+        SampleFileVerificationInputBean sampleFileVerificationInputBean = new SampleFileVerificationInputBean();
+        //get status list
+        List<Status> statusActList = common.getActiveStatusList();
+        List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_USER);
+        //set values to task bean
+        sampleFileVerificationInputBean.setStatusList(statusList);
+        sampleFileVerificationInputBean.setStatusActList(statusActList);
+
+        //add values to model map
+        map.addAttribute("sampleverify", sampleFileVerificationInputBean);
+    }
+
 
     @ModelAttribute
     public void getSampleVerifyBean(Model map) throws Exception {
