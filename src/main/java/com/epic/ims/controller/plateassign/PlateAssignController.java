@@ -81,12 +81,12 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
-    @RequestMapping(value = "/swapBlockPalte", method = RequestMethod.POST)
+    @RequestMapping(value = "/swapBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    String postSwapBlockPlate(@RequestParam("plateArray ") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
+    String postSwapBlockPlate(@RequestParam("plateArray") Map<Integer, List<String>> plateArray, @RequestParam("swapArray") Map<Integer, String> swapArray, Locale locale) {
         String message = "";
         try {
-            message = plateAssignService.swapBlockPlate(plateArray, mergeArray);
+            message = plateAssignService.swapBlockPlate(plateArray, swapArray);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
@@ -96,9 +96,9 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
-    @RequestMapping(value = "/mergeBlockPalte", method = RequestMethod.POST)
+    @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    String postMergeBlockPlate(@RequestParam("plateArray ") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
+    String postMergeBlockPlate(@RequestParam("plateArray") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
         String message = "";
         try {
             message = plateAssignService.MergeBlockPlate(plateArray, mergeArray);

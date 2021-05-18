@@ -67,7 +67,7 @@ public class PlateAssignRepository {
 
     @LogRepository
     @Transactional
-    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, String> swapArray) {
         String message = "";
         try {
             System.out.println("--------------plate array--------------------------");
@@ -75,9 +75,9 @@ public class PlateAssignRepository {
             System.out.println("--------------plate array--------------------------");
 
 
-            System.out.println("--------------merge array--------------------------");
-            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(mergeArray)));
-            System.out.println("--------------merge array--------------------------");
+            System.out.println("--------------swap array--------------------------");
+            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(swapArray)));
+            System.out.println("--------------swap array--------------------------");
 
         } catch (EmptyResultDataAccessException ex) {
             logger.error(ex);
