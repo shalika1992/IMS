@@ -1,5 +1,6 @@
 package com.epic.ims.repository.sampleverifyfile;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
@@ -44,31 +45,29 @@ public class SampleVerifyFileRepository {
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
     private final String SQL_FIND_SAMPLEDATAVERIFICATION = "select id, referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district, contactno, secondarycontactno, specimenid, barcode, receiveddate, status,createduser, createdtime from sample_data where id = ?";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public long getDataCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
         long count = 0;
-
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
-            this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
-
+            //create the where clause
+            dynamicClause =this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
+            //create the query
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
-
         } catch (Exception exception) {
             logger.error(exception);
             throw exception;
         }
-
         return count;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleVerifyFile> getSampleVerifyFileSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
         List<SampleVerifyFile> sampleVerifyFileList = null;
-
         try {
             StringBuilder dynamicClause = this.setDynamicClause(sampleFileVerificationInputBean, new StringBuilder());
-
             //create sorting order
             String sortingStr = "";
             String col = "";
@@ -132,21 +131,19 @@ public class SampleVerifyFileRepository {
             }
             sortingStr = " order by " + col + " " + sampleFileVerificationInputBean.sortDirections.get(0);
 
-            String sql = "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
-                    " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic " +
-                    " i.address as address, i.district as residentdistrict, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid" +
-                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.createduser as createduser, i.createdtime as createdtime" +
-                    " from sample_data i " +
-                    " left join status s on s.code = i.status where " +
-                    dynamicClause.toString() + sortingStr +
+            String sql = "" +
+                    "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
+                    " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
+                    " i.address as address, i.district as residentdistrict, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
+                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.createduser as createduser, i.createdtime as createdtime " +
+                    " from sample_data i left join status s on s.code = i.status where " + dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileVerificationInputBean.displayLength + " offset " + sampleFileVerificationInputBean.displayStart;
 
-            System.out.println("SQL: " + sql);
             sampleVerifyFileList = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
 
                 try {
-                    sampleVerifyFile.setReferenceNo(rs.getString("id"));
+                    sampleVerifyFile.setId(rs.getInt("id"));
                 } catch (Exception e) {
                     sampleVerifyFile.setId(0);
                 }
@@ -154,99 +151,98 @@ public class SampleVerifyFileRepository {
                 try {
                     sampleVerifyFile.setReferenceNo(rs.getString("referenceno"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setReferenceNo(null);
+                    sampleVerifyFile.setReferenceNo("--");
                 }
 
                 try {
                     sampleVerifyFile.setReceivedDate(rs.getString("receiveddate"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setReceivedDate(null);
+                    sampleVerifyFile.setReceivedDate("--");
                 }
 
                 try {
                     sampleVerifyFile.setInstitutionCode(rs.getString("institutioncode"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setInstitutionCode(null);
+                    sampleVerifyFile.setInstitutionCode("--");
                 }
 
                 try {
                     sampleVerifyFile.setName(rs.getString("name"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setName(null);
+                    sampleVerifyFile.setName("--");
                 }
 
                 try {
                     sampleVerifyFile.setAge(rs.getString("age"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setAge(null);
+                    sampleVerifyFile.setAge("--");
                 }
 
                 try {
                     sampleVerifyFile.setGender(rs.getString("gender"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setGender(null);
+                    sampleVerifyFile.setGender("--");
                 }
 
                 try {
                     sampleVerifyFile.setSymptomatic(rs.getString("symptomatic"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setSymptomatic(null);
+                    sampleVerifyFile.setSymptomatic("--");
                 }
 
                 try {
                     sampleVerifyFile.setContactType(rs.getString("contacttype"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setContactType(null);
+                    sampleVerifyFile.setContactType("--");
                 }
 
                 try {
                     sampleVerifyFile.setNic(rs.getString("nic"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setNic(null);
+                    sampleVerifyFile.setNic("--");
                 }
 
                 try {
                     sampleVerifyFile.setAddress(rs.getString("address"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setAddress(null);
+                    sampleVerifyFile.setAddress("--");
                 }
 
                 try {
                     sampleVerifyFile.setStatus(rs.getString("status"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setStatus(null);
+                    sampleVerifyFile.setStatus("--");
                 }
 
                 try {
                     sampleVerifyFile.setResidentDistrict(rs.getString("residentdistrict"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setResidentDistrict(null);
+                    sampleVerifyFile.setResidentDistrict("--");
                 }
 
                 try {
                     sampleVerifyFile.setContactNumber(rs.getString("contactnumber"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setContactNumber(null);
+                    sampleVerifyFile.setContactNumber("--");
                 }
 
                 try {
                     sampleVerifyFile.setSecondaryContactNumber(rs.getString("secondarycontactnumber"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setSecondaryContactNumber(null);
+                    sampleVerifyFile.setSecondaryContactNumber("--");
                 }
 
                 try {
                     sampleVerifyFile.setSpecimenid(rs.getString("specimenid"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setSpecimenid(null);
+                    sampleVerifyFile.setSpecimenid("--");
                 }
 
                 try {
                     sampleVerifyFile.setBarcode(rs.getString("barcode"));
                 } catch (Exception e) {
-                    sampleVerifyFile.setBarcode(null);
+                    sampleVerifyFile.setBarcode("--");
                 }
-
 
                 try {
                     sampleVerifyFile.setCreatedTime(new Date(rs.getDate("createdtime").getTime()));
@@ -257,22 +253,17 @@ public class SampleVerifyFileRepository {
                 try {
                     sampleVerifyFile.setCreatedUser(rs.getString("createduser"));
                 } catch (SQLException e) {
-                    sampleVerifyFile.setCreatedUser(null);
+                    sampleVerifyFile.setCreatedUser("--");
                 }
-
                 return sampleVerifyFile;
-
             });
-
         } catch (Exception exception) {
             throw exception;
         }
-
-        System.out.println("SAmple Data" + sampleVerifyFileList);
         return sampleVerifyFileList;
-
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public SampleVerifyFile getSampleVerifyRecord(String id) throws SQLException {
         SampleVerifyFile sampleVerifyFile = null;
@@ -396,7 +387,6 @@ public class SampleVerifyFileRepository {
                         sampleVerifyFile.setCreatedUser(null);
                     }
 
-
                     return sampleVerifyFile;
                 }
             });
@@ -405,8 +395,6 @@ public class SampleVerifyFileRepository {
         } catch (Exception e) {
             throw e;
         }
-
-        System.out.println("Sample Data:" + sampleVerifyFile);
         return sampleVerifyFile;
     }
 
@@ -416,14 +404,13 @@ public class SampleVerifyFileRepository {
 
     private StringBuilder setDynamicClause(SampleFileVerificationInputBean sampleFileVerificationInputBean, StringBuilder dynamicClause) {
         dynamicClause.append("1=1 ");
-
         try {
             if (sampleFileVerificationInputBean.getReceivedDate() != null && !sampleFileVerificationInputBean.getReceivedDate().isEmpty()) {
-                dynamicClause.append("and lower(i.receiveddate) like lower('%").append(sampleFileVerificationInputBean.getReceivedDate()).append("%') ");
+                dynamicClause.append(" and i.receiveddate = '").append(sampleFileVerificationInputBean.getReceivedDate()).append("'");
             }
 
             if (sampleFileVerificationInputBean.getInstitutionCode() != null && !sampleFileVerificationInputBean.getInstitutionCode().isEmpty()) {
-                dynamicClause.append("and i.institutioncode like '%").append(sampleFileVerificationInputBean.getInstitutionCode()).append("%') ");
+                dynamicClause.append(" and i.institutioncode = '").append(sampleFileVerificationInputBean.getInstitutionCode()).append("'");
             }
 
             if (sampleFileVerificationInputBean.getReferenceNo() != null && !sampleFileVerificationInputBean.getReferenceNo().isEmpty()) {
@@ -431,12 +418,11 @@ public class SampleVerifyFileRepository {
             }
 
             if (sampleFileVerificationInputBean.getStatus() != null && !sampleFileVerificationInputBean.getStatus().isEmpty()) {
-                dynamicClause.append("and i.status like '%").append(sampleFileVerificationInputBean.getStatus()).append("%' ");
+                dynamicClause.append(" and i.status = '").append(sampleFileVerificationInputBean.getStatus()).append("'");
             }
         } catch (Exception exception) {
             throw exception;
         }
-
         return dynamicClause;
     }
 }

@@ -1,6 +1,7 @@
 package com.epic.ims.bean.samplefileverification;
 
 import com.epic.ims.bean.common.Status;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.util.common.DataTablesRequest;
 import lombok.*;
 
@@ -33,7 +34,6 @@ public class SampleFileVerificationInputBean extends DataTablesRequest {
     private String createdUser;
     private Date lastUpdatedTime;
     private String lastUpdatedUser;
-
+    private List<Institution> institutionList;
     private List<Status> statusList;
-    private List<Status> statusActList;
 }

@@ -54,4 +54,30 @@ public class PlateAssignService {
         }
         return defaultPlateMap;
     }
+
+    @LogService
+    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+        String message = "";
+        try {
+            message = plateAssignRepository.swapBlockPlate(plateArray, mergeArray);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogService
+    public String MergeBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+        String message = "";
+        try {
+            message = plateAssignRepository.MergeBlockPlate(plateArray, mergeArray);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
 }
