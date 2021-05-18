@@ -124,7 +124,8 @@
                         'className': 'dt-body-center',
                         'render': function (data, type, full, meta) {
                             return '<input type="checkbox">';
-                        }
+                        },
+                        defaultContent: "--"
                     },
                     {
                         title: "Id",
@@ -331,7 +332,7 @@
                 // Prevent click event from propagating to parent
                 e.stopPropagation();
                 //enable buttons
-                if (rows_selected.length > 0) {
+                if (rows_selected.length > 0 && $("#status").val() === 'PEND') {
                     $("#btnInvalid").prop("disabled", false);
                     $("#btnValid").prop("disabled", false);
                     $("#btnNosample").prop("disabled", false);
