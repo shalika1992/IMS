@@ -59,11 +59,6 @@ public class PlateAssignController {
         Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
         try {
             defaultPlateMap = plateAssignService.getDefaultPlate(receivedDate);
-
-//            defaultPlateMap.put(0, Arrays.asList("GOT/C/490","WICKRAMASINGHE","920445631V"));
-//            defaultPlateMap.put(1, Arrays.asList("GOT/C/493","A.G.R.ASANKA","920445632V"));
-//            defaultPlateMap.put(2, Arrays.asList("Pall/C/488","B.G.N.R.BANDA","920445633V"));
-//            defaultPlateMap.put(3, Arrays.asList("MUL/C/01","E.G.Swarnalatha","920445634V"));
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }
