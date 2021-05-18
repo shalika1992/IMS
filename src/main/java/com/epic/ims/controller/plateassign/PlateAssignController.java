@@ -85,7 +85,7 @@ public class PlateAssignController {
     public String postSwapBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         String message = "";
         try {
-            message = plateAssignService.swapBlockPlate(null, null);
+            message = plateAssignService.swapBlockPlate(plateBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
@@ -97,10 +97,10 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    String postMergeBlockPlate(@RequestParam("plateArray") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
+    String postMergeBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         String message = "";
         try {
-            message = plateAssignService.MergeBlockPlate(plateArray, mergeArray);
+            message = plateAssignService.MergeBlockPlate(plateBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);

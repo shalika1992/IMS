@@ -107,34 +107,6 @@
 
         }
 
-        function swapBack() {
-            let swapArray = {};
-            let activeElements = $('.cell-elmt.active');
-            $.each(activeElements, function (x, y) {
-                swapArray[y.dataset.key] = y.dataset.value;
-            });
-
-            // console.log("plate array", platesNum);
-            // console.log("Swap array", swapArray);
-
-            // var jPlatesNum  = JSON.stringify(platesNum);
-            // var jSwapArray  = JSON.stringify(swapArray);
-
-            var data0= {"plateArray": platesNum, "swapArray" : swapArray};
-            $.ajax({
-                type: 'POST',
-                url: '${pageContext.request.contextPath}/swapBlockPlate.json',
-                contentType: "application/json",
-                data : JSON.stringify(data0),
-                success: function (res) {
-                    console.log(res);
-                },
-                error: function (jqXHR) {
-                    <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
-                }
-            });
-        }
-
         function swap() {
 
             let swapArray = {}
@@ -161,15 +133,7 @@
                         if (result.isConfirmed) {
                             platesNum = _swapCells(platesNum, swapArray);
                             _generatePlates(platesNum);
-                            swal.fire({
-                                text: "Changes are saved",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Proceed",
-                                customClass: {
-                                    confirmButton: "btn font-weight-bold btn-light-primary"
-                                }
-                            });
+                            _updateDatabase(platesNum,swapArray,'SWAP');
                         } else {
                             Swal.fire('Changes are not saved', '', 'info');
                         }
@@ -210,15 +174,7 @@
                         if (result.isConfirmed) {
                             platesNum = _mergeCells(platesNum, mergeArray);
                             _generatePlates(platesNum);
-                            swal.fire({
-                                text: "Changes are saved",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Proceed",
-                                customClass: {
-                                    confirmButton: "btn font-weight-bold btn-light-primary"
-                                }
-                            });
+                            _updateDatabase(platesNum,mergeArray,'MERGE');
                         } else {
                             Swal.fire('Changes are not saved', '', 'info');
                         }
@@ -231,6 +187,62 @@
             }
 
         }
+
+        function _updateDatabase(plateArray,updateArray,operation) {
+            if(operation==='SWAP'){
+                let dataS= {"plateArray": plateArray, "swapArray" : updateArray};
+
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/swapBlockPlate.json',
+                    contentType: "application/json",
+                    data : JSON.stringify(dataS),
+                    dataType: 'text',
+                    success: function (res) {
+                        console.log("message",res);
+                        swal.fire({
+                            text: res,
+                            // icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Exit",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+
+                    },
+                    error: function (jqXHR) {
+                        <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
+                    }
+                });
+            }else if(operation==='MERGE'){
+                let dataM= {"plateArray": plateArray, "mergeArray" : updateArray};
+
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
+                    contentType: "application/json",
+                    data : JSON.stringify(dataM),
+                    dataType: 'text',
+                    success: function (res) {
+                        console.log(res);
+                        swal.fire({
+                            text: res,
+                            // icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Exit",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+                    },
+                    error: function (jqXHR) {
+                        window.location = "${pageContext.request.contextPath}/logout.htm";
+                    }
+                });
+            }
+        }
+
     </script>
 </head>
 <!--begin::Content-->
@@ -332,7 +344,7 @@
         <li class="nav-item mb-2" data-toggle="tooltip" title="" data-placement="left"
             data-original-title="Swap selected cells">
             <a class="btn btn-sm btn-icon btn-bg-light btn-icon-primary btn-hover-primary" href="javascript:void(0);"
-               onclick="swapBack()">
+               onclick="swap()">
                 <i class="flaticon-refresh"></i>
             </a>
         </li>

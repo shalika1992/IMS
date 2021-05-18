@@ -58,10 +58,10 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String swapBlockPlate(Map<String, List<String>> plateArray, Map<String, List<String>> swapArray) {
+    public String swapBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
-            message = plateAssignRepository.swapBlockPlate(plateArray,swapArray);
+            message = plateAssignRepository.swapBlockPlate(plateBean);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
@@ -71,10 +71,10 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String MergeBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String MergeBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
-            message = plateAssignRepository.MergeBlockPlate(plateArray, mergeArray);
+            message = plateAssignRepository.MergeBlockPlate(plateBean);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
