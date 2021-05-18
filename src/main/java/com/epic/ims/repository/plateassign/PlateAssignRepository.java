@@ -4,6 +4,7 @@ import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.varlist.CommonVarList;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +63,47 @@ public class PlateAssignRepository {
             throw e;
         }
         return defaultPlateMap;
+    }
+
+    @LogRepository
+    @Transactional
+    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+        String message = "";
+        try {
+            System.out.println("--------------plate array--------------------------");
+            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateArray)));
+            System.out.println("--------------plate array--------------------------");
+
+
+            System.out.println("--------------merge array--------------------------");
+            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(mergeArray)));
+            System.out.println("--------------merge array--------------------------");
+
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String MergeBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+        String message = "";
+        try {
+            System.out.println("--------------plate array--------------------------");
+            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateArray)));
+            System.out.println("--------------plate array--------------------------");
+
+            System.out.println("--------------merge array--------------------------");
+            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(mergeArray)));
+            System.out.println("--------------merge array--------------------------");
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return message;
     }
 }

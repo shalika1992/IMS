@@ -1,7 +1,6 @@
 package com.epic.ims.repository.common;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
-import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
@@ -53,7 +52,8 @@ public class CommonRepository {
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
-    private final String SQL_GET_RESULT_LIST = "select * from result";
+    private final String SQL_GET_RESULT_LIST = "select code,description from result";
+    private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -139,10 +139,8 @@ public class CommonRepository {
                 @Override
                 public Result mapRow(ResultSet resultSet, int i) throws SQLException {
                     Result result = new Result();
-
                     result.setCode(resultSet.getString("code"));
                     result.setDescription(resultSet.getString("description"));
-
                     return result;
                 }
             });
@@ -153,30 +151,6 @@ public class CommonRepository {
             throw e;
         }
         return resultList;
-    }
-
-    @Transactional(readOnly = true)
-    public List<CommonInstitution> getCommonInstitutionList() throws Exception {
-        List<CommonInstitution> commonInstitutionList;
-        try {
-            commonInstitutionList = jdbcTemplate.query(SQL_GETALL_INSTITUTION_LIST, new RowMapper<CommonInstitution>() {
-                @Override
-                public CommonInstitution mapRow(ResultSet resultSet, int i) throws SQLException {
-                    CommonInstitution commonInstitution = new CommonInstitution();
-
-                    commonInstitution.setInstitutionCode(resultSet.getString("institutionCode"));
-                    commonInstitution.setInstitutionName(resultSet.getString("name"));
-
-                    return commonInstitution;
-                }
-            });
-        } catch (EmptyResultDataAccessException ere) {
-            //handle the empty result data access exception
-            commonInstitutionList = new ArrayList<>();
-        } catch (Exception e) {
-            throw e;
-        }
-        return commonInstitutionList;
     }
 
     public int getPasswordParam(String paramcode) {
@@ -274,5 +248,26 @@ public class CommonRepository {
             throw e;
         }
         return plateList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<Status> getStatusListForSampleVeridy() throws Exception {
+        List<Status> statusBeanList;
+        try {
+            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED});
+            statusBeanList = statusList.stream().map((record) -> {
+                Status statusBean = new Status();
+                statusBean.setStatusCode(record.get("code").toString());
+                statusBean.setDescription(record.get("description").toString());
+                return statusBean;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            statusBeanList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return statusBeanList;
     }
 }

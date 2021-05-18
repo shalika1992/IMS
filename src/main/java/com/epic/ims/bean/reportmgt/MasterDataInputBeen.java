@@ -1,8 +1,8 @@
 package com.epic.ims.bean.reportmgt;
 
-import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
+import com.epic.ims.mapping.institution.Institution;
 import lombok.*;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -44,6 +44,6 @@ public class MasterDataInputBeen {
 
     private List<Status> statusList;
     private List<Result> resultList;
-    private List<CommonInstitution> commonInstitutionList;
+    private List<Institution> commonInstitutionList;
 
 }

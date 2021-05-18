@@ -2,11 +2,11 @@ package com.epic.ims.controller.reportmgt;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
-import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.reportmgt.MasterDataInputBeen;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.institutionmgt.InstitutionService;
 import com.epic.ims.util.common.Common;
@@ -81,12 +81,11 @@ public class MasterDataReportController {
         //get status list
         List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_REPORT);
         List<Result> resultList = commonRepository.getResultList();
-        List<CommonInstitution> commonInstitutionList = commonRepository.getCommonInstitutionList();
+        List<Institution> institutionList = commonRepository.getInstitutionList();
         //set values to task bean
         masterDataInputBeen.setStatusList(statusList);
         masterDataInputBeen.setResultList(resultList);
-        masterDataInputBeen.setCommonInstitutionList(commonInstitutionList);
-
+        masterDataInputBeen.setCommonInstitutionList(institutionList);
         //add values to model map
         map.addAttribute("masterData", masterDataInputBeen);
     }
