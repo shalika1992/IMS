@@ -56,10 +56,10 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, String> swapArray) {
         String message = "";
         try {
-            message = plateAssignRepository.swapBlockPlate(plateArray, mergeArray);
+            message = plateAssignRepository.swapBlockPlate(plateArray, swapArray);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
