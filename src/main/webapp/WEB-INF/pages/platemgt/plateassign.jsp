@@ -108,19 +108,24 @@
         }
 
         function swapBack() {
-            let swapArray = {}
+            let swapArray = {};
             let activeElements = $('.cell-elmt.active');
             $.each(activeElements, function (x, y) {
                 swapArray[y.dataset.key] = y.dataset.value;
             });
 
-            console.log("Swap array", swapArray);
-            console.log("plate array", platesNum);
+            // console.log("plate array", platesNum);
+            // console.log("Swap array", swapArray);
 
+            // var jPlatesNum  = JSON.stringify(platesNum);
+            // var jSwapArray  = JSON.stringify(swapArray);
+
+            var data0= {"plateArray": platesNum, "swapArray" : swapArray};
             $.ajax({
                 type: 'POST',
                 url: '${pageContext.request.contextPath}/swapBlockPlate.json',
-                data: {plateArray: JSON.stringify(platesNum), swapArray: JSON.stringify(swapArray)},
+                contentType: "application/json",
+                data : JSON.stringify(data0),
                 success: function (res) {
                     console.log(res);
                 },
