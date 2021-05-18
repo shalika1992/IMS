@@ -303,6 +303,7 @@
                                                 <option value="${institution.institutionCode}">${institution.institutionName}</option>
                                             </c:forEach>
                                         </select>
+                                        <span class="form-text text-muted">Please enter Institution Code</span>
                                     </div>
 
                                     <div class="col-lg-3">
