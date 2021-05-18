@@ -1,5 +1,6 @@
 package com.epic.ims.repository.samplefileupload;
 
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.samplefileupload.SampleData;
 import com.epic.ims.bean.samplefileupload.SampleFileInputBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -8,6 +9,8 @@ import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
@@ -24,6 +27,7 @@ import java.util.List;
 @Repository
 @Scope("prototype")
 public class SampleFileUploadRepository {
+    private static Logger logger = LogManager.getLogger(SampleFileUploadRepository.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -45,6 +49,7 @@ public class SampleFileUploadRepository {
     private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.id = ?";
     private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser,createdtime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public long getDataCount(SampleFileInputBean sampleFileInputBean) {
         long count = 0;
@@ -62,6 +67,7 @@ public class SampleFileUploadRepository {
         return count;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleFile> getSampleFileSearchList(SampleFileInputBean sampleFileInputBean) {
         List<SampleFile> sampleFileList = null;
@@ -203,6 +209,7 @@ public class SampleFileUploadRepository {
         return sampleFileList;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public List<SampleData> getExistingSampleDataList(String receiveDate) {
         List<SampleData> sampleDataList = null;
@@ -243,6 +250,7 @@ public class SampleFileUploadRepository {
         return sampleDataList;
     }
 
+    @LogRepository
     @Transactional
     public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {
         String message = "";
@@ -267,7 +275,7 @@ public class SampleFileUploadRepository {
                         ps.setString(11, sampleData.getContactNumber());
                         ps.setString(12, sampleData.getSecondaryContactNumber());
                         ps.setString(13, receivedDate);
-                        ps.setString(14, commonVarList.STATUS_RECEIVED);
+                        ps.setString(14, commonVarList.STATUS_PENDING);
                         ps.setString(15, sessionBean.getUsername());
                         ps.setString(16, currentDate);
                     }
@@ -288,6 +296,7 @@ public class SampleFileUploadRepository {
         return message;
     }
 
+    @LogRepository
     @Transactional(readOnly = true)
     public SampleFile getSampleRecord(String id) {
         SampleFile sampleFile;
@@ -418,6 +427,7 @@ public class SampleFileUploadRepository {
         return sampleFile;
     }
 
+    @LogRepository
     @Transactional
     public String updateSampleFileRecord(SampleFileInputBean sampleFileInputBean) {
         String message = "";
@@ -443,7 +453,7 @@ public class SampleFileUploadRepository {
     }
 
     private StringBuilder setDynamicClause(SampleFileInputBean sampleFileInputBean, StringBuilder dynamicClause) {
-        dynamicClause.append(" 1=1 ");
+        dynamicClause.append(" 1=1 and sd.status = '").append(commonVarList.STATUS_PENDING).append("'");
         try {
             if (sampleFileInputBean.getReceivedDate() != null && !sampleFileInputBean.getReceivedDate().isEmpty()) {
                 dynamicClause.append(" and sd.receiveddate = '").append(sampleFileInputBean.getReceivedDate()).append("'");
@@ -454,7 +464,7 @@ public class SampleFileUploadRepository {
             }
 
             if (sampleFileInputBean.getInstitutionCode() != null && !sampleFileInputBean.getInstitutionCode().isEmpty()) {
-                dynamicClause.append(" and sd.institutioncode like '%").append(sampleFileInputBean.getInstitutionCode()).append("%'");
+                dynamicClause.append(" and sd.institutioncode = '").append(sampleFileInputBean.getInstitutionCode()).append("'");
             }
 
             if (sampleFileInputBean.getName() != null && !sampleFileInputBean.getName().isEmpty()) {

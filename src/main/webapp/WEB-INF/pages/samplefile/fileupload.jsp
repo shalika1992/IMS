@@ -33,33 +33,6 @@
             loadDataTable();
         });
 
-        function setReceivedDate() {
-            var date = new Date();
-            var month = date.getMonth() + 1;
-            var day = date.getDate();
-            if (day < 10) {
-                day = '0' + day;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-            var today = (date.getFullYear() + "-" + month + "-" + day);
-            $('#searchReceivedDate').val(today);
-        }
-
-        function getReceivedDate() {
-            var date = new Date();
-            var month = date.getMonth() + 1;
-            var day = date.getDate();
-            if (day < 10) {
-                day = '0' + day;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-            return (date.getFullYear() + "-" + month + "-" + day);
-        }
-
         function loadDataTable() {
             var token = $("meta[name='_csrf']").attr("content");
             var header = $("meta[name='_csrf_header']").attr("content");
@@ -125,7 +98,7 @@
                 fnDrawCallback: function (oSettings) {
                     $(".table ").css({"width": "100%"});
                 },
-                fixedColumns:   {
+                fixedColumns: {
                     rightColumns: 1
                 },
                 columnDefs: [
@@ -286,8 +259,35 @@
         }
 
         function resetSearch() {
-            $("#searchReceivedDate").datepicker("setDate", new Date());
+            $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
             oTable.fnDraw();
+        }
+
+        function setReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            var today = (date.getFullYear() + "-" + month + "-" + day);
+            $('#searchReceivedDate').val(today);
+        }
+
+        function getReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return (date.getFullYear() + "-" + month + "-" + day);
         }
     </script>
 </head>
@@ -354,10 +354,12 @@
 
                                     <div class="col-lg-4">
                                         <label>Institution Code:</label>
-                                        <input id="institutionCode" name="institutionCode" type="text"
-                                               maxlength="16" class="form-control form-control-sm"
-                                               placeholder="Institution Code" autocomplete="off">
-                                        <span class="form-text text-muted">Please enter institution code</span>
+                                        <select id="institutionCode" name="institutionCode" class="form-control">
+                                            <option selected value="">Select Institution Code</option>
+                                            <c:forEach items="${samplefile.institutionList}" var="institution">
+                                                <option value="${institution.institutionCode}">${institution.institutionName}</option>
+                                            </c:forEach>
+                                        </select>
                                     </div>
 
                                     <div class="col-lg-4">
@@ -386,7 +388,7 @@
                                     <div class="col-lg-6">
                                         <button type="button" class="btn btn-primary mr-2" onclick="search()">Search
                                         </button>
-                                        <button type="reset" class="btn btn-secondary" onclick="resetSearch()">Reset
+                                        <button type="button" class="btn btn-secondary" onclick="resetSearch()">Reset
                                         </button>
                                     </div>
                                 </div>

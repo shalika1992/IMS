@@ -1,4 +1,4 @@
-package com.epic.ims.bean.usermgt.sysuser;
+package com.epic.ims.bean.sysuser;
 
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.mapping.user.usermgt.UserRole;

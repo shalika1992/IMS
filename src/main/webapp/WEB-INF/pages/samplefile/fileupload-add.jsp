@@ -94,12 +94,13 @@
                     // handle success response
                     $('#responseMsgAdd').show();
                     $('#responseMsgAdd').addClass('success-response').text(res.successMessage);
-                    $('form[name=sampleFileUploadForm]').trigger("reset");
                     search();
                 } else {
                     $('#responseMsgAdd').show();
                     $('#responseMsgAdd').addClass('error-response').text(res.errorMessage);
                 }
+                $('form[name=sampleFileUploadForm]').trigger("reset");
+                $("#sampleFile").val(null);
             },
             error: function (err) {
                 window.location = "${pageContext.request.contextPath}/logout.htm";

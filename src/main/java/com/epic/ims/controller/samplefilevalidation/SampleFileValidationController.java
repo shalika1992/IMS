@@ -3,11 +3,9 @@ package com.epic.ims.controller.samplefilevalidation;
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
-import com.epic.ims.mapping.institutionmgt.Institution;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.sampleverifyfile.SampleVerifyFileService;
@@ -79,6 +77,10 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         return modelAndView;
     }
 
+//<<<<<<< HEAD
+//=======
+//
+//>>>>>>> fdaf8ea36aca36d135e57fdbe1771c937cebdac8
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
     @PostMapping(value = "/listSampleVerification", headers = {"content-type=application/json"})

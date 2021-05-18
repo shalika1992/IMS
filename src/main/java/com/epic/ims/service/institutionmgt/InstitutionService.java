@@ -2,16 +2,12 @@ package com.epic.ims.service.institutionmgt;
 
 import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.bean.usermgt.sysuser.SystemUserInputBean;
-import com.epic.ims.mapping.institutionmgt.Institution;
-import com.epic.ims.mapping.user.usermgt.SystemUser;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.institutionmgt.InstitutionRepository;
 import com.epic.ims.util.common.Common;
-import com.epic.ims.util.common.ResponseBean;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.StatusVarList;
-import com.epic.ims.util.varlist.TaskVarList;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,12 +21,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 @Service
 @Scope("prototype")
@@ -69,10 +66,10 @@ public class InstitutionService {
         return message;
     }
 
-    public String insertInstitutionBulk(InstitutionInputBean institutionInputBean, Locale locale){
+    public String insertInstitutionBulk(InstitutionInputBean institutionInputBean, Locale locale) {
         String message = "";
 
-        try{
+        try {
             MultipartFile file = institutionInputBean.getInstitutionBulk();
             Workbook workbook = null;
             InputStream inputStream = file.getInputStream();
@@ -113,17 +110,16 @@ public class InstitutionService {
 
                     Institution existingInstitution = institutionRepository.getInstitution(institutionCode.trim());
 
-                    if (existingInstitution==null){
+                    if (existingInstitution == null) {
                         InstitutionInputBean institution = new InstitutionInputBean();
 
-                        institution.setInstitutionCode(institutionCode);
-                        institution.setInstitutionName(institutionName);
+                        institution.setInstitutionCode(institutionCode.trim().toUpperCase(Locale.ROOT));
+                        institution.setInstitutionName(institutionName.trim());
                         institution.setAddress(address);
-                        institution.setContactNumber(contactNumber);
+                        institution.setContactNumber(contactNumber.trim());
                         institution.setStatus(StatusVarList.STATUS_DFLT_ACT);
 
                         //set the other values to input bean
-
                         Date currentDate = commonRepository.getCurrentDate();
                         String lastUpdatedUser = sessionBean.getUsername();
 
@@ -144,7 +140,7 @@ public class InstitutionService {
             }
 
 
-        }catch (Exception e){
+        } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
 
@@ -282,7 +278,7 @@ public class InstitutionService {
     public long getCount(InstitutionInputBean institutionInputBean) throws Exception {
         long count = 0;
 
-        try{
+        try {
             count = institutionRepository.getCount(institutionInputBean);
         } catch (Exception ere) {
             throw ere;
@@ -294,22 +290,22 @@ public class InstitutionService {
     public List<Institution> getInstitutionSearchResultList(InstitutionInputBean institutionInputBean) {
         List<Institution> institutionList;
 
-        try{
+        try {
             institutionList = institutionRepository.getInstitutionSearchList(institutionInputBean);
-        }catch (Exception exception){
-            throw  exception;
+        } catch (Exception exception) {
+            throw exception;
         }
 
         return institutionList;
     }
 
-    public String insertInstitution(InstitutionInputBean institutionInputBean, Locale locale){
+    public String insertInstitution(InstitutionInputBean institutionInputBean, Locale locale) {
         String message = "";
 
         try {
             Institution existingInstitution = institutionRepository.getInstitution(institutionInputBean.getInstitutionCode().trim());
 
-            if (existingInstitution == null){
+            if (existingInstitution == null) {
 
                 //set the other values to input bean
                 Date currentDate = commonRepository.getCurrentDate();
@@ -318,14 +314,15 @@ public class InstitutionService {
                 institutionInputBean.setCreatedTime(currentDate);
                 institutionInputBean.setLastUpdatedUser("error");
                 institutionInputBean.setLastUpdatedTime(currentDate);
+                institutionInputBean.setInstitutionCode(institutionInputBean.getInstitutionCode().trim().toUpperCase(Locale.ROOT));
 
                 message = institutionRepository.insertInstitution(institutionInputBean);
-            }else{
+            } else {
                 message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
             }
-        }catch (DuplicateKeyException ex){
+        } catch (DuplicateKeyException ex) {
             message = MessageVarList.INSTITUTION_MGT_ALREADY_EXISTS;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
 

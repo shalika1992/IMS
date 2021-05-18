@@ -21,8 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class InstitutionBulkValidation {
@@ -62,7 +61,7 @@ public class InstitutionBulkValidation {
                 excelFile.close();
             }
         } else {
-            responseBean = new ResponseBean(false, null, MessageVarList.COMMON_ERROR_PROCESS);
+            responseBean = new ResponseBean(false, null, MessageVarList.INSTITUTION_MGT_EMPTY_FILE);
         }
 
         return responseBean;
@@ -74,6 +73,7 @@ public class InstitutionBulkValidation {
         Row titleRow = sheet.getRow(0);
         int count = sheet.getPhysicalNumberOfRows();
         ResponseBean responseBean = new ResponseBean();
+        HashSet<String> uniqueInstitutionCodeSet = new HashSet<>();
 
         try {
 
@@ -127,10 +127,18 @@ public class InstitutionBulkValidation {
                                 responseBean = new ResponseBean(false, null, messageSource.getMessage(Objects.requireNonNull(bindingResult.getAllErrors().get(0).getCode()), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US) + " Row Number: " + ++rowNumber);
                                 break;
                             } else {
-                                responseBean.setFlag(true);
+                                //check for duplicates
+                                if (!uniqueInstitutionCodeSet.add(institutionInputBean.getInstitutionCode())){
+                                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_DUPLICATE_RECORD, null, locale)+ " Row Number: " + ++rowNumber);
+                                    break;
+                                }else {
+                                    responseBean.setFlag(true);
+                                }
+
                             }
                         }
                     }
+
                 } else {
                     responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_INVALID_COLUMN_ORDER, null, locale));
                 }
@@ -156,7 +164,7 @@ public class InstitutionBulkValidation {
 
         for (Cell cell : titleRow) {
             try {
-                columnOrder.append(cell.getRichStringCellValue());
+                columnOrder.append(cell.getRichStringCellValue().toString().trim());
             } catch (Exception e) {
                 columnOrder.append("--");
             } finally {

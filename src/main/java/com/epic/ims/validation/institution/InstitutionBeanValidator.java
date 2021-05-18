@@ -38,8 +38,8 @@ public class InstitutionBeanValidator implements Validator {
 
                 if (userTask.equals(TaskVarList.ADD_BULK_TASK)) {
                     //validate input fields for empty fields
-                    ValidationUtils.rejectIfEmpty(errors, "institutionCode", MessageVarList.INSTITUTION_MGT_EMPTY_CODE , "Institution Code can not be empty. Row Number: " + ++rowNumber);
-                    ValidationUtils.rejectIfEmpty(errors, "institutionName", MessageVarList.INSTITUTION_MGT_EMPTY_NAME , "Institution name can not be empty. Row Number: " + ++rowNumber);
+                    ValidationUtils.rejectIfEmpty(errors, "institutionCode", MessageVarList.INSTITUTION_MGT_EMPTY_CODE , "CommonInstitution Code can not be empty. Row Number: " + ++rowNumber);
+                    ValidationUtils.rejectIfEmpty(errors, "institutionName", MessageVarList.INSTITUTION_MGT_EMPTY_NAME , "CommonInstitution name can not be empty. Row Number: " + ++rowNumber);
                     ValidationUtils.rejectIfEmpty(errors, "address", MessageVarList.INSTITUTION_MGT_EMPTY_ADDRESS , "Address can not be empty. Row Number: " + ++rowNumber);
                     ValidationUtils.rejectIfEmpty(errors, "contactNumber", MessageVarList.INSTITUTION_MGT_EMPTY_CONTACT_NUMBER , "Contact Number can not be empty. Row Number: " + ++rowNumber);
                     if (contactNumber.equals("invalidData")){
@@ -48,8 +48,8 @@ public class InstitutionBeanValidator implements Validator {
 
                 }else {
                     //validate input fields for empty fields
-                    ValidationUtils.rejectIfEmpty(errors, "institutionCode", MessageVarList.INSTITUTION_MGT_EMPTY_CODE, "Institution Code can not be empty.");
-                    ValidationUtils.rejectIfEmpty(errors, "institutionName", MessageVarList.INSTITUTION_MGT_EMPTY_NAME, "Institution name can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors, "institutionCode", MessageVarList.INSTITUTION_MGT_EMPTY_CODE, "CommonInstitution Code can not be empty.");
+                    ValidationUtils.rejectIfEmpty(errors, "institutionName", MessageVarList.INSTITUTION_MGT_EMPTY_NAME, "CommonInstitution name can not be empty.");
                     ValidationUtils.rejectIfEmpty(errors, "address", MessageVarList.INSTITUTION_MGT_EMPTY_ADDRESS, "Address can not be empty.");
                     ValidationUtils.rejectIfEmpty(errors, "contactNumber", MessageVarList.INSTITUTION_MGT_EMPTY_CONTACT_NUMBER, "Contact Number can not be empty.");
                     ValidationUtils.rejectIfEmpty(errors, "status", MessageVarList.INSTITUTION_MGT_EMPTY_STATUS, "Status can not be empty.");

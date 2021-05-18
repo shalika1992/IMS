@@ -32,7 +32,7 @@ public class ExcelHelper {
         return true;
     }
 
-    public List<SampleData> excelToSampleData(InputStream inputStream) throws Exception {
+    public List<SampleData> excelToSampleData(InputStream inputStream,String receivedDate) throws Exception {
         try {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
@@ -64,7 +64,7 @@ public class ExcelHelper {
                             break;
 
                         case 1:
-                            sampleData.setDate(common.handleNullAndEmptyInExcelCell(currentCell.getStringCellValue()));
+                            sampleData.setDate(receivedDate);
                             break;
 
                         case 2:

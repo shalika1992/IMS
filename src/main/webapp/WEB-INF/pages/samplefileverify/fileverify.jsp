@@ -89,12 +89,13 @@
                     document.getElementById('data-table-wrapper').style.display = "block";
                 },
                 fnDrawCallback: function (oSettings) {
-                    $(".table ").css({"width": "100%"});
+                    $("#table ").css({"width": "100%"});
                 },
                 columnDefs: [
                     {
                         title: "Id",
                         targets: 0,
+                        visible:false,
                         mDataProp: "id",
                         defaultContent: "--"
                     },
@@ -184,28 +185,8 @@
                         render: function (data, type, full, meta) {
                             var status = {
                                 'Active': {
-                                    'title': 'Active',
+                                    'title': 'Valid',
                                     'class': ' label-light-info'
-                                },
-                                'Inactive': {
-                                    'title': 'Inactive',
-                                    'class': ' label-light-danger'
-                                },
-                                'New': {
-                                    'title': 'New',
-                                    'class': ' label-light-primary'
-                                },
-                                'Changed': {
-                                    'title': 'Changed',
-                                    'class': ' label-light-success'
-                                },
-                                'Reset': {
-                                    'title': 'Reset',
-                                    'class': ' label-light-warning'
-                                },
-                                'De-Active': {
-                                    'title': 'De-Active',
-                                    'class': ' label-light-danger'
                                 },
                                 'Pending': {
                                     'title': 'Pending',
@@ -254,22 +235,20 @@
         }
 
 
-        function search() {
-            oTable.fnDraw();
-        }
 
         function searchStart() {
             oTable.fnDraw();
         }
 
         function resetSearch() {
-            $('#receivedDate').val("");
+            $("#receivedDate").val("");
             $('#institutionCode').val("");
             $('#referenceNo').val("");
             $('#status').val("");
 
             oTable.fnDraw();
         }
+
     </script>
 </head>
 <!--begin::Content-->
@@ -300,7 +279,7 @@
                     <!--begin::Card-->
                     <div class="card card-custom gutter-b">
                         <div class="card-header">
-                            <h3 class="card-title">Verify Data</h3>
+                            <h3 class="card-title">Search sample data</h3>
                         </div>
                         <!--begin::Form-->
                         <form:form class="form" id="sampleverifyform" name="sampleverifyform" action=""
@@ -308,35 +287,32 @@
                             <%--                        <form class="form">--%>
                             <div class="card-body">
                                 <div class="form-group row">
-
                                     <div class="col-lg-3">
                                         <label>Received Date:</label>
-                                        <input id="receivedDate" name="receivedDate" type="text"
+                                        <input id="receivedDate" name="receivedDate" type="date"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
-                                               maxlength="16" class="form-control "
+                                                class="form-control "
                                                placeholder="Received Date">
-                                        <span class="form-text text-muted">Please enter received date</span>
+                                        <span class="form-text text-muted">Please enter Received Date</span>
                                     </div>
-
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-4">
                                         <label>Institution Code:</label>
-                                        <input id="institutionCode" name="institutionCode" type="text"
-                                               onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
-                                               maxlength="256" class="form-control "
-                                               placeholder="Institution Code">
-                                        <span class="form-text text-muted">Please enter institution code</span>
+                                        <select id="institutionCode" name="institutionCode" class="form-control">
+                                            <option selected value="">Select Institution Code</option>
+                                            <c:forEach items="${sampleverify.institutionList}" var="institution">
+                                                <option value="${institution.institutionCode}">${institution.institutionName}</option>
+                                            </c:forEach>
+                                        </select>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Reference No:</label>
+                                        <label>Reference Number</label>
                                         <input id="referenceNo" name="referenceNo" type="text"
-                                               onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
-                                               maxlength="10"
-                                               class="form-control form-control-sm" placeholder="Reference Number">
-
-                                        <span class="form-text text-muted">Please enter reference number</span>
+                                        onkeyup="$(this).val($(this).val().replace(/^[A-Za-z0-9\!\@\#\$\%\^\&\*\)\(+\=\._-]+$/g, ''))"
+                                               maxlength="16" class="form-control "
+                                               placeholder="Reference Number">
+                                        <span class="form-text text-muted">Please enter reference Number</span>
                                     </div>
-
                                     <div class="col-lg-3">
                                         <label>Status:</label>
                                         <select id="status" name="status" class="form-control">

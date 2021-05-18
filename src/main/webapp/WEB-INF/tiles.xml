@@ -55,6 +55,11 @@
         <put-attribute name="body" value="/WEB-INF/pages/usermgt/sysuser/systemuser-mgt.jsp"/>
     </definition>
 
+    <!-- rejected sample page -->
+    <definition name="rejectedsampleview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/rejectedsample/rejectedsample-mgt.jsp"/>
+    </definition>
+
     <!--institution management page-->
     <definition name="institutionview" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/institutionmgt/institution-mgt.jsp"/>
@@ -71,9 +76,20 @@
         <put-attribute name="body" value="/WEB-INF/pages/samplefileverify/fileverify.jsp"/>
     </definition>
 
+    <!--master data management page-->
+    <definition name="reportgenerationview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/reportmgt/masterdata-mgt.jsp"/>
+    </definition>
+
+
     <!--plate assign page-->
     <definition name="plate/assign" extends="home-template">
         <put-attribute name="body" value="/WEB-INF/pages/platemgt/plateassign.jsp"/>
+    </definition>
+
+    <!--result update page-->
+    <definition name="resultupdateview" extends="home-template">
+        <put-attribute name="body" value="/WEB-INF/pages/resultupdate/resultupdate.jsp"/>
     </definition>
 
     <!--404 page-->
