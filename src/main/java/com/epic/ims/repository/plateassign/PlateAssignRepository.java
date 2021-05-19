@@ -1,6 +1,7 @@
 package com.epic.ims.repository.plateassign;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
+import com.epic.ims.bean.plate.PlateBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.varlist.CommonVarList;
@@ -67,17 +68,19 @@ public class PlateAssignRepository {
 
     @LogRepository
     @Transactional
-    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String swapBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
             System.out.println("--------------plate array--------------------------");
-            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateArray)));
+            plateBean.getPlateArray().forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateBean.getPlateArray())));
             System.out.println("--------------plate array--------------------------");
 
 
-            System.out.println("--------------merge array--------------------------");
-            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(mergeArray)));
-            System.out.println("--------------merge array--------------------------");
+            System.out.println("--------------swap array--------------------------");
+            plateBean.getSwapArray().forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateBean.getSwapArray())));
+            System.out.println("--------------swap array--------------------------");
+
+            message = "DB updated swap";
 
         } catch (EmptyResultDataAccessException ex) {
             logger.error(ex);
@@ -89,16 +92,18 @@ public class PlateAssignRepository {
 
     @LogRepository
     @Transactional
-    public String MergeBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String MergeBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
             System.out.println("--------------plate array--------------------------");
-            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateArray)));
+            plateBean.getPlateArray().forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateBean.getPlateArray())));
             System.out.println("--------------plate array--------------------------");
 
             System.out.println("--------------merge array--------------------------");
-            plateArray.forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(mergeArray)));
+            plateBean.getMergeArray().forEach((key, value) -> System.out.println(key + "--:" + new Gson().toJson(plateBean.getMergeArray())));
             System.out.println("--------------merge array--------------------------");
+
+            message = "DB updated merge";
         } catch (EmptyResultDataAccessException ex) {
             logger.error(ex);
         } catch (Exception e) {

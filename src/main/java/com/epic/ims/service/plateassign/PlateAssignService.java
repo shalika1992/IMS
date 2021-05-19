@@ -1,6 +1,7 @@
 package com.epic.ims.service.plateassign;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.plate.PlateBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.plateassign.PlateAssignRepository;
@@ -14,6 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,10 +58,10 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String swapBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String swapBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
-            message = plateAssignRepository.swapBlockPlate(plateArray, mergeArray);
+            message = plateAssignRepository.swapBlockPlate(plateBean);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
@@ -69,10 +71,10 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String MergeBlockPlate(Map<Integer, List<String>> plateArray, Map<Integer, List<String>> mergeArray) {
+    public String MergeBlockPlate(PlateBean plateBean) {
         String message = "";
         try {
-            message = plateAssignRepository.MergeBlockPlate(plateArray, mergeArray);
+            message = plateAssignRepository.MergeBlockPlate(plateBean);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {

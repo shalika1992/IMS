@@ -96,7 +96,7 @@ function _generatePlates(platesArray) {
                         });
                         ul+='</ul>';
                         //
-                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0] + "' title='"+ul+"'>" + platesArray[val + shift][0] + "</div>\n";
+                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift] + "' title='"+ul+"'>" + platesArray[val + shift][0] + "</div>\n";
                     } else {
                         // html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0] + "'>N/A</div>\n";
                         html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
@@ -150,28 +150,4 @@ $(document).on("click", ".cell-click", function () {
     } else {
         $(this).addClass("active");
     }
-
 });
-
-
-// for (let k = 0; k < round; k++) { // plate rounds
-//     html += "</div><div class='col-12'>---- [ Plate " + (k + 1) + " ] ----</div>\n";
-//     let val;
-//     for (let i = 0; i < 8; i++) { // rows
-//         for (let j = 0; j < 12; j++) { // columns
-//             val = i + (8 * j); // change normal filling
-//             if (val < 93) { // ignore last 3 plates
-//                 if (platesArray[val + shift] !== undefined) { // after finish filling
-//                     html += "<div class='col-1 " + (val + shift + 1) + "'>" + platesArray[val + shift] + "</div>\n";
-//                 } else {
-//                     html += "<div class='col-1 " + (val + shift + 1) + "'>-</div>\n";
-//                 }
-//             } else {
-//                 html += "<div class='col-1 " + (val + shift + 1) + "'>-</div>\n";
-//             }
-//         }
-//     }
-//     // to next plate
-//     shift += 93;
-//     html += '</div>'
-// }

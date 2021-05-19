@@ -17,12 +17,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,12 +80,12 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
-    @RequestMapping(value = "/swapBlockPalte", method = RequestMethod.POST)
-    public @ResponseBody
-    String postSwapBlockPlate(@RequestParam("plateArray ") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
+    @RequestMapping(value = "/swapBlockPlate", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public String postSwapBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         String message = "";
         try {
-            message = plateAssignService.swapBlockPlate(plateArray, mergeArray);
+            message = plateAssignService.swapBlockPlate(plateBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
@@ -96,12 +95,12 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
-    @RequestMapping(value = "/mergeBlockPalte", method = RequestMethod.POST)
+    @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    String postMergeBlockPlate(@RequestParam("plateArray ") Map<Integer, List<String>> plateArray, @RequestParam("mergeArray") Map<Integer, List<String>> mergeArray, Locale locale) {
+    String postMergeBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         String message = "";
         try {
-            message = plateAssignService.MergeBlockPlate(plateArray, mergeArray);
+            message = plateAssignService.MergeBlockPlate(plateBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
