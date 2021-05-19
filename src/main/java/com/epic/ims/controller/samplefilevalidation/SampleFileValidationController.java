@@ -205,22 +205,22 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
     }
 
     @LogController
-    @PostMapping(value = "/validsample", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @PostMapping(value = "/validsample", consumes = "application/json")
     public @ResponseBody
-    ResponseBean validSample(@ModelAttribute("sampleverify") SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+    ResponseBean validSample(@RequestParam Integer[] rowList, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE RECORD");
         ResponseBean responseBean;
         try {
-            BindingResult bindingResult = validateRequestBean(sampleFileVerificationInputBean);
-            if (bindingResult.hasErrors()) {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));
+            System.out.println(rowList);
+            String message = sampleVerifyFileService.validateSample(null);
+            System.out.println("Message: "+message);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                System.out.println("IF: "+responseBean);
             } else {
-                String message = sampleVerifyFileService.validateSample(sampleFileVerificationInputBean);
-                if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
-                } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-                }
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                System.out.println("ELSE: "+responseBean);
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);

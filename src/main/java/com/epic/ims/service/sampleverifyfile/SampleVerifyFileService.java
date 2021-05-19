@@ -142,6 +142,7 @@ public class SampleVerifyFileService {
         return message;
     }
 
+    @LogService
     private String getSampleAsString(SampleVerifyFile sampleVerifyFile, boolean checkChanges) {
         StringBuilder sampleStringBuilder = new StringBuilder();
         try {
@@ -167,11 +168,13 @@ public class SampleVerifyFileService {
         return sampleStringBuilder.toString();
     }
 
+    @LogService
     public String validateSample(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
         String message = "";
         SampleVerifyFile existingSample = null;
         try {
-            existingSample = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getInstitutionCode());
+            existingSample = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getId());
+            System.out.println("ExistingSample: "+existingSample);
             if (existingSample != null) {
                 //check changed values
                 String oldValueAsString = this.getSampleAsString(existingSample, true);
@@ -189,17 +192,21 @@ public class SampleVerifyFileService {
                     sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
 
                     message = sampleVerifyFileRepository.validateSample(sampleFileVerificationInputBean);
+                    System.out.println("RepoFirstElse: "+message);
 
                 }
             } else {
                 message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+                System.out.println("RepoElse: "+message);
             }
         } catch (EmptyResultDataAccessException ere) {
             message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+            System.out.println("RepoCatch: "+message);
 
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
+        System.out.println("Repo: "+message);
         return message;
     }
 }

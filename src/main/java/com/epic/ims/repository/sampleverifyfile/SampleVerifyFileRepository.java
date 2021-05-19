@@ -64,7 +64,7 @@ public class SampleVerifyFileRepository {
         }
         return count;
     }
-
+    @LogRepository
     @Transactional
     public String validateSample(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception{
         String message = "";
@@ -79,6 +79,8 @@ public class SampleVerifyFileRepository {
         } catch (Exception ex) {
             throw ex;
         }
+        System.out.println("SQL: "+SQL_UPDATE_STATUS);
+        System.out.println("Repository class: "+message);
         return message;
     }
 

@@ -439,14 +439,16 @@
         }
 
         function openValidModal() {
-            console.log(rows_selected);
+            var rowList = rows_selected;
+            console.log(JSON.stringify(rowList));
             $.ajax({
-                dataType: 'json',
                 type: 'POST',
                 url: "${pageContext.request.contextPath}/validsample.json",
                 contentType: "application/json",
-                data: rows_selected,
-                success: function (e) {alert("fffffffffffff")},
+                data: rowList,
+                success: function (e) {
+                    alert("fffffffffffff");
+                },
                 error: function (e) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
                 }
