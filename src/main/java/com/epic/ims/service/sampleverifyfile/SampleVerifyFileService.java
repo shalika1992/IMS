@@ -1,8 +1,10 @@
 package com.epic.ims.service.sampleverifyfile;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.sampleverifyfile.SampleVerifyFileRepository;
@@ -134,6 +136,67 @@ public class SampleVerifyFileService {
             }
         } catch (EmptyResultDataAccessException ere) {
             message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+    private String getSampleAsString(SampleVerifyFile sampleVerifyFile, boolean checkChanges) {
+        StringBuilder sampleStringBuilder = new StringBuilder();
+        try {
+            if (sampleVerifyFile != null) {
+
+                if (sampleVerifyFile.getId() != 0) {
+                    sampleStringBuilder.append(sampleVerifyFile.getId());
+                } else {
+                    sampleStringBuilder.append("error");
+                }
+
+                sampleStringBuilder.append("|");
+                if (sampleVerifyFile.getStatus() != null && !sampleVerifyFile.getStatus().isEmpty()) {
+                    sampleStringBuilder.append(sampleVerifyFile.getStatus());
+                } else {
+                    sampleStringBuilder.append("--");
+                }
+
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return sampleStringBuilder.toString();
+    }
+
+    public String validateSample(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
+        String message = "";
+        SampleVerifyFile existingSample = null;
+        try {
+            existingSample = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getInstitutionCode());
+            if (existingSample != null) {
+                //check changed values
+                String oldValueAsString = this.getSampleAsString(existingSample, true);
+                String newValueAsString = this.getSampleAsString(existingSample, true);
+                //check the old value and new value
+                if (oldValueAsString.equals(newValueAsString)) {
+                    message = MessageVarList.COMMON_ERROR_NO_VALUE_CHANGE;
+                } else {
+                    //set the other values to input bean
+                    Date currentDate = commonRepository.getCurrentDate();
+                    String lastUpdatedUser = sessionBean.getUsername();
+
+                    sampleFileVerificationInputBean.setCreatedTime(currentDate);
+                    sampleFileVerificationInputBean.setLastUpdatedTime(currentDate);
+                    sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
+
+                    message = sampleVerifyFileRepository.validateSample(sampleFileVerificationInputBean);
+
+                }
+            } else {
+                message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
+
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }

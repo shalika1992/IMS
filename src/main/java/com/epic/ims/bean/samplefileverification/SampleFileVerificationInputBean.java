@@ -34,8 +34,6 @@ public class SampleFileVerificationInputBean extends DataTablesRequest {
     private String createdUser;
     private Date lastUpdatedTime;
     private String lastUpdatedUser;
-
-    private List<Status> statusList;
-    private List<Status> statusActList;
     private List<Institution> institutionList;
+    private List<Status> statusList;
 }
