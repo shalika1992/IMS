@@ -1,10 +1,9 @@
 package com.epic.ims.service.sampleverifyfile;
 
 import com.epic.ims.annotation.logservice.LogService;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
+import com.epic.ims.bean.samplefileverification.SampleIdListBean;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.sampleverifyfile.SampleVerifyFileRepository;
@@ -19,9 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @Scope("prototype")
@@ -73,69 +70,10 @@ public class SampleVerifyFileService {
     }
 
     @LogService
-    public SampleVerifyFile getSampleVerifyRecord(String id) throws Exception {
-        SampleVerifyFile sampleVerifyFile;
-        try {
-            sampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(id);
-        } catch (EmptyResultDataAccessException ere) {
-            throw ere;
-        } catch (Exception e) {
-            throw e;
-        }
-        return sampleVerifyFile;
-    }
-
-    @LogService
-    public String verifySampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
+    public String validateSample(SampleIdListBean sampleIdListBean) {
         String message = "";
         try {
-            List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileSearchList(sampleFileVerificationInputBean);
-            //TODO
-        } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
-        } catch (Exception e) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
-        }
-        return message;
-    }
-
-    @LogService
-    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
-        String message = "";
-        SampleVerifyFile existingSampleVerifyFile = null;
-        try {
-            existingSampleVerifyFile = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getId());
-            if (existingSampleVerifyFile != null) {
-                //set the other values to input bean
-                Date currentDate = commonRepository.getCurrentDate();
-                String lastUpdatedUser = sessionBean.getUsername();
-
-                sampleFileVerificationInputBean.setId(existingSampleVerifyFile.getId() + "");
-                sampleFileVerificationInputBean.setReferenceNo(existingSampleVerifyFile.getReferenceNo());
-                sampleFileVerificationInputBean.setReceivedDate(existingSampleVerifyFile.getReceivedDate());
-                sampleFileVerificationInputBean.setInstitutionCode(existingSampleVerifyFile.getInstitutionCode());
-                sampleFileVerificationInputBean.setName(existingSampleVerifyFile.getName());
-                sampleFileVerificationInputBean.setAge(existingSampleVerifyFile.getAge());
-                sampleFileVerificationInputBean.setGender(existingSampleVerifyFile.getGender());
-                sampleFileVerificationInputBean.setSymptomatic(existingSampleVerifyFile.getSymptomatic());
-                sampleFileVerificationInputBean.setContactType(existingSampleVerifyFile.getContactType());
-                sampleFileVerificationInputBean.setNic(existingSampleVerifyFile.getNic());
-                sampleFileVerificationInputBean.setAddress(existingSampleVerifyFile.getAddress());
-                sampleFileVerificationInputBean.setResidentDistrict(existingSampleVerifyFile.getResidentDistrict());
-                sampleFileVerificationInputBean.setContactNumber(existingSampleVerifyFile.getContactNumber());
-                sampleFileVerificationInputBean.setSecondaryContactNumber(existingSampleVerifyFile.getSecondaryContactNumber());
-                sampleFileVerificationInputBean.setCreatedTime(currentDate);
-                sampleFileVerificationInputBean.setCreatedUser(existingSampleVerifyFile.getCreatedUser());
-                sampleFileVerificationInputBean.setLastUpdatedTime(currentDate);
-                sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
-
-                //update the sample record
-                message = sampleVerifyFileRepository.rejectSampleRecord(sampleFileVerificationInputBean);
-            } else {
-                message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
-            }
-        } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.SAMPLERECORD_NORECORD_FOUND;
+            message = sampleVerifyFileRepository.validateSample(sampleIdListBean);
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
@@ -168,45 +106,5 @@ public class SampleVerifyFileService {
         return sampleStringBuilder.toString();
     }
 
-    @LogService
-    public String validateSample(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
-        String message = "";
-        SampleVerifyFile existingSample = null;
-        try {
-            existingSample = sampleVerifyFileRepository.getSampleVerifyRecord(sampleFileVerificationInputBean.getId());
-            System.out.println("ExistingSample: "+existingSample);
-            if (existingSample != null) {
-                //check changed values
-                String oldValueAsString = this.getSampleAsString(existingSample, true);
-                String newValueAsString = this.getSampleAsString(existingSample, true);
-                //check the old value and new value
-                if (oldValueAsString.equals(newValueAsString)) {
-                    message = MessageVarList.COMMON_ERROR_NO_VALUE_CHANGE;
-                } else {
-                    //set the other values to input bean
-                    Date currentDate = commonRepository.getCurrentDate();
-                    String lastUpdatedUser = sessionBean.getUsername();
 
-                    sampleFileVerificationInputBean.setCreatedTime(currentDate);
-                    sampleFileVerificationInputBean.setLastUpdatedTime(currentDate);
-                    sampleFileVerificationInputBean.setLastUpdatedUser(lastUpdatedUser);
-
-                    message = sampleVerifyFileRepository.validateSample(sampleFileVerificationInputBean);
-                    System.out.println("RepoFirstElse: "+message);
-
-                }
-            } else {
-                message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
-                System.out.println("RepoElse: "+message);
-            }
-        } catch (EmptyResultDataAccessException ere) {
-            message = MessageVarList.INSTITUTION_MGT_NORECORD_FOUND;
-            System.out.println("RepoCatch: "+message);
-
-        } catch (Exception e) {
-            message = MessageVarList.COMMON_ERROR_PROCESS;
-        }
-        System.out.println("Repo: "+message);
-        return message;
-    }
 }

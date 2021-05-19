@@ -1,8 +1,8 @@
 package com.epic.ims.repository.sampleverifyfile;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
+import com.epic.ims.bean.samplefileverification.SampleIdListBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
@@ -13,16 +13,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
@@ -36,6 +38,9 @@ public class SampleVerifyFileRepository {
     JdbcTemplate jdbcTemplate;
 
     @Autowired
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Autowired
     CommonRepository commonRepository;
 
     @Autowired
@@ -46,7 +51,7 @@ public class SampleVerifyFileRepository {
 
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
     private final String SQL_FIND_SAMPLEDATAVERIFICATION = "select id, referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district, contactno, secondarycontactno, specimenid, barcode, receiveddate, status,createduser, createdtime from sample_data where id = ?";
-    private final String SQL_UPDATE_STATUS="update sample_data set status='Validated' where id=?";
+    private final String SQL_UPDATE_STATUS = "update sample_data set status =:status where id in (:ids)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -55,7 +60,7 @@ public class SampleVerifyFileRepository {
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
             //create the where clause
-            dynamicClause =this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
+            dynamicClause = this.setDynamicClause(sampleFileVerificationInputBean, dynamicClause);
             //create the query
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
         } catch (Exception exception) {
@@ -63,25 +68,6 @@ public class SampleVerifyFileRepository {
             throw exception;
         }
         return count;
-    }
-    @LogRepository
-    @Transactional
-    public String validateSample(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception{
-        String message = "";
-        try {
-            int value = jdbcTemplate.update(SQL_UPDATE_STATUS,
-                    sampleFileVerificationInputBean.getStatus()
-            );
-
-            if (value != 1) {
-                message = MessageVarList.COMMON_ERROR_PROCESS;
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-        System.out.println("SQL: "+SQL_UPDATE_STATUS);
-        System.out.println("Repository class: "+message);
-        return message;
     }
 
     @LogRepository
@@ -286,142 +272,24 @@ public class SampleVerifyFileRepository {
     }
 
     @LogRepository
-    @Transactional(readOnly = true)
-    public SampleVerifyFile getSampleVerifyRecord(String id) throws SQLException {
-        SampleVerifyFile sampleVerifyFile = null;
+    @Transactional
+    public String validateSample(SampleIdListBean sampleIdListBean) throws Exception {
+        String message = "";
         try {
-            sampleVerifyFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEDATAVERIFICATION, new Object[]{id}, new RowMapper<SampleVerifyFile>() {
-                @Override
-                public SampleVerifyFile mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
-                    try {
-                        sampleVerifyFile.setReferenceNo(rs.getString("id"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setId(0);
-                    }
-
-                    try {
-                        sampleVerifyFile.setReferenceNo(rs.getString("referenceno"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setReferenceNo(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setReceivedDate(rs.getString("receiveddate"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setReceivedDate(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setInstitutionCode(rs.getString("institutioncode"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setInstitutionCode(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setName(rs.getString("name"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setName(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setAge(rs.getString("age"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setAge(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setGender(rs.getString("gender"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setGender(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setSymptomatic(rs.getString("symptomatic"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setSymptomatic(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setContactType(rs.getString("contacttype"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setContactType(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setNic(rs.getString("nic"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setNic(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setAddress(rs.getString("address"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setAddress(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setStatus(rs.getString("status"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setStatus(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setResidentDistrict(rs.getString("residentdistrict"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setResidentDistrict(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setContactNumber(rs.getString("contactnumber"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setContactNumber(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setSecondaryContactNumber(rs.getString("secondarycontactnumber"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setSecondaryContactNumber(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setSpecimenid(rs.getString("specimenid"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setSpecimenid(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setBarcode(rs.getString("barcode"));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setBarcode(null);
-                    }
-
-
-                    try {
-                        sampleVerifyFile.setCreatedTime(new Date(rs.getDate("createdtime").getTime()));
-                    } catch (Exception e) {
-                        sampleVerifyFile.setCreatedTime(null);
-                    }
-
-                    try {
-                        sampleVerifyFile.setCreatedUser(rs.getString("createduser"));
-                    } catch (SQLException e) {
-                        sampleVerifyFile.setCreatedUser(null);
-                    }
-
-                    return sampleVerifyFile;
-                }
-            });
-        } catch (EmptyResultDataAccessException erse) {
-            sampleVerifyFile = null;
-        } catch (Exception e) {
-            throw e;
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_VALIDATED);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
         }
-        return sampleVerifyFile;
-    }
-
-    public String rejectSampleRecord(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
-        return null;
+        return message;
     }
 
     private StringBuilder setDynamicClause(SampleFileVerificationInputBean sampleFileVerificationInputBean, StringBuilder dynamicClause) {

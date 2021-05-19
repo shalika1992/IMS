@@ -5,6 +5,7 @@ import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
+import com.epic.ims.bean.samplefileverification.SampleIdListBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.institution.Institution;
@@ -82,10 +83,6 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         return modelAndView;
     }
 
-//<<<<<<< HEAD
-//=======
-//
-//>>>>>>> fdaf8ea36aca36d135e57fdbe1771c937cebdac8
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
     @PostMapping(value = "/listSampleVerification", headers = {"content-type=application/json"})
@@ -119,62 +116,17 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
-    @GetMapping(value = "/getSampleVerifyRecord")
+    @PostMapping(value = "/validsample", consumes = "application/json")
     public @ResponseBody
-    SampleVerifyFile getSampleVerifyRecord(@RequestParam String id) {
-        logger.info("[" + sessionBean.getSessionid() + "]  GET SAMPLE VERIFY RECORD");
-        SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
-        try {
-            if (id != null && !id.isEmpty()) {
-                sampleVerifyFile = sampleVerifyFileService.getSampleVerifyRecord(id);
-            }
-        } catch (Exception e) {
-            logger.error("Exception  :  ", e);
-        }
-        return sampleVerifyFile;
-    }
-
-
-    @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
-    @PostMapping(value = "/verifySampleRecord", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    ResponseBean verifySampleRecord(@ModelAttribute("sampleverify") SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
-        logger.info("[" + sessionBean.getSessionid() + "] VERIFY SAMPLE RECORD");
+    ResponseBean validSample(@RequestBody SampleIdListBean sampleIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE RECORD");
         ResponseBean responseBean;
         try {
-            String message = sampleVerifyFileService.verifySampleRecord(sampleFileVerificationInputBean, locale);
+            String message = sampleVerifyFileService.validateSample(sampleIdListBean);
             if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_VERIFY_SUCCESSFULLY, null, locale), null);
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-            }
-        } catch (Exception e) {
-            logger.error("Exception  :  ", e);
-            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
-        }
-        return responseBean;
-    }
-
-
-    @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
-    @PostMapping(value = "/rejectSampleRecord", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public @ResponseBody
-    ResponseBean rejectSampleRecord(@ModelAttribute("sampleverify") SampleFileVerificationInputBean sampleFileVerificationInputBean, Locale locale) {
-        logger.info("[" + sessionBean.getSessionid() + "] REJECT SAMPLE RECORD");
-        ResponseBean responseBean;
-        try {
-            BindingResult bindingResult = validateRequestBean(sampleFileVerificationInputBean);
-            if (bindingResult.hasErrors()) {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, locale));
-            } else {
-                String message = sampleVerifyFileService.rejectSampleRecord(sampleFileVerificationInputBean, locale);
-                if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_REJECT_SUCCESSFULLY, null, locale), null);
-                } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-                }
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
@@ -204,30 +156,7 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         return dataBinder.getBindingResult();
     }
 
-    @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
-    @PostMapping(value = "/validsample", consumes = "application/json")
-    public @ResponseBody
-    ResponseBean validSample(@RequestParam Integer[] rowList, Locale locale) {
-        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE RECORD");
-        ResponseBean responseBean;
-        try {
-            System.out.println(rowList);
-            String message = sampleVerifyFileService.validateSample(null);
-            System.out.println("Message: "+message);
-            if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
-                System.out.println("IF: "+responseBean);
-            } else {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
-                System.out.println("ELSE: "+responseBean);
-            }
-        } catch (Exception e) {
-            logger.error("Exception  :  ", e);
-            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
-        }
-        return responseBean;
-    }
+
 
 
 }

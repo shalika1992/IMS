@@ -397,7 +397,7 @@
             $("#receivedDate").datepicker('setDate', getReceivedDate());
             $('#institutionCode').val("");
             $('#referenceNo').val("");
-            $('#status').val("");
+            $('#status').val("PEND");
 
             oTable.fnDraw();
         }
@@ -429,6 +429,28 @@
             return (date.getFullYear() + "-" + month + "-" + day);
         }
 
+        function openValidModal() {
+            $('#modalValid').modal('show');
+        }
+
+        function markAsValid() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/validsample.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalValid').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
 
         function openNoSampleFoundModal() {
             console.log(rows_selected);
@@ -437,24 +459,6 @@
         function openInvalidModal() {
             console.log(rows_selected);
         }
-
-        function openValidModal() {
-            var rowList = rows_selected;
-            console.log(JSON.stringify(rowList));
-            $.ajax({
-                type: 'POST',
-                url: "${pageContext.request.contextPath}/validsample.json",
-                contentType: "application/json",
-                data: rowList,
-                success: function (e) {
-                    alert("fffffffffffff");
-                },
-                error: function (e) {
-                    window.location = "${pageContext.request.contextPath}/logout.htm";
-                }
-            });
-        }
-
     </script>
 </head>
 <!--begin::Content-->
@@ -668,6 +672,6 @@
     </div>
 </div>
 <!-- start include jsp files -->
-<jsp:include page="../common/delete-modal.jsp"/>
+<jsp:include page="fileverify_confirm.jsp"/>
 <!-- end include jsp files -->
 </html>
