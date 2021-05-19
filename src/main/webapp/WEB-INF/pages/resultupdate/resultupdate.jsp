@@ -7,9 +7,22 @@
 
 <html>
 <head>
+    <script type="text/javascript"
+            src="${pageContext.request.contextPath}/resources/datatable/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript"
+            src="${pageContext.request.contextPath}/resources/datatablecheckbox/js/dataTables.checkboxes.min.js"></script>
+    <style>
+        table.dataTable tr th.select-checkbox.selected::after {
+            content: "✔";
+            margin-top: -11px;
+            margin-left: -4px;
+            text-align: center;
+            text-shadow: rgb(176, 190, 217) 1px 1px, rgb(176, 190, 217) -1px -1px, rgb(176, 190, 217) 1px -1px, rgb(176, 190, 217) -1px 1px;
+        }
+    </style>
     <script type="text/javascript">
         var oTable;
-
+        var rows_selected = [];
         var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");
 
@@ -99,76 +112,95 @@
                 fixedColumns: {
                     rightColumns: 1
                 },
+                stateSave: true,
                 columnDefs: [
                     {
+                        'targets': 0,
+                        'searchable': false,
+                        'orderable': false,
+                        'width': '1%',
+                        'className': 'dt-body-center',
+                        'render': function (data, type, full, meta) {
+                            return '<input type="checkbox">';
+                        },
+                        defaultContent: "--"
+                    },
+                    {
                         title: "ID",
-                        targets: 0,
+                        targets: 1,
                         visible: false,
                         mDataProp: "id",
                         defaultContent: "--"
                     },
                     {
+                        title: "Sample ID",
+                        targets: 2,
+                        visible: true,
+                        mDataProp: "sampleId",
+                        defaultContent: "--"
+                    },
+                    {
                         title: "Reference No",
-                        targets: 1,
+                        targets: 3,
                         mDataProp: "referenceNo",
                         defaultContent: "--"
                     },
                     {
                         title: "Institution Code",
-                        targets: 2,
+                        targets: 4,
                         mDataProp: "institutionCode",
                         defaultContent: "--"
                     }, {
                         title: "Name",
-                        targets: 3,
+                        targets: 5,
                         mDataProp: "name",
                         defaultContent: "--"
                     },
                     {
                         title: "Age",
-                        targets: 4,
+                        targets: 6,
                         mDataProp: "age",
                         defaultContent: "--"
                     },
                     {
                         title: "Gender",
-                        targets: 5,
+                        targets: 7,
                         mDataProp: "gender",
                         defaultContent: "--"
                     },
                     {
                         title: "NIC",
-                        targets: 6,
+                        targets: 8,
                         mDataProp: "nic",
                         defaultContent: "--"
                     },
                     {
                         title: "Plate Id",
-                        targets: 7,
-                        mDataProp: "",
+                        targets: 9,
+                        mDataProp: "plateId",
                         defaultContent: "--"
                     },
                     {
                         title: "Block Value",
-                        targets: 8,
-                        mDataProp: "",
+                        targets: 10,
+                        mDataProp: "blockValue",
                         defaultContent: "--"
                     },
                     {
                         title: "Pool Or Un-Pool",
-                        targets: 9,
-                        mDataProp: "",
+                        targets: 11,
+                        mDataProp: "pool",
                         defaultContent: "--"
                     },
                     {
                         title: "Pool Id",
-                        targets: 10,
-                        mDataProp: "",
+                        targets: 12,
+                        mDataProp: "poolId",
                         defaultContent: "--"
                     },
                     {
                         title: "Received Date",
-                        targets: 11,
+                        targets: 13,
                         mDataProp: "receivedDate",
                         defaultContent: "--",
                         render: function (data) {
@@ -177,7 +209,7 @@
                     },
                     {
                         title: "Status",
-                        targets: 12,
+                        targets: 14,
                         mDataProp: "status",
                         defaultContent: "--"
                     },
@@ -188,11 +220,128 @@
                         mRender: function (data, type, full) {
                             return '<button id=' + full.id + ' class="btn btn-default btn-sm"  onclick="viewRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-view.svg" alt=""></button>';
                         },
-                        targets: 13,
+                        targets: 15,
                         defaultContent: "--"
                     }
-                ]
+                ],
+                select: {
+                    style: 'multi',
+                    selector: 'td:first-child + td'
+                },
+                rowCallback: function (row, data, dataIndex) {
+                    // Get row ID
+                    var rowId = data[1];
+                    // If row ID is in the list of selected row IDs
+                    if ($.inArray(rowId, rows_selected) !== -1) {
+                        $(row).find('input[type="checkbox"]').prop('checked', true);
+                        $(row).addClass('selected');
+                    }
+                },
+                fnDrawCallback: function (oSettings, json) {
+                    $("#btnDetected").prop("disabled", true);
+                    $("#btnNotDetected").prop("disabled", true);
+                    $("#btnRepeat").prop("disabled", true);
+
+                    //disable and enable the select_all input
+                    if (oTable.fnGetData().length > 0) {
+                        document.getElementById("select_all").disabled = false;
+                    } else {
+                        document.getElementById("select_all").disabled = true;
+                    }
+
+                    document.getElementById("select_all").checked = false;
+                    rows_selected = [];
+                }
             });
+
+            // Handle click on checkbox
+            $('#table tbody').on('click', 'input[type="checkbox"]', function (e) {
+                var $row = $(this).closest('tr');
+
+                // Get row data
+                var data = oTable.api().row($row).data();
+
+                // Get row ID
+                var rowId = data['id'];
+                // Determine whether row ID is in the list of selected row IDs
+                var index = $.inArray(rowId, rows_selected);
+
+                // If checkbox is checked and row ID is not in list of selected row IDs
+                if (this.checked && index === -1) {
+                    rows_selected.push(rowId);
+                    // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+                } else if (!this.checked && index !== -1) {
+                    rows_selected.splice(index, 1);
+                }
+
+                if (this.checked) {
+                    $row.addClass('selected');
+                } else {
+                    $row.removeClass('selected');
+                }
+
+                // Update state of "Select all" control
+                updateDataTableSelectAllCtrl(oTable);
+
+                // Prevent click event from propagating to parent
+                e.stopPropagation();
+                //enable buttons
+                if (rows_selected.length > 0) {
+                    $("#btnDetected").prop("disabled", false);
+                    $("#btnNotDetected").prop("disabled", false);
+                    $("#btnRepeat").prop("disabled", false);
+
+                } else {
+                    $("#btnDetected").prop("disabled", true);
+                    $("#btnNotDetected").prop("disabled", true);
+                    $("#btnRepeat").prop("disabled", true);
+                }
+            });
+
+            $('thead input[name="select_all"]', oTable.api().table().container()).on('click', function (e) {
+                if (this.checked) {
+                    $('#table tbody input[type="checkbox"]:not(:checked)').trigger('click');
+                } else {
+                    $('#table tbody input[type="checkbox"]:checked').trigger('click');
+                }
+                // Prevent click event from propagating to parent
+                e.stopPropagation();
+            });
+
+            // Handle table draw event
+            oTable.on('draw', function () {
+                // Update state of "Select all" control
+                updateDataTableSelectAllCtrl(oTable);
+            });
+        }
+
+        function updateDataTableSelectAllCtrl(table) {
+            var $table = table.api().table().node();
+            var $chkbox_all = $('tbody input[type="checkbox"]', $table);
+            var $chkbox_checked = $('tbody input[type="checkbox"]:checked', $table);
+            var chkbox_select_all = $('thead input[name="select_all"]', $table).get(0);
+
+            // If none of the checkboxes are checked
+            if ($chkbox_checked.length === 0) {
+                chkbox_select_all.checked = false;
+                if ('indeterminate' in chkbox_select_all) {
+                    chkbox_select_all.indeterminate = false;
+                }
+
+                // If all of the checkboxes are checked
+            } else if ($chkbox_checked.length === $chkbox_all.length) {
+                chkbox_select_all.checked = true;
+                if ('indeterminate' in chkbox_select_all) {
+                    chkbox_select_all.indeterminate = false;
+                }
+
+                // If some of the checkboxes are checked
+            } else {
+                chkbox_select_all.checked = true;
+                if ('indeterminate' in chkbox_select_all) {
+                    chkbox_select_all.indeterminate = true;
+                }
+            }
         }
 
         function viewRecord(id) {
@@ -293,6 +442,75 @@
                 }
             });
         }
+
+        function openDetectedModal() {
+            $('#modalDetected').modal('show');
+        }
+
+        function markAsDetected() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/updateDetectedList.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalDetected').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
+        function openNotDetectedModal() {
+            $('#modalNotDetected').modal('show');
+        }
+
+        function markAsNotDetected() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/updateNotDetectedList.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalNotDetected').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
+        function openRepeatedModal() {
+            $('#modalRepeated').modal('show');
+        }
+
+        function markAsRepeated() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/updateRepeatList.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalRepeated').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -323,7 +541,7 @@
                     <!--begin::Card-->
                     <div class="card card-custom gutter-b">
                         <div class="card-header">
-                            <h3 class="card-title">Search Sample Record</h3>
+                            <h3 class="card-title">Search Result Update</h3>
                         </div>
                         <!--begin::Form-->
                         <form:form class="form" id="resultupdateform" name="resultupdateform"
@@ -417,8 +635,70 @@
 
             <div class="card card-custom gutter-b">
                 <div class="card-header flex-wrap border-0 pt-1 pb-0">
-                    <div class="card-title"></div>
-                    <div class="card-toolbar"></div>
+                    <div class="card-title">
+                        Sample Result Update
+                    </div>
+                    <div class="card-toolbar">
+                        <button onclick="openDetectedModal()" class="btn btn-primary font-weight-bolder" id="btnDetected">
+                            <span class="svg-icon svg-icon-md">
+                                <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="24px"
+                                     height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24"/>
+                                        <circle fill="#000000" cx="9" cy="15" r="6"/>
+                                        <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
+                                              fill="#000000" opacity="0.3"/>
+                                    </g>
+                                </svg>
+                                <!--end::Svg Icon-->
+                            </span>Mark As Detected
+                        </button>
+                        <!--end::Button-->
+                    </div>
+
+                    <div class="card-toolbar">
+                        <button onclick="openNotDetectedModal()" class="btn btn-primary font-weight-bolder"
+                                id="btnNotDetected">
+                            <span class="svg-icon svg-icon-md">
+                                <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="24px"
+                                     height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24"/>
+                                        <circle fill="#000000" cx="9" cy="15" r="6"/>
+                                        <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
+                                              fill="#000000" opacity="0.3"/>
+                                    </g>
+                                </svg>
+                                <!--end::Svg Icon-->
+                            </span>Mark As Not Detected
+                        </button>
+                        <!--end::Button-->
+                    </div>
+
+                    <div class="card-toolbar">
+                        <button onclick="openRepeatedModal()" class="btn btn-primary font-weight-bolder"
+                                id="btnRepeat">
+                            <span class="svg-icon svg-icon-md">
+                                <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="24px"
+                                     height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24"/>
+                                        <circle fill="#000000" cx="9" cy="15" r="6"/>
+                                        <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
+                                              fill="#000000" opacity="0.3"/>
+                                    </g>
+                                </svg>
+                                <!--end::Svg Icon-->
+                            </span>Mark As Repeat
+                        </button>
+                        <!--end::Button-->
+                    </div>
                 </div>
                 <div class="card-body">
                     <!--begin: Datatable-->
@@ -430,7 +710,9 @@
                         <table class="table table-separate table-head-custom table-checkable" id="table">
                             <thead>
                             <tr>
+                                <th><input id="select_all" name="select_all" value="1" type="checkbox"></th>
                                 <th>ID</th>
+                                <th>Sample ID</th>
                                 <th>Reference No</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
@@ -455,4 +737,9 @@
         </div>
     </div>
 </div>
+<!-- start include jsp files -->
+<jsp:include page="resultupdate_detected.jsp"/>
+<jsp:include page="resultupdate_notdetected.jsp"/>
+<jsp:include page="resultupdate_repeat.jsp"/>
+<!-- end include jsp files -->
 </html>

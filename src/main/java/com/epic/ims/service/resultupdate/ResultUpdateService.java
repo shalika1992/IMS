@@ -1,6 +1,7 @@
 package com.epic.ims.service.resultupdate;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.plate.Plate;
@@ -10,6 +11,7 @@ import com.epic.ims.repository.resultupdate.ResultUpdateRepository;
 import com.epic.ims.service.profile.ProfileService;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
+import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,5 +82,38 @@ public class ResultUpdateService {
             throw e;
         }
         return plate;
+    }
+
+    @LogService
+    public String markAsDetected(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            message = resultUpdateRepository.markAsDetected(resultIdListBean);
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+    @LogService
+    public String markAsNotDetected(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            message = resultUpdateRepository.markAsNotDetected(resultIdListBean);
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+    @LogService
+    public String markAsRepeated(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            message = resultUpdateRepository.markAsRepeated(resultIdListBean);
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
     }
 }

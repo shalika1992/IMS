@@ -2,6 +2,7 @@ package com.epic.ims.controller.resultupdate;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
@@ -11,6 +12,7 @@ import com.epic.ims.mapping.result.Result;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.resultupdate.ResultUpdateService;
 import com.epic.ims.util.common.DataTablesResponse;
+import com.epic.ims.util.common.ResponseBean;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.PageVarList;
@@ -127,6 +129,69 @@ public class ResultUpdateController {
             logger.error("Exception  :  ", e);
         }
         return plate;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @PostMapping(value = "/updateDetectedList", consumes = "application/json")
+    public @ResponseBody
+    ResponseBean updateDetectedList(@RequestBody ResultIdListBean resultIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] RESULT UPDATE DETECTED");
+        ResponseBean responseBean;
+        try {
+            String message = resultUpdateService.markAsDetected(resultIdListBean);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @PostMapping(value = "/updateNotDetectedList", consumes = "application/json")
+    public @ResponseBody
+    ResponseBean updateNotDetectedList(@RequestBody ResultIdListBean resultIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] RESULT UPDATE NOT DETECTED");
+        ResponseBean responseBean;
+        try {
+            String message = resultUpdateService.markAsNotDetected(resultIdListBean);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @PostMapping(value = "/updateRepeatList", consumes = "application/json")
+    public @ResponseBody
+    ResponseBean updateResultList(@RequestBody ResultIdListBean resultIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] RESULT UPDATE REPEATED");
+        ResponseBean responseBean;
+        try {
+            String message = resultUpdateService.markAsRepeated(resultIdListBean);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
     }
 
     @ModelAttribute

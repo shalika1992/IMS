@@ -3,7 +3,6 @@ package com.epic.ims.controller.samplefilevalidation;
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.samplefileverification.SampleIdListBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -26,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -35,7 +33,6 @@ import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.xml.ws.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -135,7 +132,6 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         return responseBean;
     }
 
-
     @ModelAttribute
     public void getSampleVerifyBean(Model map) throws Exception {
         SampleFileVerificationInputBean sampleFileVerificationInputBean = new SampleFileVerificationInputBean();
@@ -155,8 +151,6 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         dataBinder.validate();
         return dataBinder.getBindingResult();
     }
-
-
 
 
 }

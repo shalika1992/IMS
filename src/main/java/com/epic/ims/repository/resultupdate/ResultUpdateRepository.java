@@ -1,6 +1,7 @@
 package com.epic.ims.repository.resultupdate;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
+import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.plate.Plate;
@@ -8,16 +9,22 @@ import com.epic.ims.mapping.result.Result;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
+import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
@@ -39,7 +46,13 @@ public class ResultUpdateRepository {
     @Autowired
     Common common;
 
+    @Autowired
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
     private final String SQL_GET_LIST_DATA_COUNT = "select count(*) from master_data md left outer join status s on s.code=md.status where";
+    private final String SQL_UPDATE_LIST_DETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
+    private final String SQL_UPDATE_LIST_NOTDETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
+    private final String SQL_UPDATE_LIST_PENDING = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -69,15 +82,15 @@ public class ResultUpdateRepository {
             //create sorting order
             String sortingStr = "";
             if (resultUpdateInputBean.sortedColumns.get(0) == 0) {
-                sortingStr = " order by md.createdtime desc ";
+                sortingStr = " order by md.sampleid asc ";
             } else {
-                sortingStr = " order by md.createdtime " + resultUpdateInputBean.sortDirections.get(0);
+                sortingStr = " order by md.sampleid " + resultUpdateInputBean.sortDirections.get(0);
             }
 
             String sql = "" +
                     " select " +
                     " md.id , md.sampleid, md.referenceno , md.institutioncode , md.name , md.age , md.gender , md.nic , md.address , md.district , md.contactno ,s.description as statusdescription," +
-                    " md.serialno , md.contactno , md.serialno , md.specimenid , md.barcode , md.receiveddate ,md.plateid,md.blockvalue,md.ispool,md.poolid, md.createdtime as createdtime,md.createduser as createduser from master_data md " +
+                    " md.serialno , md.specimenid , md.barcode , md.receiveddate ,md.plateid,md.blockvalue,md.ispool,md.poolid, md.createdtime as createdtime,md.createduser as createduser from master_data md " +
                     " left outer join status s on s.code = md.status " +
                     " where " + dynamicClause.toString() + sortingStr +
                     " limit " + resultUpdateInputBean.displayLength + " offset " + resultUpdateInputBean.displayStart;
@@ -88,6 +101,12 @@ public class ResultUpdateRepository {
                     result.setId(rs.getString("id"));
                 } catch (Exception e) {
                     result.setId("--");
+                }
+
+                try {
+                    result.setSampleId(common.handleNullAndEmptyValue(rs.getString("sampleid")));
+                } catch (Exception e) {
+                    result.setSampleId("--");
                 }
 
                 try {
@@ -120,12 +139,6 @@ public class ResultUpdateRepository {
                     result.setGender("--");
                 }
 
-//                try {
-//                    result.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
-//                } catch (Exception e) {
-//                    result.setContactType("--");
-//                }
-
                 try {
                     result.setNic(common.handleNullAndEmptyValue(rs.getString("nic")));
                 } catch (Exception e) {
@@ -139,40 +152,71 @@ public class ResultUpdateRepository {
                 }
 
                 try {
+                    result.setDistrict(common.handleNullAndEmptyValue(rs.getString("district")));
+                } catch (Exception e) {
+                    result.setDistrict("--");
+                }
+
+                try {
+                    result.setContactNo(common.handleNullAndEmptyValue(rs.getString("contactno")));
+                } catch (Exception e) {
+                    result.setContactNo("--");
+                }
+
+                try {
                     result.setStatus(common.handleNullAndEmptyValue(rs.getString("statusdescription")));
                 } catch (Exception e) {
                     result.setStatus("--");
                 }
 
-//                try {
-//                    result.setResidentDistrict(common.handleNullAndEmptyValue(rs.getString("district")));
-//                } catch (Exception e) {
-//                    result.setResidentDistrict("--");
-//                }
-//
-//                try {
-//                    result.setContactNumber(common.handleNullAndEmptyValue(rs.getString("contactno")));
-//                } catch (Exception e) {
-//                    result.setContactNumber("--");
-//                }
-//
-//                try {
-//                    result.setSecondaryContactNumber(common.handleNullAndEmptyValue(rs.getString("secondarycontactno")));
-//                } catch (Exception e) {
-//                    result.setSecondaryContactNumber("--");
-//                }
-//
-//                try {
-//                    result.setSpecimenid(common.handleNullAndEmptyValue(rs.getString("specimenid")));
-//                } catch (Exception e) {
-//                    result.setSpecimenid("--");
-//                }
-//
-//                try {
-//                    result.setBarcode(common.handleNullAndEmptyValue(rs.getString("barcode")));
-//                } catch (Exception e) {
-//                    result.setBarcode("--");
-//                }
+                try {
+                    result.setPlateId(rs.getInt("plateid")+"");
+                } catch (Exception e) {
+                    result.setPlateId("--");
+                }
+
+                try {
+                    result.setBlockValue(common.handleNullAndEmptyValue(rs.getString("blockvalue")));
+                } catch (Exception e) {
+                    result.setBlockValue("--");
+                }
+
+                try {
+                    result.setPool(rs.getBoolean("ispool"));
+                } catch (Exception e) {
+                    result.setPool(false);
+                }
+
+                try {
+                    result.setPoolId(rs.getInt("poolid")+"");
+                } catch (Exception e) {
+                    result.setPoolId("--");
+                }
+
+                try {
+                    result.setStatus(common.handleNullAndEmptyValue(rs.getString("statusdescription")));
+                } catch (Exception e) {
+                    result.setStatus("--");
+                }
+
+
+                try {
+                    result.setSerialNo(common.handleNullAndEmptyValue(rs.getString("serialno")));
+                } catch (Exception e) {
+                    result.setSerialNo("--");
+                }
+
+                try {
+                    result.setSpecimenId(common.handleNullAndEmptyValue(rs.getString("specimenid")));
+                } catch (Exception e) {
+                    result.setSpecimenId("--");
+                }
+
+                try {
+                    result.setBarCode(common.handleNullAndEmptyValue(rs.getString("barcode")));
+                } catch (Exception e) {
+                    result.setBarCode("--");
+                }
 
                 try {
                     result.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
@@ -180,17 +224,17 @@ public class ResultUpdateRepository {
                     result.setReceivedDate("--");
                 }
 
-//                try {
-//                    result.setCreatedTime(rs.getDate("createdtime"));
-//                } catch (Exception e) {
-//                    result.setCreatedTime(null);
-//                }
-//
-//                try {
-//                    result.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
-//                } catch (Exception e) {
-//                    result.setCreatedUser("--");
-//                }
+                try {
+                    result.setCreatedDateTime(rs.getDate("createdtime"));
+                } catch (Exception e) {
+                    result.setCreatedDateTime(null);
+                }
+
+                try {
+                    result.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
+                } catch (Exception e) {
+                    result.setCreatedUser("--");
+                }
 
                 return result;
             });
@@ -216,6 +260,77 @@ public class ResultUpdateRepository {
         return plate;
     }
 
+    @LogRepository
+    @Transactional
+    public String markAsDetected(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(resultIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
+            idSetParameterMap.addValue("isverified", 1);
+            idSetParameterMap.addValue("iscomplete", 1);
+            idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_DETECTED);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_LIST_DETECTED, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String markAsNotDetected(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(resultIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
+            idSetParameterMap.addValue("isverified", 1);
+            idSetParameterMap.addValue("iscomplete", 1);
+            idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_NOTDETECTED);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_LIST_NOTDETECTED, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String markAsRepeated(ResultIdListBean resultIdListBean) {
+        String message = "";
+        try {
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(resultIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_REPEATED);
+            idSetParameterMap.addValue("isverified", 1);
+            idSetParameterMap.addValue("iscomplete", 1);
+            idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_PENDING);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_LIST_PENDING, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
 
     private StringBuilder setDynamicClause(ResultUpdateInputBean resultUpdateInputBean, StringBuilder dynamicClause) {
         dynamicClause.append(" 1=1 and md.status = '").append(commonVarList.STATUS_PLATEASSIGNED).append("'");
@@ -243,4 +358,6 @@ public class ResultUpdateRepository {
         }
         return dynamicClause;
     }
+
+
 }
