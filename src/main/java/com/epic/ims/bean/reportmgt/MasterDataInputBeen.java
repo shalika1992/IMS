@@ -3,6 +3,7 @@ package com.epic.ims.bean.reportmgt;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
+import com.epic.ims.util.common.DataTablesRequest;
 import lombok.*;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -16,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 @MultipartConfig
-public class MasterDataInputBeen {
+public class MasterDataInputBeen extends DataTablesRequest {
 
     private long sampleID;
     private String referenceNumber;

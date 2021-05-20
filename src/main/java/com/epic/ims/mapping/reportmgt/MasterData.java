@@ -30,15 +30,11 @@ public class MasterData {
     private String specimenID;
     private String barcode;
     private Date receivedDate;
-    private String status;
     private String statusDescription;
     private String result;
     private String resultDescription;
-    private int plateID;
+    private String plateCode;
     private String blockValue;
-    private boolean isPool;
-    private boolean isVerified;
-    private boolean isComplete;
     private String createdUser;
     private Date createdTime;
     private Date reportTime;

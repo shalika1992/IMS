@@ -5,11 +5,16 @@ import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
+import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.reportmgt.MasterDataInputBeen;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.institution.Institution;
+import com.epic.ims.mapping.reportmgt.MasterData;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.institutionmgt.InstitutionService;
+import com.epic.ims.service.reportmgt.MasterDataReportService;
 import com.epic.ims.util.common.Common;
+import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
 import com.epic.ims.validation.institution.InstitutionBulkValidation;
@@ -21,11 +26,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,7 +54,7 @@ public class MasterDataReportController {
     Common common;
 
     @Autowired
-    InstitutionService institutionService;
+    MasterDataReportService masterDataReportService;
 
     @Autowired
     InstitutionBeanValidator institutionBeanValidator;
@@ -73,6 +77,32 @@ public class MasterDataReportController {
             modelAndView = new ModelAndView("reportgenerationview", modelMap);
         }
         return modelAndView;
+    }
+
+    @LogController
+    @PostMapping(value = "/listMasterData", headers = {"content-type=application/json"})
+    public @ResponseBody
+    DataTablesResponse<MasterData> searchMasterData(@RequestBody MasterDataInputBeen masterDataInputBeen) {
+        logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA SEARCH");
+        DataTablesResponse<MasterData> responseBean = new DataTablesResponse<>();
+        try {
+            long count = masterDataReportService.getCount(masterDataInputBeen);
+            if (count > 0) {
+                List<MasterData> masterDataList = masterDataReportService.getMasterDataSearchResultList(masterDataInputBeen);
+                //set data set to response bean
+                responseBean.data.addAll(masterDataList);
+            } else {
+                //set data set to response bean
+                responseBean.data.addAll(new ArrayList<>());
+            }
+            responseBean.echo = masterDataInputBeen.echo;
+            responseBean.columns = masterDataInputBeen.columns;
+            responseBean.totalRecords = count;
+            responseBean.totalDisplayRecords = count;
+        } catch (Exception exception) {
+            logger.error("Exception " + exception);
+        }
+        return responseBean;
     }
 
     @ModelAttribute

@@ -58,7 +58,7 @@ public class SystemUserRepository {
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
             //create the where clause
-            dynamicClause = this.setDynamicClause(systemUserInputBean, dynamicClause);
+            this.setDynamicClause(systemUserInputBean, dynamicClause);
             //create the query
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
         } catch (Exception exception) {
