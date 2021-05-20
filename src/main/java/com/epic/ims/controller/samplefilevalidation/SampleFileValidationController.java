@@ -124,7 +124,49 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         try {
             String message = sampleVerifyFileService.validateSample(sampleIdListBean);
             if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.INSTITUTION_MGT_UPDATE_SUCCESSFULLY, null, locale), null);
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @PostMapping(value = "/invalidsample", consumes = "application/json")
+    public @ResponseBody
+    ResponseBean invalidSample(@RequestBody SampleIdListBean sampleIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE RECORD");
+        ResponseBean responseBean;
+        try {
+            String message = sampleVerifyFileService.invalidateSample(sampleIdListBean);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+            } else {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_DATA_VERIFICATION)
+    @PostMapping(value = "/notfoundsample", consumes = "application/json")
+    public @ResponseBody
+    ResponseBean notFoundSample(@RequestBody SampleIdListBean sampleIdListBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE RECORD");
+        ResponseBean responseBean;
+        try {
+            String message = sampleVerifyFileService.notFoundSample(sampleIdListBean);
+            if (message.isEmpty()) {
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY, null, locale), null);
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
             }

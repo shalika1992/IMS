@@ -94,7 +94,7 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_PASSWORDS_MISMATCH = "institution.password.mismatch";
     public static final String INSTITUTION_MGT_CONFIRM_SUCCESSFULLY = "institution.confirm.success";
     public static final String INSTITUTION_MGT_REJECT_SUCCESSFULLY = "institution.reject.success";
-    //-------------------------- institution user mgt----------------------------------------------------------------------//
+    //-------------------------- institution user mgt-----------------------------------------------------------------//
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
     public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
@@ -107,4 +107,8 @@ public class MessageVarList {
     public static final String SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL = "samplerecord.mandatoryfield.validationfail";
     public static final String SAMPLERECORD_DUPLICATE_RECORDFOUND = "samplerecord.duplicate.recordfound";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
+
+    //-------------------------- sample verify file mgt---------------------------------------------------------------//
+    public static final String SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY = "sampleverifyfilerecord.updated.success";
+     //------------------------- sample verify file mgt---------------------------------------------------------------//
 }
