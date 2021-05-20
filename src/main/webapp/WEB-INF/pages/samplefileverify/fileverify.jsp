@@ -453,11 +453,48 @@
         }
 
         function openNoSampleFoundModal() {
-            console.log(rows_selected);
+            $('#modalNotFound').modal('show');
+        }
+
+        function markAsNotFound() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/notfoundsample.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalNotFound').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
         }
 
         function openInvalidModal() {
-            console.log(rows_selected);
+            $('#modalInvalid').modal('show');
+        }
+        function markAsInvalid() {
+            let dataS = {"idList": rows_selected};
+            $.ajax({
+                type: 'POST',
+                url: "${pageContext.request.contextPath}/invalidsample.json",
+                contentType: "application/json",
+                data: JSON.stringify(dataS),
+                success: function (e) {
+                    //hide the modal
+                    $('#modalInvalid').modal('hide');
+                    //reset the search
+                    resetSearch();
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
         }
     </script>
 </head>
@@ -673,5 +710,7 @@
 </div>
 <!-- start include jsp files -->
 <jsp:include page="fileverify_confirm.jsp"/>
+<jsp:include page="fileverify_invalid.jsp"/>
+<jsp:include page="fileverify_notfound.jsp"/>
 <!-- end include jsp files -->
 </html>

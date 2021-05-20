@@ -81,30 +81,28 @@ public class SampleVerifyFileService {
     }
 
     @LogService
-    private String getSampleAsString(SampleVerifyFile sampleVerifyFile, boolean checkChanges) {
-        StringBuilder sampleStringBuilder = new StringBuilder();
+    public String invalidateSample(SampleIdListBean sampleIdListBean) {
+        String message = "";
         try {
-            if (sampleVerifyFile != null) {
-
-                if (sampleVerifyFile.getId() != 0) {
-                    sampleStringBuilder.append(sampleVerifyFile.getId());
-                } else {
-                    sampleStringBuilder.append("error");
-                }
-
-                sampleStringBuilder.append("|");
-                if (sampleVerifyFile.getStatus() != null && !sampleVerifyFile.getStatus().isEmpty()) {
-                    sampleStringBuilder.append(sampleVerifyFile.getStatus());
-                } else {
-                    sampleStringBuilder.append("--");
-                }
-
-            }
+            message = sampleVerifyFileRepository.invalidateSample(sampleIdListBean);
         } catch (Exception e) {
-            throw e;
+            message = MessageVarList.COMMON_ERROR_PROCESS;
         }
-        return sampleStringBuilder.toString();
+        return message;
     }
+
+    @LogService
+    public String notFoundSample(SampleIdListBean sampleIdListBean) {
+        String message = "";
+        try {
+            message = sampleVerifyFileRepository.notFoundSample(sampleIdListBean);
+        } catch (Exception e) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+
+
 
 
 }

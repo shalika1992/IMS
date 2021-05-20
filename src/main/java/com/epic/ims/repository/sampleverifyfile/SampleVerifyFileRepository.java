@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
-public class SampleVerifyFileRepository {
+public class SampleVerifyFileRepository<yes> {
     private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
@@ -52,6 +52,19 @@ public class SampleVerifyFileRepository {
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
     private final String SQL_FIND_SAMPLEDATAVERIFICATION = "select id, referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district, contactno, secondarycontactno, specimenid, barcode, receiveddate, status,createduser, createdtime from sample_data where id = ?";
     private final String SQL_UPDATE_STATUS = "update sample_data set status =:status where id in (:ids)";
+    private final String SQL_DELETE_SAMPLEDATA = "delete from sample_data where id in (:ids)";
+    private final String SQL_INSERT_REJECTDATAINVALID = "insert into reject_data"+
+            "(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
+    "contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)"+
+            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
+    "contactno, secondarycontactno, receiveddate, status, 'yes',"+
+            " createduser, createdtime from sample_data where id in (:ids)";
+    private final String SQL_INSERT_REJECTDATANOTFOUND = "insert into reject_data"+
+            "(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
+            "contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)"+
+            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
+            "contactno, secondarycontactno, receiveddate, status, 'no',"+
+            " createduser, createdtime from sample_data where id in (:ids)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -285,6 +298,71 @@ public class SampleVerifyFileRepository {
             int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
+    @LogRepository
+    @Transactional
+    public String invalidateSample(SampleIdListBean sampleIdListBean) throws Exception {
+        String message = "";
+        try {
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+            else{
+                int value1 = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATAINVALID, idSetParameterMap);
+                if(value1<=0){
+                    message = MessageVarList.COMMON_ERROR_PROCESS;
+                }
+                else{
+                    int value2 = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, idSetParameterMap);
+                    if(value2<=0){
+                        message = MessageVarList.COMMON_ERROR_PROCESS;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String notFoundSample(SampleIdListBean sampleIdListBean) throws Exception {
+        String message = "";
+        try {
+            //create the parameter map
+            Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("status", commonVarList.STATUS_NOSAMPLEFOUND);
+            idSetParameterMap.addValue("ids", idSet);
+            //execute the query
+            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+            else{
+                int value1 = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATANOTFOUND, idSetParameterMap);
+                if(value1<=0){
+                    message = MessageVarList.COMMON_ERROR_PROCESS;
+                }
+                else{
+                    int value2 = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, idSetParameterMap);
+                    if(value2<=0){
+                        message = MessageVarList.COMMON_ERROR_PROCESS;
+                    }
+                }
             }
         } catch (Exception ex) {
             throw ex;
