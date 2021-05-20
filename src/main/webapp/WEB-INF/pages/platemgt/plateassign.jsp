@@ -38,21 +38,21 @@
                     }
                 }).then((result) => {
                     $("#generateDiv").show();
-                    $("#stickyOp").show();
-                    $.ajax({
-                        type: 'POST',
-                        url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
-                        data: {receivedDate: selectedDate},
-                        success: function (res) {
-                            platesNum = res;
-                            initArray = res;
-                            _generatePlates(platesNum);
-                        },
-                        error: function (jqXHR) {
-                            window.location = "${pageContext.request.contextPath}/logout.htm";
-                        }
-                    });
+                $("#stickyOp").show();
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
+                    data: {receivedDate: selectedDate},
+                    success: function (res) {
+                        platesNum = res;
+                        initArray = res;
+                        _generatePlates(platesNum);
+                    },
+                    error: function (jqXHR) {
+                        window.location = "${pageContext.request.contextPath}/logout.htm";
+                    }
                 });
+            });
             } else {
                 $("#generateDiv").hide();
                 $("#stickyOp").hide();
@@ -131,13 +131,13 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            platesNum = _swapCells(platesNum, swapArray);
-                            _generatePlates(platesNum);
-                            _updateDatabase(platesNum,swapArray,'SWAP');
-                        } else {
-                            Swal.fire('Changes are not saved', '', 'info');
-                        }
-                    });
+                        platesNum = _swapCells(platesNum, swapArray);
+                        _generatePlates(platesNum);
+                        _updateDatabase(platesNum,swapArray,'SWAP');
+                    } else {
+                        Swal.fire('Changes are not saved', '', 'info');
+                    }
+                });
 
                 } else {
                     Swal.fire('Only 2 values can swap', '', 'error');
@@ -172,13 +172,13 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            platesNum = _mergeCells(platesNum, mergeArray);
-                            _generatePlates(platesNum);
-                            _updateDatabase(platesNum,mergeArray,'MERGE');
-                        } else {
-                            Swal.fire('Changes are not saved', '', 'info');
-                        }
-                    });
+                        platesNum = _mergeCells(platesNum, mergeArray);
+                        _generatePlates(platesNum);
+                        _updateDatabase(platesNum,mergeArray,'MERGE');
+                    } else {
+                        Swal.fire('Changes are not saved', '', 'info');
+                    }
+                });
                 } else {
                     Swal.fire('Less values to merge', '', 'error')
                 }

@@ -89,7 +89,7 @@
                 sPaginationType: "full_numbers",
                 bDeferRender: true,
                 responsive: true,
-                lengthMenu: [25, 50, 75, 100,200],
+                lengthMenu: [5, 10, 20, 50, 100],
                 searching: false,
                 initComplete: function (settings, json) {
                     document.getElementById('data-table-loading').style.display = "none";

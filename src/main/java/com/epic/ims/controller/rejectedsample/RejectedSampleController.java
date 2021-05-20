@@ -2,7 +2,6 @@ package com.epic.ims.controller.rejectedsample;
 
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
-import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.rejectedsample.RejectedSampleDataInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.institution.Institution;
@@ -25,7 +24,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,29 +47,30 @@ public class RejectedSampleController {
     @Autowired
     RejectedSampleService rejectedSampleService;
 
-    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     @GetMapping(value = "/viewRejectSample")
     public ModelAndView viewRejectSamplePage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM REJECTED SAMPLE PAGE VIEW");
         ModelAndView modelAndView;
+
         try {
             modelAndView = new ModelAndView("rejectedsampleview", "rejectsamplemap", new ModelMap());
         } catch (Exception exception) {
             modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
             modelAndView = new ModelAndView("rejectedsampleview", modelMap);
         }
+
         return modelAndView;
     }
 
-    @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
+    @ResponseBody
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
     @PostMapping(value = "/listRejectedSample", headers = {"content-type=application/json"})
-    public @ResponseBody
-    DataTablesResponse<RejectedSampleData> searchRejectedSample(@RequestBody RejectedSampleDataInputBean rejectedSampleInputBean) {
+    public DataTablesResponse<RejectedSampleData> searchRejectedSample(@RequestBody RejectedSampleDataInputBean rejectedSampleInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE SEARCH");
         DataTablesResponse<RejectedSampleData> responseBean = new DataTablesResponse<>();
         try {
             long count = rejectedSampleService.getCount(rejectedSampleInputBean);
+
             if (count > 0) {
                 List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleInputBean);
                 //set data set to response bean
@@ -80,14 +79,8 @@ public class RejectedSampleController {
                 responseBean.columns = rejectedSampleInputBean.columns;
                 responseBean.totalRecords = count;
                 responseBean.totalDisplayRecords = count;
-            }else{
-                //set data set to response bean
-                responseBean.data.addAll(new ArrayList<>());
-                responseBean.echo = rejectedSampleInputBean.echo;
-                responseBean.columns = rejectedSampleInputBean.columns;
-                responseBean.totalRecords = count;
-                responseBean.totalDisplayRecords = count;
             }
+
         } catch (Exception exception) {
             logger.error("Exception " + exception);
         }
@@ -102,4 +95,6 @@ public class RejectedSampleController {
         rejectedSampleDataInputBean.setInstitutionList(institutionList);
         map.addAttribute("rejectedsample", rejectedSampleDataInputBean);
     }
+
+
 }

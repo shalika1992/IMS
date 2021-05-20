@@ -39,7 +39,6 @@
           type="text/css"/>
     <!--end::Layout Themes-->
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/assets/media/logos/favicon.ico"/>
-
     <style>
         .success-response {
             color: #586cdc;

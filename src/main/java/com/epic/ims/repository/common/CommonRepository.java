@@ -1,6 +1,7 @@
 package com.epic.ims.repository.common;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
+import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
@@ -151,6 +152,30 @@ public class CommonRepository {
             throw e;
         }
         return resultList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommonInstitution> getCommonInstitutionList() throws Exception {
+        List<CommonInstitution> commonInstitutionList;
+        try {
+            commonInstitutionList = jdbcTemplate.query(SQL_GETALL_INSTITUTION_LIST, new RowMapper<CommonInstitution>() {
+                @Override
+                public CommonInstitution mapRow(ResultSet resultSet, int i) throws SQLException {
+                    CommonInstitution commonInstitution = new CommonInstitution();
+
+                    commonInstitution.setInstitutionCode(resultSet.getString("institutionCode"));
+                    commonInstitution.setInstitutionName(resultSet.getString("name"));
+
+                    return commonInstitution;
+                }
+            });
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            commonInstitutionList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return commonInstitutionList;
     }
 
     public int getPasswordParam(String paramcode) {
