@@ -16,11 +16,19 @@
 <head>
     <script type="text/javascript">
         var oTable;
-
         var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");
 
         $(document).ready(function () {
+            $('#receivedDate').datepicker({
+                format: 'yyyy-mm-dd',
+                endDate: '+0d',
+                setDate: new Date(),
+                todayHighlight: true,
+                forceParse: false,
+                autoclose: true
+            });
+            setReceivedDate();
             loadDataTable();
         });
 
@@ -58,12 +66,11 @@
                     aoData.push(
                         {'name': 'csrf_token', 'value': token},
                         {'name': 'header', 'value': header},
+                        {'name': 'receivedDate', 'value': $('#receivedDate').val()},
                         {'name': 'referenceNo', 'value': $('#referenceNo').val()},
                         {'name': 'institutionCode', 'value': $('#institutionCode').val()},
                         {'name': 'name', 'value': $('#name').val()},
-                        {'name': 'nic', 'value': $('#nic').val()},
-                        {'name': 'receivedDate', 'value': $('#receivedDate').val()},
-
+                        {'name': 'nic', 'value': $('#nic').val()}
                     );
                     $.ajax({
                         dataType: 'json',
@@ -81,10 +88,8 @@
                 sPaginationType: "full_numbers",
                 bDeferRender: true,
                 responsive: true,
-                lengthMenu: [5, 10, 20, 50, 100],
+                lengthMenu: [25, 50, 75, 100, 200],
                 searching: false,
-                scrollY: '50vh',
-                scrollX: true,
                 scrollCollapse: true,
                 initComplete: function (settings, json) {
                     document.getElementById('data-table-loading').style.display = "none";
@@ -93,6 +98,7 @@
                 fnDrawCallback: function (oSettings) {
                     $(".table ").css({"width": "100%"});
                 },
+                stateSave: false,
                 columnDefs: [
                     {
                         title: "Reference No",
@@ -122,66 +128,69 @@
                         title: "Gender",
                         targets: 4,
                         mDataProp: "gender",
-                        defaultContent: "--"
+                        defaultContent: "--",
+                        render: function (data) {
+                            if (data === 'M') {
+                                return 'Male';
+                            } else {
+                                return 'Female';
+                            }
+                        }
                     },
-
                     {
                         title: "Symptomatic",
                         targets: 5,
                         mDataProp: "symptomatic",
                         defaultContent: "--"
                     },
-
                     {
                         title: "Contact Type",
                         targets: 6,
                         mDataProp: "contactType",
                         defaultContent: "--"
                     },
-
                     {
                         title: "NIC",
                         targets: 7,
                         mDataProp: "nic",
                         defaultContent: "--"
                     },
-
                     {
                         title: "Address",
                         targets: 8,
                         mDataProp: "address",
                         defaultContent: "--"
                     },
-
                     {
                         title: "District",
                         targets: 9,
                         mDataProp: "district",
                         defaultContent: "--"
                     },
-
                     {
                         title: "Contact No",
                         targets: 10,
                         mDataProp: "contactNo",
                         defaultContent: "--"
                     },
-
-
+                    {
+                        title: "Secondary Contact Number",
+                        targets: 11,
+                        mDataProp: "secondaryContactNo",
+                        defaultContent: "--"
+                    },
                     {
                         title: "Received Date",
-                        targets: 11,
+                        targets: 12,
                         mDataProp: "receivedDate",
                         defaultContent: "--",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD")
                         }
-                    }
-                   ,
-
+                    },
                     {
                         title: "Status",
-                        targets: 12,
+                        targets: 13,
                         mDataProp: "status",
                         defaultContent: "--",
                         render: function (data, type, full, meta) {
@@ -221,26 +230,36 @@
                             return '<span class="label label-lg font-weight-bold' + status[data].class + ' label-inline">' + status[data].title + '</span>';
                         },
                     },
-
-
                     {
                         title: "Remark",
-                        targets: 13,
+                        targets: 14,
                         mDataProp: "remark",
                         defaultContent: "--"
                     },
-
-                     {
+                    {
+                        title: "Created User",
+                        targets: 15,
+                        mDataProp: "createdUser",
+                        defaultContent: "--"
+                    },
+                    {
                         label: 'Created Time',
                         name: 'createdTime',
-                        targets: 14,
+                        targets: 16,
                         mDataProp: "createdTime",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD HH:mm:ss A")
                         }
                     }
-
-                ]
+                ],
+                fnDrawCallback: function (oSettings, json) {
+                    //disable and enable the select_all input
+                    if (oTable.fnGetData().length > 0) {
+                        $("#viewPDF").prop("disabled", false);
+                    } else {
+                        $("#viewPDF").prop("disabled", true);
+                    }
+                }
             });
         }
 
@@ -248,7 +267,48 @@
             oTable.fnDraw();
         }
 
+        function resetSearch() {
+            $("#receivedDate").datepicker('setDate', getReceivedDate());
+            $('#referenceNo').val("");
+            $('#institutionCode').val("");
+            $('#name').val("");
+            $('#nic').val("");
 
+            oTable.fnDraw();
+        }
+
+        function setReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            var today = (date.getFullYear() + "-" + month + "-" + day);
+            $('#receivedDate').val(today);
+        }
+
+        function getReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return (date.getFullYear() + "-" + month + "-" + day);
+        }
+
+        function downloadPDFReport() {
+            form = document.getElementById('rejectedsampleform');
+            form.action = 'pdfReportRejected.htm';
+            form.submit();
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -285,19 +345,28 @@
                         <!--begin::Form-->
                         <form:form class="form" id="rejectedsampleform" name="rejectedsampleform" action=""
                                    theme="simple" method="post" modelAttribute="rejectedsample">
-                            <%--                        <form class="form">--%>
                             <div class="card-body">
                                 <div class="form-group row">
+                                    <div class="col-lg-3">
+                                        <label>Received Date:</label>
+                                        <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                            <input path="receivedDate" name="receivedDate" id="receivedDate"
+                                                   class="form-control" readonly="true"
+                                                   autocomplete="off" type="text" onkeydown="return false"/>
+                                        </div>
+
+                                        <span class="form-text text-muted">Please enter received date</span>
+                                    </div>
+
                                     <div class="col-lg-3">
                                         <label>Reference No:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-																	<span class="input-group-text">
-																		<i class="la la-bookmark-o"></i>
-																	</span>
+                                                <span class="input-group-text">
+                                                    <i class="la la-bookmark-o"></i>
+                                                </span>
                                             </div>
                                             <input id="referenceNo" name="referenceNo" type="text"
-                                                   onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                    maxlength="16" class="form-control"
                                                    placeholder="Reference No">
                                         </div>
@@ -315,7 +384,6 @@
                                         <span class="form-text text-muted">Please select institution</span>
                                     </div>
 
-
                                     <div class="col-lg-3">
                                         <label>Name:</label>
                                         <input id="name" name="name" type="text"
@@ -332,16 +400,6 @@
                                         <span class="form-text text-muted">Please enter nic</span>
                                     </div>
 
-                                    <div class="col-lg-3">
-                                        <label>Received Date:</label>
-                                        <input id="receivedDate" name="receivedDate" type="date"
-                                               onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
-                                               maxlength="10"
-                                               class="form-control form-control-sm" placeholder="Received Date">
-
-                                        <span class="form-text text-muted">Please enter received date</span>
-                                    </div>
-
                                 </div>
                             </div>
                             <div class="card-footer">
@@ -353,6 +411,15 @@
                                         </button>
                                         <button type="reset" class="btn btn-secondary btn-sm" onclick="resetSearch()">
                                             Reset
+                                        </button>
+                                    </div>
+
+                                    <div class="col-lg-4"></div>
+
+                                    <div class="col-lg-2">
+                                        <button id="viewPDF" type="button" class="btn btn-primary mr-2"
+                                                onclick="downloadPDFReport()">
+                                            View Report
                                         </button>
                                     </div>
                                 </div>
@@ -368,27 +435,8 @@
             <div class="card card-custom gutter-b">
                 <div class="card-header flex-wrap border-0 pt-6 pb-0">
                     <div class="card-title">
-                        <h3 class="card-label">System User Management
-                            <span class="d-block text-muted pt-2 font-size-sm">System User list</span></h3>
-                    </div>
-                    <div class="card-toolbar">
-                        <!--begin::Button-->
-                        <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
-											<span class="svg-icon svg-icon-md">
-												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
-												<svg xmlns="http://www.w3.org/2000/svg"
-                                                     width="24px"
-                                                     height="24px" viewBox="0 0 24 24" version="1.1">
-													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-														<rect x="0" y="0" width="24" height="24"></rect>
-														<circle fill="#000000" cx="9" cy="15" r="6"></circle>
-														<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
-                                                              fill="#000000" opacity="0.3"></path>
-													</g>
-												</svg>
-                                                <!--end::Svg Icon-->
-											</span>Download Record</a>
-                        <!--end::Button-->
+                        <h3 class="card-label">Rejected Data Management
+                            <span class="d-block text-muted pt-2 font-size-sm"></span></h3>
                     </div>
                 </div>
 
@@ -402,7 +450,6 @@
                         <table class="table table-separate table-head-custom table-checkable" id="table">
                             <thead>
                             <tr>
-
                                 <th>Reference No</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
@@ -414,25 +461,22 @@
                                 <th>Address</th>
                                 <th>District</th>
                                 <th>Contact No</th>
+                                <th>Secondary Contact No</th>
                                 <th>Received Date</th>
                                 <th>Status</th>
                                 <th>Remark</th>
+                                <th>Created User</th>
                                 <th>Created Time</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
-<%--                        <!--end: Datatable-->--%>
+                        <!--end: Datatable-->
                     </div>
                 </div>
             </div>
             <!--end::Card-->
-
         </div>
     </div>
-
-
-
 </div>
-
 </html>

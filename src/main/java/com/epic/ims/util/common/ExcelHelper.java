@@ -106,7 +106,11 @@ public class ExcelHelper {
 
                         case 11:
                             String contactNumber = NumberToTextConverter.toText(currentCell.getNumericCellValue());
-                            sampleData.setContactNumber(contactNumber);
+                            if(contactNumber != "0"){
+                                sampleData.setContactNumber(contactNumber);
+                            }else{
+                                sampleData.setContactNumber("");
+                            }
                             break;
 
                         case 12:

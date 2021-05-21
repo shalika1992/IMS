@@ -1,11 +1,14 @@
 package com.epic.ims.repository.rejectedsample;
 
-
+import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.rejectedsample.RejectedSampleDataInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.epic.ims.repository.common.CommonRepository;
+import com.epic.ims.util.common.Common;
+import com.epic.ims.util.varlist.CommonVarList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +22,7 @@ import java.util.List;
 @Repository
 @Scope("request")
 public class RejectedSampleRepository {
-    private final Log logger = LogFactory.getLog(getClass());
+    private static Logger logger = LogManager.getLogger(RejectedSampleRepository.class);
 
     @Autowired
     SessionBean sessionBean;
@@ -27,66 +30,37 @@ public class RejectedSampleRepository {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    CommonRepository commonRepository;
+
+    @Autowired
+    CommonVarList commonVarList;
+
+    @Autowired
+    Common common;
 
     private final String SQL_GET_COUNT = "select count(*) from reject_data rd where ";
 
+    @LogRepository
     @Transactional(readOnly = true)
     public long getCount(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception {
-
         long count = 0;
-
         try {
             StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
-            this.setDynamicClause(rejectedSampleDataInputBean, dynamicClause);
-
+            //create the where clause
+            dynamicClause = this.setDynamicClause(rejectedSampleDataInputBean, dynamicClause);
+            //create the query
             count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
-
         } catch (Exception exception) {
-            logger.error(exception);
             throw exception;
         }
-
         return count;
     }
 
-    private StringBuilder setDynamicClause(RejectedSampleDataInputBean rejectedSampleDataInputBean, StringBuilder dynamicClause) {
-        dynamicClause.append("1=1 ");
-
-        try {
-            if (rejectedSampleDataInputBean.getReferenceNo() != null && !rejectedSampleDataInputBean.getReferenceNo().isEmpty()) {
-                dynamicClause.append("and lower(rd.referenceno) like lower('%").append(rejectedSampleDataInputBean.getReferenceNo()).append("%') ");
-            }
-
-            if (rejectedSampleDataInputBean.getInstitutionCode() != null && !rejectedSampleDataInputBean.getInstitutionCode().isEmpty()) {
-                dynamicClause.append("and lower(rd.institutioncode) like lower('%").append(rejectedSampleDataInputBean.getInstitutionCode()).append("%') ");
-            }
-
-            if (rejectedSampleDataInputBean.getName() != null && !rejectedSampleDataInputBean.getName().isEmpty()) {
-                dynamicClause.append("and lower(rd.name) like lower('%").append(rejectedSampleDataInputBean.getName()).append("%') ");
-            }
-
-            if (rejectedSampleDataInputBean.getNic() != null && !rejectedSampleDataInputBean.getNic().isEmpty()) {
-                dynamicClause.append("and lower(rd.nic) like lower('%").append(rejectedSampleDataInputBean.getNic()).append("%') ");
-            }
-
-            if (rejectedSampleDataInputBean.getReceivedDate() != null) {
-                dynamicClause.append("and rd.receiveddate like '%").append(rejectedSampleDataInputBean.getReceivedDate()).append("%' ");
-            }
-
-        } catch (Exception exception) {
-            throw exception;
-        }
-
-        return dynamicClause;
-    }
-
-
     public List<RejectedSampleData> getRejectedSampleSearchList(RejectedSampleDataInputBean rejectedSampleDataInputBean) {
         List<RejectedSampleData> rejectedSampleDataList = null;
-
         try {
             StringBuilder dynamicClause = this.setDynamicClause(rejectedSampleDataInputBean, new StringBuilder());
-
             //create sorting order
             String sortingStr = "";
             String col = "";
@@ -139,9 +113,9 @@ public class RejectedSampleRepository {
             }
             sortingStr = " order by " + col + " " + rejectedSampleDataInputBean.sortDirections.get(0);
 
-            String sql = "select rd.referenceno as referenceno, inst.institutioncode as institutioncode, rd.name as name, rd.age as age, rd.gender as gender, " +
-                    "rd.symptomatic as symptomatic,rd.contacttype as contacttype," +
-                    "rd.nic as nic, rd.address as address, rd.district as district ,rd.contactno as contactno,rd.receiveddate as receiveddate,rd.status as status,rd.remark as remark,rd.createdtime as createdtime " +
+            String sql = "" +
+                    "select rd.referenceno as referenceno, inst.institutioncode as institutioncode, rd.name as name, rd.age as age, rd.gender as gender, " +
+                    "rd.symptomatic as symptomatic,rd.contacttype as contacttype,rd.nic as nic, rd.address as address, rd.district as district ,rd.contactno as contactno,rd.secondarycontactno , rd.receiveddate as receiveddate,s.description as status,rd.remark as remark,rd.createduser as createduser , rd.createdtime as createdtime " +
                     "from reject_data rd " +
                     "left join institution inst on inst.institutioncode = rd.institutioncode " +
                     "left join status s on s.code = rd.status where " + dynamicClause.toString() + sortingStr +
@@ -152,87 +126,99 @@ public class RejectedSampleRepository {
                 RejectedSampleData rejectedSampleData = new RejectedSampleData();
 
                 try {
-                    rejectedSampleData.setReferenceNo(rs.getString("referenceno"));
+                    rejectedSampleData.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
                 } catch (Exception e) {
-                    rejectedSampleData.setReferenceNo(null);
+                    rejectedSampleData.setReferenceNo("--");
                 }
 
                 try {
-                    rejectedSampleData.setInstitutionCode(rs.getString("institutioncode"));
+                    rejectedSampleData.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
                 } catch (Exception e) {
-                    rejectedSampleData.setInstitutionCode(null);
+                    rejectedSampleData.setInstitutionCode("--");
                 }
 
                 try {
-                    rejectedSampleData.setName(rs.getString("name"));
+                    rejectedSampleData.setName(common.handleNullAndEmptyValue(rs.getString("name")));
                 } catch (Exception e) {
-                    rejectedSampleData.setName(null);
+                    rejectedSampleData.setName("--");
                 }
 
                 try {
-                    rejectedSampleData.setAge(rs.getString("age"));
+                    rejectedSampleData.setAge(common.handleNullAndEmptyValue(rs.getString("age")));
                 } catch (SQLException e) {
-                    rejectedSampleData.setAge(null);
+                    rejectedSampleData.setAge("--");
                 }
 
                 try {
-                    rejectedSampleData.setGender(rs.getString("gender"));
+                    rejectedSampleData.setGender(common.handleNullAndEmptyValue(rs.getString("gender")));
                 } catch (Exception e) {
-                    rejectedSampleData.setGender(null);
+                    rejectedSampleData.setGender("--");
                 }
 
                 try {
-                    rejectedSampleData.setSymptomatic(rs.getString("symptomatic"));
+                    rejectedSampleData.setSymptomatic(common.handleNullAndEmptyValue(rs.getString("symptomatic")));
                 } catch (Exception e) {
-                    rejectedSampleData.setStatus(null);
+                    rejectedSampleData.setStatus("--");
                 }
 
                 try {
-                    rejectedSampleData.setContactType(rs.getString("contacttype"));
+                    rejectedSampleData.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
                 } catch (Exception e) {
-                    rejectedSampleData.setContactType(null);
+                    rejectedSampleData.setContactType("--");
                 }
 
                 try {
-                    rejectedSampleData.setNic(rs.getString("nic"));
+                    rejectedSampleData.setNic(common.handleNullAndEmptyValue(rs.getString("nic")));
                 } catch (Exception e) {
                     rejectedSampleData.setCreatedTime(null);
                 }
 
                 try {
-                    rejectedSampleData.setAddress(rs.getString("address"));
+                    rejectedSampleData.setAddress(common.handleNullAndEmptyValue(rs.getString("address")));
                 } catch (Exception e) {
-                    rejectedSampleData.setAddress(null);
+                    rejectedSampleData.setAddress("--");
                 }
 
                 try {
-                    rejectedSampleData.setDistrict(rs.getString("district"));
+                    rejectedSampleData.setDistrict(common.handleNullAndEmptyValue(rs.getString("district")));
                 } catch (Exception e) {
-                    rejectedSampleData.setDistrict(null);
+                    rejectedSampleData.setDistrict("--");
                 }
 
                 try {
-                    rejectedSampleData.setContactNo(rs.getString("contactno"));
+                    rejectedSampleData.setContactNo(common.handleNullAndEmptyValue(rs.getString("contactno")));
                 } catch (Exception e) {
-                    rejectedSampleData.setContactNo(null);
+                    rejectedSampleData.setContactNo("--");
                 }
 
                 try {
-                    rejectedSampleData.setReceivedDate(rs.getDate("receiveddate"));
+                    rejectedSampleData.setSecondaryContactNo(common.handleNullAndEmptyValue(rs.getString("secondarycontactno")));
                 } catch (Exception e) {
-                    rejectedSampleData.setReceivedDate(null);
+                    rejectedSampleData.setSecondaryContactNo("--");
                 }
 
                 try {
-                    rejectedSampleData.setStatus(rs.getString("status"));
+                    rejectedSampleData.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
                 } catch (Exception e) {
-                    rejectedSampleData.setStatus(null);
+                    rejectedSampleData.setReceivedDate("--");
                 }
 
                 try {
-                    rejectedSampleData.setRemark(rs.getString("remark"));
+                    rejectedSampleData.setStatus(common.handleNullAndEmptyValue(rs.getString("status")));
                 } catch (Exception e) {
-                    rejectedSampleData.setRemark(null);
+                    rejectedSampleData.setStatus("--");
+                }
+
+                try {
+                    rejectedSampleData.setRemark(common.handleNullAndEmptyValue(rs.getString("remark")));
+                } catch (Exception e) {
+                    rejectedSampleData.setRemark("--");
+                }
+
+                try {
+                    rejectedSampleData.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
+                } catch (Exception e) {
+                    rejectedSampleData.setCreatedUser("--");
                 }
 
                 try {
@@ -243,13 +229,38 @@ public class RejectedSampleRepository {
 
                 return rejectedSampleData;
             });
+        } catch (Exception exception) {
+            throw exception;
+        }
+        return rejectedSampleDataList;
+    }
 
+    private StringBuilder setDynamicClause(RejectedSampleDataInputBean rejectedSampleDataInputBean, StringBuilder dynamicClause) {
+        dynamicClause.append("1=1 ");
+        try {
+            if (rejectedSampleDataInputBean.getReferenceNo() != null && !rejectedSampleDataInputBean.getReferenceNo().isEmpty()) {
+                dynamicClause.append("and lower(rd.referenceno) like lower('%").append(rejectedSampleDataInputBean.getReferenceNo()).append("%') ");
+            }
+
+            if (rejectedSampleDataInputBean.getInstitutionCode() != null && !rejectedSampleDataInputBean.getInstitutionCode().isEmpty()) {
+                dynamicClause.append("and lower(rd.institutioncode) like lower('%").append(rejectedSampleDataInputBean.getInstitutionCode()).append("%') ");
+            }
+
+            if (rejectedSampleDataInputBean.getName() != null && !rejectedSampleDataInputBean.getName().isEmpty()) {
+                dynamicClause.append("and lower(rd.name) like lower('%").append(rejectedSampleDataInputBean.getName()).append("%') ");
+            }
+
+            if (rejectedSampleDataInputBean.getNic() != null && !rejectedSampleDataInputBean.getNic().isEmpty()) {
+                dynamicClause.append("and lower(rd.nic) like lower('%").append(rejectedSampleDataInputBean.getNic()).append("%') ");
+            }
+
+            if (rejectedSampleDataInputBean.getReceivedDate() != null) {
+                dynamicClause.append(" and rd.receiveddate = '").append(rejectedSampleDataInputBean.getReceivedDate()).append("'");
+            }
         } catch (Exception exception) {
             throw exception;
         }
 
-        return rejectedSampleDataList;
+        return dynamicClause;
     }
-
-
 }

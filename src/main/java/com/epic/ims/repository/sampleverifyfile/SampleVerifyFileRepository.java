@@ -50,21 +50,17 @@ public class SampleVerifyFileRepository<yes> {
     Common common;
 
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
-    private final String SQL_FIND_SAMPLEDATAVERIFICATION = "select id, referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district, contactno, secondarycontactno, specimenid, barcode, receiveddate, status,createduser, createdtime from sample_data where id = ?";
     private final String SQL_UPDATE_STATUS = "update sample_data set status =:status where id in (:ids)";
     private final String SQL_DELETE_SAMPLEDATA = "delete from sample_data where id in (:ids)";
-    private final String SQL_INSERT_REJECTDATAINVALID = "insert into reject_data"+
-            "(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
-    "contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)"+
-            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
-    "contactno, secondarycontactno, receiveddate, status, 'yes',"+
-            " createduser, createdtime from sample_data where id in (:ids)";
-    private final String SQL_INSERT_REJECTDATANOTFOUND = "insert into reject_data"+
-            "(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
-            "contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)"+
-            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,"+
-            "contactno, secondarycontactno, receiveddate, status, 'no',"+
-            " createduser, createdtime from sample_data where id in (:ids)";
+
+    private final String SQL_INSERT_REJECTDATAINVALID = "" +
+            "insert into reject_data(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)" +
+            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, 'Mark as invalid', createduser, createdtime from sample_data where id in (:ids)";
+
+
+    private final String SQL_INSERT_REJECTDATANOTFOUND = "" +
+            "insert into reject_data(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, remark, createduser )" +
+            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, 'Mark as sample not found',createduser from sample_data where id in (:ids)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -170,109 +166,109 @@ public class SampleVerifyFileRepository<yes> {
                 }
 
                 try {
-                    sampleVerifyFile.setReferenceNo(rs.getString("referenceno"));
+                    sampleVerifyFile.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
                 } catch (Exception e) {
                     sampleVerifyFile.setReferenceNo("--");
                 }
 
                 try {
-                    sampleVerifyFile.setReceivedDate(rs.getString("receiveddate"));
+                    sampleVerifyFile.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
                 } catch (Exception e) {
                     sampleVerifyFile.setReceivedDate("--");
                 }
 
                 try {
-                    sampleVerifyFile.setInstitutionCode(rs.getString("institutioncode"));
+                    sampleVerifyFile.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
                 } catch (Exception e) {
                     sampleVerifyFile.setInstitutionCode("--");
                 }
 
                 try {
-                    sampleVerifyFile.setName(rs.getString("name"));
+                    sampleVerifyFile.setName(common.handleNullAndEmptyValue(rs.getString("name")));
                 } catch (Exception e) {
                     sampleVerifyFile.setName("--");
                 }
 
                 try {
-                    sampleVerifyFile.setAge(rs.getString("age"));
+                    sampleVerifyFile.setAge(common.handleNullAndEmptyValue(rs.getString("age")));
                 } catch (Exception e) {
                     sampleVerifyFile.setAge("--");
                 }
 
                 try {
-                    sampleVerifyFile.setGender(rs.getString("gender"));
+                    sampleVerifyFile.setGender(common.handleNullAndEmptyValue(rs.getString("gender")));
                 } catch (Exception e) {
                     sampleVerifyFile.setGender("--");
                 }
 
                 try {
-                    sampleVerifyFile.setSymptomatic(rs.getString("symptomatic"));
+                    sampleVerifyFile.setSymptomatic(common.handleNullAndEmptyValue(rs.getString("symptomatic")));
                 } catch (Exception e) {
                     sampleVerifyFile.setSymptomatic("--");
                 }
 
                 try {
-                    sampleVerifyFile.setContactType(rs.getString("contacttype"));
+                    sampleVerifyFile.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
                 } catch (Exception e) {
                     sampleVerifyFile.setContactType("--");
                 }
 
                 try {
-                    sampleVerifyFile.setNic(rs.getString("nic"));
+                    sampleVerifyFile.setNic(common.handleNullAndEmptyValue(rs.getString("nic")));
                 } catch (Exception e) {
                     sampleVerifyFile.setNic("--");
                 }
 
                 try {
-                    sampleVerifyFile.setAddress(rs.getString("address"));
+                    sampleVerifyFile.setAddress(common.handleNullAndEmptyValue(rs.getString("address")));
                 } catch (Exception e) {
                     sampleVerifyFile.setAddress("--");
                 }
 
                 try {
-                    sampleVerifyFile.setStatus(rs.getString("status"));
+                    sampleVerifyFile.setStatus(common.handleNullAndEmptyValue(rs.getString("status")));
                 } catch (Exception e) {
                     sampleVerifyFile.setStatus("--");
                 }
 
                 try {
-                    sampleVerifyFile.setResidentDistrict(rs.getString("residentdistrict"));
+                    sampleVerifyFile.setResidentDistrict(common.handleNullAndEmptyValue(rs.getString("residentdistrict")));
                 } catch (Exception e) {
                     sampleVerifyFile.setResidentDistrict("--");
                 }
 
                 try {
-                    sampleVerifyFile.setContactNumber(rs.getString("contactnumber"));
+                    sampleVerifyFile.setContactNumber(common.handleNullAndEmptyValue(rs.getString("contactnumber")));
                 } catch (Exception e) {
                     sampleVerifyFile.setContactNumber("--");
                 }
 
                 try {
-                    sampleVerifyFile.setSecondaryContactNumber(rs.getString("secondarycontactnumber"));
+                    sampleVerifyFile.setSecondaryContactNumber(common.handleNullAndEmptyValue(rs.getString("secondarycontactnumber")));
                 } catch (Exception e) {
                     sampleVerifyFile.setSecondaryContactNumber("--");
                 }
 
                 try {
-                    sampleVerifyFile.setSpecimenid(rs.getString("specimenid"));
+                    sampleVerifyFile.setSpecimenid(common.handleNullAndEmptyValue(rs.getString("specimenid")));
                 } catch (Exception e) {
                     sampleVerifyFile.setSpecimenid("--");
                 }
 
                 try {
-                    sampleVerifyFile.setBarcode(rs.getString("barcode"));
+                    sampleVerifyFile.setBarcode(common.handleNullAndEmptyValue(rs.getString("barcode")));
                 } catch (Exception e) {
                     sampleVerifyFile.setBarcode("--");
                 }
 
                 try {
-                    sampleVerifyFile.setCreatedTime(new Date(rs.getDate("createdtime").getTime()));
+                    sampleVerifyFile.setCreatedTime(rs.getTimestamp("createdtime"));
                 } catch (Exception e) {
                     sampleVerifyFile.setCreatedTime(null);
                 }
 
                 try {
-                    sampleVerifyFile.setCreatedUser(rs.getString("createduser"));
+                    sampleVerifyFile.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
                 } catch (SQLException e) {
                     sampleVerifyFile.setCreatedUser("--");
                 }
@@ -304,6 +300,7 @@ public class SampleVerifyFileRepository<yes> {
         }
         return message;
     }
+
     @LogRepository
     @Transactional
     public String invalidateSample(SampleIdListBean sampleIdListBean) throws Exception {
@@ -311,22 +308,25 @@ public class SampleVerifyFileRepository<yes> {
         try {
             //create the parameter map
             Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
-            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
-            idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
-            idSetParameterMap.addValue("ids", idSet);
+            //parameter map for update query
+            MapSqlParameterSource parameterMapOne = new MapSqlParameterSource();
+            parameterMapOne.addValue("status", commonVarList.STATUS_INVALID);
+            parameterMapOne.addValue("ids", idSet);
             //execute the query
-            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
-            if (value <= 0) {
+            int valueOne = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, parameterMapOne);
+            if (valueOne <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
-            }
-            else{
-                int value1 = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATAINVALID, idSetParameterMap);
-                if(value1<=0){
+            } else {
+                //parameter map for insert and delete query
+                MapSqlParameterSource parameterMapTwo = new MapSqlParameterSource();
+                parameterMapTwo.addValue("ids", idSet);
+                //execute the query
+                int valueTwo = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATAINVALID, parameterMapTwo);
+                if (valueTwo <= 0) {
                     message = MessageVarList.COMMON_ERROR_PROCESS;
-                }
-                else{
-                    int value2 = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, idSetParameterMap);
-                    if(value2<=0){
+                } else {
+                    int valueThree = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, parameterMapTwo);
+                    if (valueThree <= 0) {
                         message = MessageVarList.COMMON_ERROR_PROCESS;
                     }
                 }
@@ -344,22 +344,24 @@ public class SampleVerifyFileRepository<yes> {
         try {
             //create the parameter map
             Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
-            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
-            idSetParameterMap.addValue("status", commonVarList.STATUS_NOSAMPLEFOUND);
-            idSetParameterMap.addValue("ids", idSet);
+            MapSqlParameterSource parameterMapOne = new MapSqlParameterSource();
+            parameterMapOne.addValue("status", commonVarList.STATUS_NOSAMPLEFOUND);
+            parameterMapOne.addValue("ids", idSet);
             //execute the query
-            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, idSetParameterMap);
-            if (value <= 0) {
+            int valueOne = namedParameterJdbcTemplate.update(SQL_UPDATE_STATUS, parameterMapOne);
+            if (valueOne <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
-            }
-            else{
-                int value1 = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATANOTFOUND, idSetParameterMap);
-                if(value1<=0){
+            } else {
+                //parameter map for insert and delete query
+                MapSqlParameterSource parameterMapTwo = new MapSqlParameterSource();
+                parameterMapTwo.addValue("ids", idSet);
+                //execute the query
+                int valueTwo = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATANOTFOUND, parameterMapTwo);
+                if (valueTwo <= 0) {
                     message = MessageVarList.COMMON_ERROR_PROCESS;
-                }
-                else{
-                    int value2 = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, idSetParameterMap);
-                    if(value2<=0){
+                } else {
+                    int value2 = namedParameterJdbcTemplate.update(SQL_DELETE_SAMPLEDATA, parameterMapTwo);
+                    if (value2 <= 0) {
                         message = MessageVarList.COMMON_ERROR_PROCESS;
                     }
                 }

@@ -311,9 +311,9 @@
                         <h4>Following operations can be done</h4>
                         <div class="form-group row">
                             <div class="col-lg-3">
-                                <label>Merge selected cells</label>
+                                <label>Pool selected cells</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
-                                        onclick="merge()">Merge
+                                        onclick="merge()">Pool
                                 </button>
                             </div>
                             <div class="col-lg-3">

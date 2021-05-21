@@ -24,6 +24,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -51,14 +56,12 @@ public class RejectedSampleController {
     public ModelAndView viewRejectSamplePage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM REJECTED SAMPLE PAGE VIEW");
         ModelAndView modelAndView;
-
         try {
             modelAndView = new ModelAndView("rejectedsampleview", "rejectsamplemap", new ModelMap());
         } catch (Exception exception) {
             modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
             modelAndView = new ModelAndView("rejectedsampleview", modelMap);
         }
-
         return modelAndView;
     }
 
@@ -70,7 +73,6 @@ public class RejectedSampleController {
         DataTablesResponse<RejectedSampleData> responseBean = new DataTablesResponse<>();
         try {
             long count = rejectedSampleService.getCount(rejectedSampleInputBean);
-
             if (count > 0) {
                 List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleInputBean);
                 //set data set to response bean
@@ -79,12 +81,40 @@ public class RejectedSampleController {
                 responseBean.columns = rejectedSampleInputBean.columns;
                 responseBean.totalRecords = count;
                 responseBean.totalDisplayRecords = count;
+            } else {
+                //set data set to response bean
+                responseBean.data.addAll(new ArrayList<>());
+                responseBean.echo = rejectedSampleInputBean.echo;
+                responseBean.columns = rejectedSampleInputBean.columns;
+                responseBean.totalRecords = count;
+                responseBean.totalDisplayRecords = count;
             }
-
         } catch (Exception exception) {
             logger.error("Exception " + exception);
         }
         return responseBean;
+    }
+
+    @PostMapping(value = "/pdfReportRejected")
+    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
+    public void pdfReportRejectedSample(@ModelAttribute("rejectedsample") RejectedSampleDataInputBean rejectedSampleDataInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE REPORT");
+        OutputStream outputStream = null;
+        try {
+            List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleDataInputBean);
+
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException ex) {
+                //do nothing
+            }
+        }
     }
 
     @ModelAttribute
@@ -95,6 +125,4 @@ public class RejectedSampleController {
         rejectedSampleDataInputBean.setInstitutionList(institutionList);
         map.addAttribute("rejectedsample", rejectedSampleDataInputBean);
     }
-
-
 }

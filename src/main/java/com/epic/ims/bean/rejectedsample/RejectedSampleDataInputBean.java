@@ -24,7 +24,7 @@ public class RejectedSampleDataInputBean extends DataTablesRequest {
     private String nic;
     private String address;
     private String contactNo;
-    private Date receivedDate;
+    private String receivedDate;
     private String status;
     private String district;
     private Timestamp createdTime;

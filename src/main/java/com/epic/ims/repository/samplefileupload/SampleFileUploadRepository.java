@@ -47,7 +47,7 @@ public class SampleFileUploadRepository {
     private final String SQL_GET_LIST_DATA_COUNT = "select count(*) from sample_data sd left outer join status s on s.code=sd.status where";
     private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate , sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.id = ?";
     private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.id = ?";
-    private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser,createdtime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -128,6 +128,12 @@ public class SampleFileUploadRepository {
                 }
 
                 try {
+                    sampleFile.setSymptomatic(common.handleNullAndEmptyValue(rs.getString("symptomatic")));
+                } catch (Exception e) {
+                    sampleFile.setSymptomatic("--");
+                }
+
+                try {
                     sampleFile.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
                 } catch (Exception e) {
                     sampleFile.setContactType("--");
@@ -188,7 +194,7 @@ public class SampleFileUploadRepository {
                 }
 
                 try {
-                    sampleFile.setCreatedTime(rs.getDate("createdtime"));
+                    sampleFile.setCreatedTime(rs.getTimestamp("createdtime"));
                 } catch (Exception e) {
                     sampleFile.setCreatedTime(null);
                 }
@@ -277,7 +283,6 @@ public class SampleFileUploadRepository {
                         ps.setString(13, receivedDate);
                         ps.setString(14, commonVarList.STATUS_PENDING);
                         ps.setString(15, sessionBean.getUsername());
-                        ps.setString(16, currentDate);
                     }
 
                     @Override

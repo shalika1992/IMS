@@ -170,7 +170,7 @@ public class ResultUpdateRepository {
                 }
 
                 try {
-                    result.setPlateId(rs.getInt("plateid")+"");
+                    result.setPlateId(rs.getInt("plateid") + "");
                 } catch (Exception e) {
                     result.setPlateId("--");
                 }
@@ -188,7 +188,7 @@ public class ResultUpdateRepository {
                 }
 
                 try {
-                    result.setPoolId(rs.getInt("poolid")+"");
+                    result.setPoolId(rs.getInt("poolid") + "");
                 } catch (Exception e) {
                     result.setPoolId("--");
                 }

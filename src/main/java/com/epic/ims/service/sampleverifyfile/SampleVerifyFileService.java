@@ -101,8 +101,4 @@ public class SampleVerifyFileService {
         }
         return message;
     }
-
-
-
-
 }

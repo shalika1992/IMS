@@ -89,7 +89,7 @@
                 sPaginationType: "full_numbers",
                 bDeferRender: true,
                 responsive: true,
-                lengthMenu: [5, 10, 20, 50, 100],
+                lengthMenu: [25, 50, 75, 100, 200],
                 searching: false,
                 initComplete: function (settings, json) {
                     document.getElementById('data-table-loading').style.display = "none";
@@ -137,66 +137,85 @@
                         title: "Gender",
                         targets: 5,
                         mDataProp: "gender",
+                        defaultContent: "--",
+                        render: function (data) {
+                            if (data === 'M') {
+                                return 'Male';
+                            } else {
+                                return 'Female';
+                            }
+                        }
+                    },
+                    {
+                        title: "Symptomatic",
+                        targets: 6,
+                        mDataProp: "symptomatic",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Contact Type",
+                        targets: 7,
+                        mDataProp: "contactType",
                         defaultContent: "--"
                     },
                     {
                         title: "NIC",
-                        targets: 6,
+                        targets: 8,
                         mDataProp: "nic",
                         defaultContent: "--"
                     },
                     {
                         title: "Address",
-                        targets: 7,
+                        targets: 9,
                         mDataProp: "address",
                         defaultContent: "--"
                     },
                     {
                         title: "District",
-                        targets: 8,
+                        targets: 10,
                         mDataProp: "residentDistrict",
                         defaultContent: "--"
                     },
                     {
                         title: "Contact No",
-                        targets: 9,
+                        targets: 11,
                         mDataProp: "contactNumber",
                         defaultContent: "--"
                     },
                     {
                         title: "Secondary Contact No",
-                        targets: 10,
+                        targets: 12,
                         mDataProp: "secondaryContactNumber",
                         defaultContent: "--"
                     },
                     {
                         title: "Received Date",
-                        targets: 11,
+                        targets: 13,
                         mDataProp: "receivedDate",
                         defaultContent: "--",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD")
                         }
                     },
                     {
                         title: "Status",
-                        targets: 12,
+                        targets: 14,
                         mDataProp: "status",
                         defaultContent: "--"
                     },
                     {
                         title: "Created User",
-                        targets: 13,
+                        targets: 15,
                         mDataProp: "createdUser",
                         defaultContent: "--"
                     },
                     {
                         title: "Created Time",
-                        targets: 14,
+                        targets: 16,
                         mDataProp: "createdTime",
                         defaultContent: "--",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD HH:mm:ss A")
                         }
                     },
                     {
@@ -206,7 +225,7 @@
                         mRender: function (data, type, full) {
                             return '<button id="editBtn" class="btn btn-default btn-sm"  onclick="editSampleFileRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-edit.svg" alt=""></button>';
                         },
-                        targets: 15,
+                        targets: 17,
                         defaultContent: "--"
                     }
                 ]
@@ -438,6 +457,8 @@
                                 <th>Name</th>
                                 <th>Age</th>
                                 <th>Gender</th>
+                                <th>Symptomatic</th>
+                                <th>Contact Type</th>
                                 <th>NIC</th>
                                 <th>Address</th>
                                 <th>District</th>

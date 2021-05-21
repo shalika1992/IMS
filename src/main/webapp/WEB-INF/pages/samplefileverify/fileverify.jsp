@@ -114,7 +114,7 @@
                 order: [
                     [1, 'asc']
                 ],
-                stateSave: true,
+                stateSave: false,
                 columnDefs: [
                     {
                         'targets': 0,
@@ -131,7 +131,8 @@
                         title: "Id",
                         targets: 1,
                         mDataProp: "id",
-                        defaultContent: "--"
+                        defaultContent: "--",
+                        visible: false
                     },
                     {
                         title: "Reference Number",
@@ -162,7 +163,14 @@
                         title: "Gender",
                         targets: 6,
                         mDataProp: "gender",
-                        defaultContent: "--"
+                        defaultContent: "--",
+                        render: function (data) {
+                            if (data === 'M') {
+                                return 'Male';
+                            } else {
+                                return 'Female';
+                            }
+                        }
                     },
                     {
                         title: "Symptomatic",
@@ -266,7 +274,7 @@
                         targets: 17,
                         mDataProp: "createdTime",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD HH:mm:ss A")
                         }
                     }
                 ],
@@ -478,6 +486,7 @@
         function openInvalidModal() {
             $('#modalInvalid').modal('show');
         }
+
         function markAsInvalid() {
             let dataS = {"idList": rows_selected};
             $.ajax({
@@ -561,7 +570,6 @@
                                     <div class="col-lg-3">
                                         <label>Reference No:</label>
                                         <input id="referenceNo" name="referenceNo" type="text"
-                                               onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                                maxlength="10"
                                                class="form-control form-control-sm" placeholder="Reference Number">
 
