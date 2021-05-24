@@ -204,14 +204,20 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Created User",
+                        title: "Ward",
                         targets: 15,
+                        mDataProp: "ward",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Created User",
+                        targets: 16,
                         mDataProp: "createdUser",
                         defaultContent: "--"
                     },
                     {
                         title: "Created Time",
-                        targets: 16,
+                        targets: 17,
                         mDataProp: "createdTime",
                         defaultContent: "--",
                         render: function (data) {
@@ -225,7 +231,7 @@
                         mRender: function (data, type, full) {
                             return '<button id="editBtn" class="btn btn-default btn-sm"  onclick="editSampleFileRecord(\'' + full.id + '\')"><img src="${pageContext.request.contextPath}/resources/images/action-edit.svg" alt=""></button>';
                         },
-                        targets: 17,
+                        targets: 18,
                         defaultContent: "--"
                     }
                 ]
@@ -235,6 +241,11 @@
         function openAddModal() {
             $('#modalUploadSampleFile').modal('toggle');
             $('#modalUploadSampleFile').modal('show');
+        }
+
+        function openWardEntryModal(){
+            $('#modalAddWardEntry').modal('toggle');
+            $('#modalAddWardEntry').modal('show');
         }
 
         function editSampleFileRecord(id) {
@@ -263,6 +274,7 @@
                     $('#eDistrict').val(data.residentDistrict);
                     $('#eContactno').val(data.contactNumber);
                     $('#eSecondaryContactNo').val(data.secondaryContactNumber);
+                    $('#eWardNumber').val(data.ward);
 
                     $('#modalUpdateSampleRecord').modal('toggle');
                     $('#modalUpdateSampleRecord').modal('show');
@@ -419,11 +431,13 @@
             </div>
 
             <div class="card card-custom gutter-b">
-                <div class="card-header flex-wrap border-0 pt-1 pb-0">
+                <div class="card-header flex-wrap border-0 pt-6 pb-0">
                     <div class="card-title">
+                        <h3 class="card-label">Sample Data Upload</h3>
                     </div>
-                    <div class="card-toolbar">
-                        <a href="#" onclick="openAddModal()" class="btn btn-primary font-weight-bolder">
+                    <div class="d-flex flex-row-reverse">
+                        <div class="card-toolbar">
+                            <button onclick="openAddModal()" class="btn btn-primary font-weight-bolder" id="btnUpload">
                             <span class="svg-icon svg-icon-md">
                                 <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -437,8 +451,28 @@
                                     </g>
                                 </svg>
                                 <!--end::Svg Icon-->
-                            </span>Bulk Upload</a>
-                        <!--end::Button-->
+                            </span>Bulk Upload</button>
+                            <!--end::Button-->
+                        </div>
+
+                        <div class="card-toolbar">
+                            <button onclick="openWardEntryModal()" class="btn btn-primary font-weight-bolder" id="btnWardEntry" >
+                            <span class="svg-icon svg-icon-md">
+                                <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="24px"
+                                     height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24"/>
+                                        <circle fill="#000000" cx="9" cy="15" r="6"/>
+                                        <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
+                                              fill="#000000" opacity="0.3"/>
+                                    </g>
+                                </svg>
+                                <!--end::Svg Icon-->
+                            </span>Add Ward Entry</button>
+                            <!--end::Button-->
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -466,6 +500,7 @@
                                 <th>Secondary Contact No</th>
                                 <th>Received Date</th>
                                 <th>Status</th>
+                                <th>Ward</th>
                                 <th>Created User</th>
                                 <th>Created Time</th>
                                 <th>Update</th>
@@ -483,5 +518,6 @@
 <!-- start include jsp files -->
 <jsp:include page="fileupload-update.jsp"/>
 <jsp:include page="fileupload-add.jsp"/>
+<jsp:include page="fileupload-add-wardentry.jsp"/>
 <!-- end include jsp files -->
 </html>

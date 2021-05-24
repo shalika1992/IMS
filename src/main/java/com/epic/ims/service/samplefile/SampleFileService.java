@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,31 @@ public class SampleFileService {
             throw e;
         }
         return sampleFileList;
+    }
+
+    @LogService
+    public String insertSampleWardEntry(SampleFileInputBean sampleFileInputBean, Locale locale) {
+        String message = "";
+        try {
+            SampleFile existingSampleFile = sampleFileUploadRepository.getSampleWardEntry(sampleFileInputBean);
+            if (existingSampleFile == null) {
+                //set the other values to input bean
+                String currentDate = commonRepository.getCurrentDateAsString();
+                String createdUser = sessionBean.getUsername();
+
+                sampleFileInputBean.setReceivedDate(currentDate);
+                sampleFileInputBean.setCreatedUser(createdUser);
+
+                message = sampleFileUploadRepository.insertSampleWardEntry(sampleFileInputBean);
+            } else {
+                message = MessageVarList.SAMPLERECORD_ALREADY_EXISTS;
+            }
+        } catch (DuplicateKeyException ex) {
+            message = MessageVarList.SAMPLERECORD_ALREADY_EXISTS;
+        } catch (Exception exception) {
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
     }
 
     @LogService
@@ -153,10 +179,10 @@ public class SampleFileService {
                 if (sampleDataList.size() <= commonVarList.BULKUPLOAD_BATCH_SIZE) {
                     message = sampleFileUploadRepository.insertSampleRecordBatch(sampleDataList, receivedDate);
                 } else {
-                    message = MessageVarList.SAMPLE_FILE_CONTAIN_MAXRECORDS;
+                    message = MessageVarList.SAMPLEFILE_CONTAIN_MAXRECORDS;
                 }
             } else {
-                message = MessageVarList.SAMPLE_FILE_INVALID_FILE;
+                message = MessageVarList.SAMPLEFILE_INVALID_FILE;
             }
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;

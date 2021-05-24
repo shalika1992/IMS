@@ -26,6 +26,16 @@
                     <div class="form-group"><span id="responseMsgUpdate"></span></div>
 
                     <div class="form-group row" hidden="true">
+                        <label for="userTask" class="col-sm-4 col-form-label">User Task<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <form:input path="userTask" name="userTask" type="text"
+                                        class="form-control form-control-sm"
+                                        id="eUserTask" value="UPDATE" placeholder="User Task"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group row" hidden="true">
                         <label class="col-sm-4 col-form-label">
                             ID<span class="text-danger">*</span>
                         </label>
@@ -45,6 +55,18 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Institution Code<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <form:select path="institutionCode" name="institutionCode"
+                                         class="form-control form-control-sm" id="eInstitutionCode" readonly="true">
+                                <c:forEach items="${samplefile.institutionList}" var="institution">
+                                    <form:option value="${institution.institutionCode}">${institution.institutionName}</form:option>
+                                </c:forEach>
+                            </form:select>
+                        </div>
+                    </div>
 
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Name<span
@@ -131,6 +153,15 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Ward No<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <form:input path="wardNumber" name="wardNumber" type="text"
+                                        class="form-control form-control-sm" maxlength="4"
+                                        id="eWardNumber" placeholder="Ward Number"/>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-end">
                     <button id="updateReset" type="button" class="btn btn-default" onclick="resetUpdate()">
@@ -189,6 +220,7 @@
                 $('#eReferenceNo').val(data.referenceNo);
                 $('#eReferenceNo').attr('readOnly', true);
 
+                $('#eInstitutionCode').val(data.institutionCode);
                 $('#eName').val(data.name);
                 $('#eAge').val(data.age);
                 $('#eGender').val(data.gender);

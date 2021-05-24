@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,9 +46,11 @@ public class SampleFileUploadRepository {
     Common common;
 
     private final String SQL_GET_LIST_DATA_COUNT = "select count(*) from sample_data sd left outer join status s on s.code=sd.status where";
-    private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate , sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.id = ?";
-    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? where sd.id = ?";
+    private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.id = ?";
+    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? ,ward = ? where sd.id = ?";
     private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_SAMPLEWARDENTRY = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,ward,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.receiveddate = ? and sd.institutioncode = ? and sd.receiveddate = ? and sd.ward = ?";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -84,7 +87,7 @@ public class SampleFileUploadRepository {
             String sql = "" +
                     " select " +
                     " sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,s.description as statusdescription," +
-                    " sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate , sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd " +
+                    " sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd " +
                     " left outer join status s on s.code=sd.status " +
                     " where " + dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileInputBean.displayLength + " offset " + sampleFileInputBean.displayStart;
@@ -194,6 +197,12 @@ public class SampleFileUploadRepository {
                 }
 
                 try {
+                    sampleFile.setWard(common.handleNullAndEmptyValue(rs.getString("ward")));
+                } catch (Exception e) {
+                    sampleFile.setWard("--");
+                }
+
+                try {
                     sampleFile.setCreatedTime(rs.getTimestamp("createdtime"));
                 } catch (Exception e) {
                     sampleFile.setCreatedTime(null);
@@ -213,6 +222,182 @@ public class SampleFileUploadRepository {
             throw e;
         }
         return sampleFileList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public SampleFile getSampleWardEntry(SampleFileInputBean sampleFileInputBean) {
+        SampleFile sampleFile = null;
+        try {
+            String currentDate = commonRepository.getCurrentDateAsString();
+            sampleFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEDATA, new Object[]{sampleFileInputBean.getReferenceNo(), sampleFileInputBean.getInstitutionCode(), currentDate, sampleFileInputBean.getWardNumber()}, (rs, rowNum) -> {
+                SampleFile s = new SampleFile();
+
+                try {
+                    s.setId(rs.getInt("id"));
+                } catch (Exception e) {
+                    s.setId(0);
+                }
+
+                try {
+                    s.setReferenceNo(rs.getString("referenceno"));
+                } catch (Exception e) {
+                    s.setReferenceNo(null);
+                }
+
+                try {
+                    s.setInstitutionCode(rs.getString("institutioncode"));
+                } catch (Exception e) {
+                    s.setInstitutionCode(null);
+                }
+
+                try {
+                    s.setName(rs.getString("name"));
+                } catch (Exception e) {
+                    s.setName(null);
+                }
+
+                try {
+                    s.setAge(rs.getString("age"));
+                } catch (Exception e) {
+                    s.setAge(null);
+                }
+
+                try {
+                    s.setGender(rs.getString("gender"));
+                } catch (Exception e) {
+                    s.setGender(null);
+                }
+
+                try {
+                    s.setContactType(rs.getString("contacttype"));
+                } catch (Exception e) {
+                    s.setContactType(null);
+                }
+
+                try {
+                    s.setNic(rs.getString("nic"));
+                } catch (Exception e) {
+                    s.setNic(null);
+                }
+
+                try {
+                    s.setAddress(rs.getString("address"));
+                } catch (Exception e) {
+                    s.setAddress(null);
+                }
+
+                try {
+                    s.setStatus(rs.getString("status"));
+                } catch (Exception e) {
+                    s.setStatus(null);
+                }
+
+                try {
+                    s.setResidentDistrict(rs.getString("district"));
+                } catch (Exception e) {
+                    s.setResidentDistrict(null);
+                }
+
+                try {
+                    s.setContactNumber(rs.getString("contactno"));
+                } catch (Exception e) {
+                    s.setContactNumber(null);
+                }
+
+                try {
+                    s.setSecondaryContactNumber(rs.getString("secondarycontactno"));
+                } catch (Exception e) {
+                    s.setSecondaryContactNumber(null);
+                }
+
+                try {
+                    s.setSpecimenid(rs.getString("specimenid"));
+                } catch (Exception e) {
+                    s.setSpecimenid(null);
+                }
+
+                try {
+                    s.setSpecimenid(rs.getString("specimenid"));
+                } catch (Exception e) {
+                    s.setSpecimenid(null);
+                }
+
+                try {
+                    s.setBarcode(rs.getString("barcode"));
+                } catch (Exception e) {
+                    s.setBarcode(null);
+                }
+
+                try {
+                    s.setReceivedDate(rs.getString("receiveddate"));
+                } catch (Exception e) {
+                    s.setReceivedDate(null);
+                }
+
+                try {
+                    s.setWard(rs.getString("ward"));
+                } catch (Exception e) {
+                    s.setWard(null);
+                }
+
+                try {
+                    s.setCreatedTime(rs.getDate("createdtime"));
+                } catch (Exception e) {
+                    s.setCreatedTime(null);
+                }
+
+                try {
+                    s.setCreatedUser(rs.getString("createduser"));
+                } catch (Exception e) {
+                    s.setCreatedUser(null);
+                }
+
+                return s;
+            });
+        } catch (EmptyResultDataAccessException erse) {
+            sampleFile = null;
+        } catch (Exception e) {
+            sampleFile = null;
+        }
+        return sampleFile;
+    }
+
+    @LogRepository
+    @Transactional
+    public String insertSampleWardEntry(SampleFileInputBean sampleFileInputBean) throws Exception {
+        String message = "";
+        try {
+            int value = 0;
+            //insert query
+            value = jdbcTemplate.update(SQL_INSERT_SAMPLEWARDENTRY, new Object[]{
+                    sampleFileInputBean.getReferenceNo(),
+                    sampleFileInputBean.getInstitutionCode(),
+                    sampleFileInputBean.getName(),
+                    sampleFileInputBean.getAge(),
+                    sampleFileInputBean.getGender(),
+                    sampleFileInputBean.getSymptomatic(),
+                    sampleFileInputBean.getContactType(),
+                    sampleFileInputBean.getNic(),
+                    sampleFileInputBean.getAddress(),
+                    sampleFileInputBean.getResidentDistrict(),
+                    sampleFileInputBean.getContactNumber(),
+                    sampleFileInputBean.getSecondaryContactNumber(),
+                    sampleFileInputBean.getReceivedDate(),
+                    commonVarList.STATUS_PENDING,
+                    sampleFileInputBean.getWardNumber(),
+                    sampleFileInputBean.getCreatedUser()
+            });
+
+            if (value != 1) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (DuplicateKeyException dke) {
+            throw dke;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
     }
 
     @LogRepository
@@ -411,6 +596,12 @@ public class SampleFileUploadRepository {
                 }
 
                 try {
+                    s.setWard(rs.getString("ward"));
+                } catch (Exception e) {
+                    s.setWard(null);
+                }
+
+                try {
                     s.setCreatedTime(rs.getDate("createdtime"));
                 } catch (Exception e) {
                     s.setCreatedTime(null);
@@ -446,6 +637,7 @@ public class SampleFileUploadRepository {
                     sampleFileInputBean.getResidentDistrict(),
                     sampleFileInputBean.getContactNumber(),
                     sampleFileInputBean.getSecondaryContactNumber(),
+                    sampleFileInputBean.getWardNumber(),
                     sampleFileInputBean.getId(),
             });
             if (value != 1) {
@@ -484,6 +676,4 @@ public class SampleFileUploadRepository {
         }
         return dynamicClause;
     }
-
-
 }

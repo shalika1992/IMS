@@ -114,6 +114,32 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
+    @RequestMapping(value = "/addSampleWardEntry", method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseBean addSampleWardEntry(@ModelAttribute("samplefile") SampleFileInputBean sampleFileInputBean, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "]  SAMPLE WARD ENTRY ADD");
+        ResponseBean responseBean = null;
+        try {
+            BindingResult bindingResult = validateRequestBean(sampleFileInputBean);
+            if (bindingResult.hasErrors()) {
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, locale));
+            } else {
+                String message = sampleFileService.insertSampleWardEntry(sampleFileInputBean, locale);
+                if (message.isEmpty()) {
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_ADDED_SUCCESSFULLY, null, locale), null);
+                } else {
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+            responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+        }
+        return responseBean;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
     @RequestMapping(value = "/sampleFileUpload", method = RequestMethod.POST)
     public @ResponseBody
     ResponseBean postSampleFileUpload(@RequestParam("sampleFile") MultipartFile multipartFile, @RequestParam("receivedDate") String receivedDate, Locale locale) {
@@ -132,7 +158,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
                             //upload sample file
                             message = sampleFileService.uploadSampleFile(sampleDataList, receivedDate, locale);
                             if (message.isEmpty()) {
-                                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_FILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLEFILE_UPLOAD_SUCCESSFULLY, null, locale), null);
                             } else {
                                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
                             }
@@ -143,7 +169,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
                         responseBean = new ResponseBean(false, null, message);
                     }
                 } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLE_FILE_INVALID_FILE, null, locale));
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLEFILE_INVALID_FILE, null, locale));
                 }
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
@@ -186,7 +212,7 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
             } else {
                 String message = sampleFileService.updateSampleFileRecord(sampleFileInputBean, locale);
                 if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
                 } else {
                     responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
                 }

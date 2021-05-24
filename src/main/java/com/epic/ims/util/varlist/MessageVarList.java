@@ -94,13 +94,19 @@ public class MessageVarList {
     public static final String INSTITUTION_MGT_PASSWORDS_MISMATCH = "institution.password.mismatch";
     public static final String INSTITUTION_MGT_CONFIRM_SUCCESSFULLY = "institution.confirm.success";
     public static final String INSTITUTION_MGT_REJECT_SUCCESSFULLY = "institution.reject.success";
-    //-------------------------- institution user mgt----------------------------------------------------------------------//
+    //-------------------------- institution user mgt-----------------------------------------------------------------//
 
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
-    public static final String SAMPLE_FILE_RECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
-    public static final String SAMPLE_FILE_INVALID_FILE = "samplefile.invalid.file";
-    public static final String SAMPLE_FILE_CONTAIN_MAXRECORDS = "samplefile.contain.maxrecords";
-    public static final String SAMPLE_FILE_UPLOAD_SUCCESSFULLY = "samplefile.upload.success";
+    public static final String SAMPLERECORD_EMPTY_REFNO = "samplerecord.empty.refno";
+    public static final String SAMPLERECORD_EMPTY_INSTITUTION = "samplerecord.empty.institution";
+    public static final String SAMPLERECORD_EMPTY_NAME = "samplerecord.empty.name";
+    public static final String SAMPLERECORD_EMPTY_NIC = "samplerecord.empty.nic";
+    public static final String SAMPLERECORD_ALREADY_EXISTS = "samplerecord.already.exists";
+    public static final String SAMPLERECORD_ADDED_SUCCESSFULLY = "samplerecord.added.success";
+    public static final String SAMPLERECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
+    public static final String SAMPLEFILE_INVALID_FILE = "samplefile.invalid.file";
+    public static final String SAMPLEFILE_CONTAIN_MAXRECORDS = "samplefile.contain.maxrecords";
+    public static final String SAMPLEFILE_UPLOAD_SUCCESSFULLY = "samplefile.upload.success";
     public static final String SAMPLERECORD_NORECORD_FOUND = "samplerecord.norecord.found";
     public static final String SAMPLERECORD_REJECT_SUCCESSFULLY = "samplerecord.reject.success";
     public static final String SAMPLERECORD_VERIFY_SUCCESSFULLY = "samplerecord.verify.success";
@@ -109,10 +115,11 @@ public class MessageVarList {
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 
     //-------------------------- result update mgt--------------------------------------------------------------------//
-    public static final String SAMPLERECORD_UPDATE_SUCCESSFULLY = "samplerecord.update.success";
+    public static final String SAMPLERESULT_UPDATE_SUCCESSFULLY = "sampleresult.update.success";
     //-------------------------- result update mgt--------------------------------------------------------------------//
 
     //-------------------------- sample verify file mgt---------------------------------------------------------------//
     public static final String SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY = "sampleverifyfilerecord.updated.success";
-     //------------------------- sample verify file mgt---------------------------------------------------------------//
+
+    //------------------------- sample verify file mgt---------------------------------------------------------------//
 }

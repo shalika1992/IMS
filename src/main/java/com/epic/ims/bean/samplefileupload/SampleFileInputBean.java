@@ -16,6 +16,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 public class SampleFileInputBean extends DataTablesRequest {
+    private String userTask;
     private String id;
     private String referenceNo;
     private String receivedDate;
@@ -30,6 +31,7 @@ public class SampleFileInputBean extends DataTablesRequest {
     private String residentDistrict;
     private String contactNumber;
     private String secondaryContactNumber;
+    private String wardNumber;
     private Date createdTime;
     private String createdUser;
     private Date lastUpdatedTime;

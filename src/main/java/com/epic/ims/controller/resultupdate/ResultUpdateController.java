@@ -141,7 +141,7 @@ public class ResultUpdateController {
         try {
             String message = resultUpdateService.markAsDetected(resultIdListBean);
             if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERESULT_UPDATE_SUCCESSFULLY, null, locale), null);
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
             }
@@ -162,7 +162,7 @@ public class ResultUpdateController {
         try {
             String message = resultUpdateService.markAsNotDetected(resultIdListBean);
             if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERESULT_UPDATE_SUCCESSFULLY, null, locale), null);
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
             }
@@ -183,7 +183,7 @@ public class ResultUpdateController {
         try {
             String message = resultUpdateService.markAsRepeated(resultIdListBean);
             if (message.isEmpty()) {
-                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_UPDATE_SUCCESSFULLY, null, locale), null);
+                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERESULT_UPDATE_SUCCESSFULLY, null, locale), null);
             } else {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
             }

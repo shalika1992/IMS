@@ -134,7 +134,7 @@ public class SystemUserService {
         return message;
     }
 
-    public String changePasswordSystemUser(SystemUserInputBean systemUserInputBean, Locale locale){
+    public String changePasswordSystemUser(SystemUserInputBean systemUserInputBean, Locale locale) {
         String message = "";
         try {
             String password = systemUserInputBean.getPassword();
@@ -142,7 +142,7 @@ public class SystemUserService {
 
             message = systemUserRepository.checkForSamePassword(systemUserInputBean);
 
-            if (message.isEmpty()){
+            if (message.isEmpty()) {
                 message = systemUserRepository.changePassword(systemUserInputBean);
             }
 

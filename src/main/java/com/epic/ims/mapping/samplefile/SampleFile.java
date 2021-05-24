@@ -25,6 +25,7 @@ public class SampleFile {
     private String secondaryContactNumber;
     private String specimenid;
     private String barcode;
+    private String ward;
     private Date createdTime;
     private String createdUser;
     private Date lastUpdatedTime;
@@ -33,7 +34,7 @@ public class SampleFile {
     public SampleFile() {
     }
 
-    public SampleFile(int id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public SampleFile(int id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String ward, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
         this.id = id;
         this.referenceNo = referenceNo;
         this.receivedDate = receivedDate;
@@ -51,6 +52,7 @@ public class SampleFile {
         this.secondaryContactNumber = secondaryContactNumber;
         this.specimenid = specimenid;
         this.barcode = barcode;
+        this.ward = ward;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
         this.lastUpdatedTime = lastUpdatedTime;
@@ -191,6 +193,14 @@ public class SampleFile {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
     }
 
     public Date getCreatedTime() {
