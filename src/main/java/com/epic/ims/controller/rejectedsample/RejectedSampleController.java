@@ -13,8 +13,15 @@ import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.PageVarList;
 import com.epic.ims.util.varlist.SectionVarList;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.epic.ims.util.common.Common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -27,10 +34,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -48,6 +54,9 @@ public class RejectedSampleController {
 
     @Autowired
     SessionBean sessionBean;
+
+    @Autowired
+    Common common;
 
     @Autowired
     RejectedSampleService rejectedSampleService;
@@ -102,20 +111,47 @@ public class RejectedSampleController {
         OutputStream outputStream = null;
         try {
             List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleDataInputBean);
+            if (rejectedSampleDataList != null && !rejectedSampleDataList.isEmpty() && rejectedSampleDataList.size() > 0) {
+                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/rejectsamples/rejectsamples_report.jasper");
+                Map<String, Object> parameterMap = new HashMap<>();
+                //set parameters to map
+                parameterMap.put("referenceno", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReferenceNo()));
+                parameterMap.put("institutioncode", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getInstitutionCode()));
+                parameterMap.put("name", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getName()));
+                parameterMap.put("age", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getAge()));
+                parameterMap.put("gender", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getGender()));
+                parameterMap.put("symptomatic", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getSymptomatic()));
+                parameterMap.put("contacttype", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getContactType()));
+                parameterMap.put("nic", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getNic()));
+                parameterMap.put("address", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getAddress()));
+                parameterMap.put("district", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getDistrict()));
+                parameterMap.put("contactno", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getContactNo()));
+                parameterMap.put("receiveddate", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReceivedDate()));
+                parameterMap.put("status", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getStatus()));
+                parameterMap.put("remark", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getRemark()));
+                parameterMap.put("createdtime", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getCreatedTime().toString()));
 
-        } catch (Exception ex) {
-            logger.error("Exception  :  ", ex);
-        } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.flush();
-                    outputStream.close();
+                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(rejectedSampleDataList));
+
+                httpServletResponse.setContentType("application/x-download");
+                httpServletResponse.setHeader("Content-disposition", "inline; filename=Rejectsample-Report.pdf");
+                final OutputStream outStream = httpServletResponse.getOutputStream();
+                JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
+            }
+            } catch(Exception ex){
+                logger.error("Exception  :  ", ex);
+            } finally{
+                try {
+                    if (outputStream != null) {
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+                } catch (IOException ex) {
+                    //do nothing
                 }
-            } catch (IOException ex) {
-                //do nothing
             }
         }
-    }
 
     @ModelAttribute
     public void getRejectedSampleBean(Model map) throws Exception {

@@ -61,6 +61,7 @@ public class RejectedSampleRepository {
         List<RejectedSampleData> rejectedSampleDataList = null;
         try {
             StringBuilder dynamicClause = this.setDynamicClause(rejectedSampleDataInputBean, new StringBuilder());
+
             //create sorting order
             String sortingStr = "";
             String col = "";
@@ -112,6 +113,7 @@ public class RejectedSampleRepository {
                     col = "rd.createdtime";
             }
             sortingStr = " order by " + col + " " + rejectedSampleDataInputBean.sortDirections.get(0);
+
 
             String sql = "" +
                     "select rd.referenceno as referenceno, inst.institutioncode as institutioncode, rd.name as name, rd.age as age, rd.gender as gender, " +
