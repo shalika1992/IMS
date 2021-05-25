@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Repository
@@ -306,7 +307,10 @@ public class ReportMgtRepository {
 
         try{
             if (masterDataInputBeen.getReceivedDate()!=null){
-                dynamicClause.append("and m.receiveddate = '").append(masterDataInputBeen.getReceivedDate()).append("' ");
+                String pattern = "yyyy-MM-dd";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                String date = simpleDateFormat.format(masterDataInputBeen.getReceivedDate());
+                dynamicClause.append("and m.receiveddate = '").append(date).append("' ");
             }
 
             if (masterDataInputBeen.getReferenceNumber()!=null && !masterDataInputBeen.getReferenceNumber().isEmpty()){

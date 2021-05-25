@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -130,13 +131,19 @@ public class MasterDataReportController {
                         "Consultant Microbiologist");
 
                 if (masterDataInputBeen.getReceivedDate()!=null && !masterDataInputBeen.getReceivedDate().toString().isEmpty()){
-                    parameterMap.put("receivedDate", masterDataInputBeen.getReceivedDate().toString());
+                    String pattern = "yyyy-MM-dd";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String date = simpleDateFormat.format(masterDataInputBeen.getReceivedDate());
+                    parameterMap.put("receivedDate", date);
                 }else{
                     parameterMap.put("receivedDate", "--");
                 }
 
                 if (masterDataInputBeen.getInstitutionCode()!=null && !masterDataInputBeen.getInstitutionCode().isEmpty()){
-                    parameterMap.put("institution", masterDataList.get(0).getInstitutionName());
+                    String pattern = "yyyy-MM-dd";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String date = simpleDateFormat.format(masterDataInputBeen.getReceivedDate());
+                    parameterMap.put("institution", date);
                 }else{
                     parameterMap.put("institution", "--");
                 }
