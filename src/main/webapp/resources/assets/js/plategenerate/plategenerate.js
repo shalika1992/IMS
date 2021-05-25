@@ -100,10 +100,14 @@ function _generatePlates(platesArray) {
     let html = "";
     // shift for next plate
     let shift = 0;
+    let shift_val = 0;
     // fill plates
     for (let k = 0; k < round; k++) { // plate rounds
+
+        // check box
+        let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,'+(k+1)+')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
         // plate no
-        html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + "</span><span style='float:right;'>Select <input type='checkbox' style='margin-top: 5px;' id='" + k + "'></span></div>\n";
+        html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
 
         // plate vertical letters
         html += "<div class='col-1'><div class='row'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
@@ -120,21 +124,35 @@ function _generatePlates(platesArray) {
         }
         // fill cells
         let val;
-        for (let j = 0; j < 12; j++) { // columns
-            for (let i = 0; i < 8; i++) { // rows
-                val = i + (8 * j); // change normal filling
-                if (platesArray[val + shift] !== undefined) { // after finish filling
-                    // tooltip creation
-                    let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
-                        '<ul style="text-align: left !important;" class="list-group">';
-                    $.each(platesArray[val + shift], (j, e) => {
-                        ul += '<li style="text-align: left !important;" class="list-group-item">' + e + '</li>';
-                    });
-                    ul += '</ul>';
-                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift] + "' title='" + ul + "'>" + platesArray[val + shift][0] + "</div>\n";
+        for (let j = 0; j < 8; j++) { // columns
+            for (let i = 0; i < 12; i++) { // rows
+                val = i + (12 * j); // change normal filling
+                if ((val + 1) !== 84 && (val + 1) !== 96 && (val + 1) !== 27) {
+                    if (platesArray[val + shift + shift_val] !== undefined) { // after finish filling
+                        // tooltip creation
+                        let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
+                            '<ul style="text-align: left !important;" class="list-group">';
+                        $.each(platesArray[val + shift + shift_val], (j, e) => {
+                            ul += '<li style="text-align: left !important;" class="list-group-item">' + e + '</li>';
+                        });
+                        ul += '</ul>';
 
+                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0] + "</div>\n";
+                    } else {
+                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                    }
                 } else {
-                    html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
+                    shift_val--;
+                    // tooltip creation
+                    if ((val + 1) === 84) {
+                        let span = '<span class="label label-success label-inline ">Negative control</span>';
+                        html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                    } else if ((val + 1) === 96) {
+                        let span = '<span class="label label-success label-inline ">Positive control</span>';
+                        html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                    } else {
+                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                    }
                 }
             }
         }
@@ -155,6 +173,7 @@ function _generatePlates(platesArray) {
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
+
 }
 
 /*
@@ -174,6 +193,17 @@ function _swapCells(platesArray, cellArray) {
     return platesArray;
 
 }
+// function to select all
+function _checkBoxSelect(id,plateNo) {
+    if ($("#" + id).is(':checked')) {
+        console.log("checked");
+        $('.cell-click.plate-'+plateNo).addClass('active');
+    } else {
+        console.log("unchecked");
+        $('.cell-click.plate-'+plateNo).removeClass('active');
+    }
+}
+
 
 // click events
 $(document).on("click", ".cell-click", function () {
