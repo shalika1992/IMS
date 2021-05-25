@@ -25,7 +25,7 @@
         let haveData;
 
         function resetSearch() {
-            if (selectedDate && Object.keys(platesNum).length>0) {
+            if (selectedDate && Object.keys(platesNum).length > 0) {
                 swal.fire({
                     text: "Are you sure to proceed the operation? All the submitted data will be lost. Last generated plates will show",
                     // icon: "success",
@@ -38,21 +38,21 @@
                     }
                 }).then((result) => {
                     $("#generateDiv").show();
-                $("#stickyOp").show();
-                $.ajax({
-                    type: 'POST',
-                    url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
-                    data: {receivedDate: selectedDate},
-                    success: function (res) {
-                        platesNum = res;
-                        initArray = res;
-                        _generatePlates(platesNum);
-                    },
-                    error: function (jqXHR) {
-                        window.location = "${pageContext.request.contextPath}/logout.htm";
-                    }
+                    $("#stickyOp").show();
+                    $.ajax({
+                        type: 'POST',
+                        url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
+                        data: {receivedDate: selectedDate},
+                        success: function (res) {
+                            platesNum = res;
+                            initArray = res;
+                            _generatePlates(platesNum);
+                        },
+                        error: function (jqXHR) {
+                            window.location = "${pageContext.request.contextPath}/logout.htm";
+                        }
+                    });
                 });
-            });
             } else {
                 $("#generateDiv").hide();
                 $("#stickyOp").hide();
@@ -107,6 +107,20 @@
 
         }
 
+        function testMerge() {
+            if ($('#kt_datepicker_1').val()) {
+                selectedDate = $('#kt_datepicker_1').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
+                    data: {receivedDate: $('#kt_datepicker_1').val()},
+                    success: function (res) {
+                        _storeMergePlate(platesNum);
+                    }
+                });
+            }
+        }
+
         function swap() {
 
             let swapArray = {}
@@ -131,13 +145,13 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                        platesNum = _swapCells(platesNum, swapArray);
-                        _generatePlates(platesNum);
-                        _updateDatabase(platesNum,swapArray,'SWAP');
-                    } else {
-                        Swal.fire('Changes are not saved', '', 'info');
-                    }
-                });
+                            platesNum = _swapCells(platesNum, swapArray);
+                            _generatePlates(platesNum);
+                            _updateDatabase(platesNum, swapArray, 'SWAP');
+                        } else {
+                            Swal.fire('Changes are not saved', '', 'info');
+                        }
+                    });
 
                 } else {
                     Swal.fire('Only 2 values can swap', '', 'error');
@@ -149,7 +163,6 @@
         }
 
         function merge() {
-
             let mergeArray = {}
             let activeElements = $('.cell-elmt.active');
             $.each(activeElements, function (x, y) {
@@ -172,13 +185,13 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                        platesNum = _mergeCells(platesNum, mergeArray);
-                        _generatePlates(platesNum);
-                        _updateDatabase(platesNum,mergeArray,'MERGE');
-                    } else {
-                        Swal.fire('Changes are not saved', '', 'info');
-                    }
-                });
+                            platesNum = _mergeCells(platesNum, mergeArray);
+                            _generatePlates(platesNum);
+                            _updateDatabase(platesNum, mergeArray, 'MERGE');
+                        } else {
+                            Swal.fire('Changes are not saved', '', 'info');
+                        }
+                    });
                 } else {
                     Swal.fire('Less values to merge', '', 'error')
                 }
@@ -188,18 +201,18 @@
 
         }
 
-        function _updateDatabase(plateArray,updateArray,operation) {
-            if(operation==='SWAP'){
-                let dataS= {"plateArray": plateArray, "swapArray" : updateArray};
+        function _updateDatabase(plateArray, updateArray, operation) {
+            if (operation === 'SWAP') {
+                let dataS = {"plateArray": plateArray, "swapArray": updateArray};
 
                 $.ajax({
                     type: 'POST',
                     url: '${pageContext.request.contextPath}/swapBlockPlate.json',
                     contentType: "application/json",
-                    data : JSON.stringify(dataS),
+                    data: JSON.stringify(dataS),
                     dataType: 'text',
                     success: function (res) {
-                        console.log("message",res);
+                        console.log("message", res);
                         swal.fire({
                             text: res,
                             // icon: "success",
@@ -215,14 +228,14 @@
                         <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
                     }
                 });
-            }else if(operation==='MERGE'){
-                let dataM= {"plateArray": plateArray, "mergeArray" : updateArray};
+            } else if (operation === 'MERGE') {
+                let dataM = {"plateArray": plateArray, "mergeArray": updateArray};
 
                 $.ajax({
                     type: 'POST',
                     url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
                     contentType: "application/json",
-                    data : JSON.stringify(dataM),
+                    data: JSON.stringify(dataM),
                     dataType: 'text',
                     success: function (res) {
                         console.log(res);
@@ -313,7 +326,7 @@
                             <div class="col-lg-3">
                                 <label>Pool selected cells</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
-                                        onclick="merge()">Pool
+                                        onclick="testMerge()">Pool
                                 </button>
                             </div>
                             <div class="col-lg-3">
