@@ -104,10 +104,9 @@ public class MasterDataReportController {
         return responseBean;
     }
 
-    @RequestMapping(value = "/downloadMasterDataPdf", method = RequestMethod.POST)
     @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
-    public @ResponseBody
-    void getMasterDataPDF(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletResponse response) {
+    @PostMapping(value = "/downloadMasterDataPdf", headers = {"content-type=application/json"})
+    public @ResponseBody void getMasterDataPDF(@RequestBody MasterDataInputBeen masterDataInputBeen, HttpServletResponse response) {
         logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA REPORT PDF");
         OutputStream outputStream = null;
 
@@ -148,10 +147,9 @@ public class MasterDataReportController {
 
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, jrBeanCollectionDataSource);
 
-                response.setContentType("application/x-download");
-                response.setHeader("Content-disposition", "inline; filename=MasterData-Report.pdf");
+                response.setContentType("application/pdf");
+                response.setHeader("Content-disposition", "attachment; filename=MasterData-Report.pdf");
                 final OutputStream outStream = response.getOutputStream();
-                JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\akila\\Downloads\\done.pdf");
                 JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
 
             }
