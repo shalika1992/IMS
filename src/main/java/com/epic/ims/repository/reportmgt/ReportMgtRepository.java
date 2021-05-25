@@ -68,8 +68,15 @@ public class ReportMgtRepository {
             //create sorting order
             String sortingStr = "";
             String col = "";
+            int sortCol;
 
-            switch (masterDataInputBeen.sortedColumns.get(0)) {
+            try{
+                sortCol  = masterDataInputBeen.sortedColumns.get(0);
+            }catch(Exception e){
+                sortCol = 0;
+            }
+
+            switch (sortCol) {
                 case 0:
                     col = "m.referenceno";
                     break;
@@ -112,7 +119,12 @@ public class ReportMgtRepository {
                 default:
                     col = "m.createdtime";
             }
-            sortingStr = " order by " + col + " " + masterDataInputBeen.sortDirections.get(0);
+
+            try{
+                sortingStr = " order by " + col + " " + masterDataInputBeen.sortDirections.get(0);
+            }catch(Exception e){
+                sortingStr = " order by " + col + " asc ";
+            }
 
             String sql = "select " +
                     "m.referenceno as referenceNumber, " +
@@ -133,7 +145,9 @@ public class ReportMgtRepository {
                     "r.description as resultDescription, " +
                     "m.createduser as createdUser, " +
                     "m.createdtime as createdTime, " +
-                    "m.reporttime as reportTime " +
+                    "m.reporttime as reportTime, " +
+                    "m.ct_target1 as ct_target1, " +
+                    "m.ct_target2 as ct_target2 " +
                     "from master_data m " +
                     "left join status s on s.code = m.status " +
                     "left join plate p on m.plateid = p.id "  +
@@ -143,9 +157,6 @@ public class ReportMgtRepository {
                     dynamicClause.toString() + sortingStr +
                     " limit " + masterDataInputBeen.displayLength + " offset " + masterDataInputBeen.displayStart;
 
-            System.out.println(sql);
-
-
             masterDataList = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 MasterData masterData = new MasterData();
 
@@ -153,6 +164,18 @@ public class ReportMgtRepository {
                     masterData.setReferenceNumber(rs.getString("referenceNumber"));
                 } catch (Exception e) {
                     masterData.setReferenceNumber(null);
+                }
+
+                try {
+                    masterData.setCt_target1(rs.getString("ct_target1"));
+                } catch (Exception e) {
+                    masterData.setCt_target1(null);
+                }
+
+                try {
+                    masterData.setCt_target2(rs.getString("ct_target2"));
+                } catch (Exception e) {
+                    masterData.setCt_target2(null);
                 }
 
                 try {
@@ -180,7 +203,11 @@ public class ReportMgtRepository {
                 }
 
                 try {
-                    masterData.setGender(rs.getString("gender"));
+                    if (rs.getString("gender").equals("M")){
+                        masterData.setGender("Male");
+                    }else {
+                        masterData.setGender("Female");
+                    }
                 } catch (Exception e) {
                     masterData.setGender(null);
                 }

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 @Component
 @Setter
@@ -38,5 +37,7 @@ public class MasterData {
     private String createdUser;
     private Date createdTime;
     private Date reportTime;
+    private String ct_target1;
+    private String ct_target2;
 
 }

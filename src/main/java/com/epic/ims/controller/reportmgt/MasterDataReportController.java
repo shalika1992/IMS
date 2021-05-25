@@ -5,19 +5,18 @@ import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.reportmgt.MasterDataInputBeen;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.reportmgt.MasterData;
 import com.epic.ims.repository.common.CommonRepository;
-import com.epic.ims.service.institutionmgt.InstitutionService;
 import com.epic.ims.service.reportmgt.MasterDataReportService;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.varlist.*;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
 import com.epic.ims.validation.institution.InstitutionBulkValidation;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -103,6 +102,71 @@ public class MasterDataReportController {
             logger.error("Exception " + exception);
         }
         return responseBean;
+    }
+
+    @RequestMapping(value = "/downloadMasterDataPdf", method = RequestMethod.POST)
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
+    public @ResponseBody
+    void getMasterDataPDF(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletResponse response) {
+        logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA REPORT PDF");
+        OutputStream outputStream = null;
+
+        try {
+            int count = (int)masterDataReportService.getCount(masterDataInputBeen);
+
+            //set search parameters
+            masterDataInputBeen.displayLength = count;
+            masterDataInputBeen.displayStart = 0;
+
+            List<MasterData> masterDataList = masterDataReportService.getMasterDataSearchResultList(masterDataInputBeen);
+            if (!masterDataList.isEmpty()) {
+                File file = ResourceUtils.getFile("classpath:reports/masterDataPDF.jrxml");
+                JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+                JRBeanCollectionDataSource jrBeanCollectionDataSource = new JRBeanCollectionDataSource(masterDataList);
+
+                Map<String, Object> parameterMap = new HashMap<>();
+                //set parameters to map
+                parameterMap.put("consultantName", "Dr. (Mrs) R.N.D. De Silva");
+                parameterMap.put("consultantDes", "M.B.B.S., PG Dip. Med.Micro., MD\n" +
+                        "Consultant Microbiologist");
+
+                if (masterDataInputBeen.getReceivedDate()!=null && !masterDataInputBeen.getReceivedDate().toString().isEmpty()){
+                    parameterMap.put("receivedDate", masterDataInputBeen.getReceivedDate().toString());
+                }else{
+                    parameterMap.put("receivedDate", "--");
+                }
+
+                if (masterDataInputBeen.getInstitutionCode()!=null && !masterDataInputBeen.getInstitutionCode().isEmpty()){
+                    parameterMap.put("institution", masterDataList.get(0).getInstitutionName());
+                }else{
+                    parameterMap.put("institution", "--");
+                }
+
+                parameterMap.put("reportTime", "--");
+                parameterMap.put("collectionDate", "--");
+                parameterMap.put("testMethod", "Real Time RT-PCR");
+
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, jrBeanCollectionDataSource);
+
+                response.setContentType("application/x-download");
+                response.setHeader("Content-disposition", "inline; filename=MasterData-Report.pdf");
+                final OutputStream outStream = response.getOutputStream();
+                JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\\Users\\akila\\Downloads\\done.pdf");
+                JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
+
+            }
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException ex) {
+            }
+        }
+
     }
 
     @ModelAttribute

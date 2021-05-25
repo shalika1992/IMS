@@ -29,6 +29,8 @@
             loadDataTable();
         });
 
+
+
         function loadDataTable() {
             var token = $("meta[name='_csrf']").attr("content");
             var header = $("meta[name='_csrf_header']").attr("content");
@@ -36,6 +38,7 @@
                 var o = {};
                 var modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];
                 jQuery.each(aoData, function (idx, obj) {
+                    console.log(obj.value +"   "+obj.name)
                     if (obj.name) {
                         for (var i = 0; i < modifiers.length; i++) {
                             if (obj.name.substring(0, modifiers[i].length) == modifiers[i]) {
@@ -222,6 +225,73 @@
             });
         }
 
+        function downloadPDF() {
+            alert();
+            form = document.getElementById('masterDataForm');
+            form.action = 'downloadMasterDataPdf.htm';
+            form.submit();
+        }
+
+        <%--function downloadPDF() {--%>
+        <%--    let token = $("meta[name='_csrf']").attr("content");--%>
+        <%--    let header = $("meta[name='_csrf_header']").attr("content");--%>
+        <%--    let stringify_aoData = function (aoData) {--%>
+        <%--        let o = {};--%>
+        <%--        let modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];--%>
+        <%--        jQuery.each(aoData, function (idx, obj) {--%>
+        <%--            if (obj.name) {--%>
+        <%--                for (var i = 0; i < modifiers.length; i++) {--%>
+        <%--                    if (obj.name.substring(0, modifiers[i].length) == modifiers[i]) {--%>
+        <%--                        let index = parseInt(obj.name.substring(modifiers[i].length));--%>
+        <%--                        let key = 'a' + modifiers[i].substring(0, modifiers[i].length - 1);--%>
+        <%--                        if (!o[key]) {--%>
+        <%--                            o[key] = [];--%>
+        <%--                        }--%>
+        <%--                        o[key][index] = obj.value;--%>
+        <%--                        return;--%>
+        <%--                    }--%>
+        <%--                }--%>
+        <%--                o[obj.name] = obj.value;--%>
+        <%--            } else {--%>
+        <%--                o[idx] = obj;--%>
+        <%--            }--%>
+        <%--        });--%>
+        <%--        return JSON.stringify(o);--%>
+        <%--    };--%>
+
+        <%--    let aoData =[{'name': 'csrf_token', 'value': token},--%>
+        <%--        {'name': 'header', 'value': header},--%>
+        <%--        {'name': 'receivedDate', 'value': $('#receivedDate').val()},--%>
+        <%--        {'name': 'referenceNumber', 'value': $('#referenceNumber').val()},--%>
+        <%--        {'name': 'name', 'value': $('#name').val()},--%>
+        <%--        {'name': 'nic', 'value': $('#nic').val()},--%>
+        <%--        {'name': 'institutionCode', 'value': $('#institutionCode').val()},--%>
+        <%--        {'name': 'status', 'value': $('#status').val()},--%>
+        <%--        {'name': 'result', 'value': $('#result').val()}];--%>
+
+
+        <%--    $.ajax({--%>
+        <%--        type: 'POST',--%>
+        <%--        url: "${pageContext.request.contextPath}/downloadMasterDataPdf.json",--%>
+        <%--        contentType: 'application/json;charset=UTF-8',--%>
+        <%--        data: stringify_aoData(aoData),--%>
+        <%--        success: function (data){--%>
+        <%--            var file = new Blob([data], { type: 'application/pdf' });--%>
+        <%--            var fileURL = URL.createObjectURL(file);--%>
+        <%--            window.open(fileURL);--%>
+
+        <%--            alert("AKila")--%>
+        <%--            // console.log(blob.size);--%>
+
+        <%--        },--%>
+
+        <%--        error: function (e) {--%>
+
+        <%--            window.location = "${pageContext.request.contextPath}/logout.htm";--%>
+        <%--        }--%>
+        <%--    });--%>
+        <%--}--%>
+
         function searchStart() {
             oTable.fnDraw();
         }
@@ -237,6 +307,8 @@
 
             oTable.fnDraw();
         }
+
+
     </script>
 </head>
 <!--begin::Content-->
@@ -270,7 +342,7 @@
                             <h3 class="card-title">Search Master Data</h3>
                         </div>
                         <!--begin::Form-->
-                        <form:form class="form" id="systemuserform" name="systemuserform" action=""
+                        <form:form class="form" id="masterDataForm" name="masterDataForm" action="MasterData"
                                    theme="simple" method="post" modelAttribute="masterData">
                             <%--                        <form class="form">--%>
                             <div class="card-body">
@@ -359,6 +431,13 @@
 
                                 <!--end::Form-->
                             </div>
+
+                            <div class="col-md-2 col-sm-4">
+                                <button id="viewPDF" type="button"
+                                        class="btn btn-block btn-primary btn-sm"
+                                        onclick="downloadPDF()" >View PDF
+                                </button>
+                            </div>
                         </form:form>
                         <!--end::Card-->
                     </div>
@@ -373,21 +452,21 @@
                                     </div>
                                     <div class="card-toolbar">
                                         <!--begin::Button-->
-                                        <a href="#" onclick="openAddModal()" class="btn btn-sm btn-primary font-weight-bolder">
-            											<span class="svg-icon svg-icon-md">
-            												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
-            												<svg xmlns="http://www.w3.org/2000/svg"
-                                                                 width="24px"
-                                                                 height="24px" viewBox="0 0 24 24" version="1.1">
-            													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-            														<rect x="0" y="0" width="24" height="24"></rect>
-            														<circle fill="#000000" cx="9" cy="15" r="6"></circle>
-            														<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"
-                                                                          fill="#000000" opacity="0.3"></path>
-            													</g>
-            												</svg>
-                                                            <!--end::Svg Icon-->
-            											</span>Download</a>
+<%--                                        <a onclick="downloadPDF()" class="btn btn-sm btn-primary font-weight-bolder">--%>
+<%--            											<span class="svg-icon svg-icon-md">--%>
+<%--            												<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->--%>
+<%--            												<svg xmlns="http://www.w3.org/2000/svg"--%>
+<%--                                                                 width="24px"--%>
+<%--                                                                 height="24px" viewBox="0 0 24 24" version="1.1">--%>
+<%--            													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">--%>
+<%--            														<rect x="0" y="0" width="24" height="24"></rect>--%>
+<%--            														<circle fill="#000000" cx="9" cy="15" r="6"></circle>--%>
+<%--            														<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z"--%>
+<%--                                                                          fill="#000000" opacity="0.3"></path>--%>
+<%--            													</g>--%>
+<%--            												</svg>--%>
+<%--                                                            <!--end::Svg Icon-->--%>
+<%--            											</span>Download</a>--%>
                                         <!--end::Button-->
                                     </div>
                                 </div>
