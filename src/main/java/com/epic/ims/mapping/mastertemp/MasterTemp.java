@@ -1,4 +1,4 @@
-package com.epic.ims.mapping.samplefile;
+package com.epic.ims.mapping.mastertemp;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -7,66 +7,56 @@ import java.util.Date;
 
 @Component
 @Scope("prototype")
-public class SampleFile {
+public class MasterTemp {
     private int id;
+    private int sampleId;
     private String referenceNo;
-    private String receivedDate;
     private String institutionCode;
     private String name;
     private String age;
     private String gender;
+    private String nic;
     private String symptomatic;
     private String contactType;
-    private String nic;
     private String address;
-    private String status;
     private String residentDistrict;
     private String contactNumber;
     private String secondaryContactNumber;
-    private String specimenid;
     private String barcode;
+    private String receivedDate;
+    private String status;
     private String ward;
     private String plateId;
     private String blockValue;
     private Date createdTime;
     private String createdUser;
-    private Date lastUpdatedTime;
-    private String lastUpdatedUser;
 
-    public SampleFile() {
+    public MasterTemp() {
     }
 
-    public SampleFile(String referenceNo, String name, String nic) {
-        this.referenceNo = referenceNo;
-        this.name = name;
-        this.nic = nic;
-    }
-
-    public SampleFile(int id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String ward, String plateId, String blockValue, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public MasterTemp(int id, int sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String barcode, String receivedDate, String status, String ward, String plateId, String blockValue, Date createdTime, String createdUser) {
         this.id = id;
+        this.sampleId = sampleId;
         this.referenceNo = referenceNo;
-        this.receivedDate = receivedDate;
         this.institutionCode = institutionCode;
         this.name = name;
         this.age = age;
         this.gender = gender;
+        this.nic = nic;
         this.symptomatic = symptomatic;
         this.contactType = contactType;
-        this.nic = nic;
         this.address = address;
-        this.status = status;
         this.residentDistrict = residentDistrict;
         this.contactNumber = contactNumber;
         this.secondaryContactNumber = secondaryContactNumber;
-        this.specimenid = specimenid;
         this.barcode = barcode;
+        this.receivedDate = receivedDate;
+        this.status = status;
         this.ward = ward;
         this.plateId = plateId;
         this.blockValue = blockValue;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
-        this.lastUpdatedTime = lastUpdatedTime;
-        this.lastUpdatedUser = lastUpdatedUser;
     }
 
     public int getId() {
@@ -77,20 +67,20 @@ public class SampleFile {
         this.id = id;
     }
 
+    public int getSampleId() {
+        return sampleId;
+    }
+
+    public void setSampleId(int sampleId) {
+        this.sampleId = sampleId;
+    }
+
     public String getReferenceNo() {
         return referenceNo;
     }
 
     public void setReferenceNo(String referenceNo) {
         this.referenceNo = referenceNo;
-    }
-
-    public String getReceivedDate() {
-        return receivedDate;
-    }
-
-    public void setReceivedDate(String receivedDate) {
-        this.receivedDate = receivedDate;
     }
 
     public String getInstitutionCode() {
@@ -125,6 +115,14 @@ public class SampleFile {
         this.gender = gender;
     }
 
+    public String getNic() {
+        return nic;
+    }
+
+    public void setNic(String nic) {
+        this.nic = nic;
+    }
+
     public String getSymptomatic() {
         return symptomatic;
     }
@@ -141,28 +139,12 @@ public class SampleFile {
         this.contactType = contactType;
     }
 
-    public String getNic() {
-        return nic;
-    }
-
-    public void setNic(String nic) {
-        this.nic = nic;
-    }
-
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getResidentDistrict() {
@@ -189,20 +171,28 @@ public class SampleFile {
         this.secondaryContactNumber = secondaryContactNumber;
     }
 
-    public String getSpecimenid() {
-        return specimenid;
-    }
-
-    public void setSpecimenid(String specimenid) {
-        this.specimenid = specimenid;
-    }
-
     public String getBarcode() {
         return barcode;
     }
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public String getReceivedDate() {
+        return receivedDate;
+    }
+
+    public void setReceivedDate(String receivedDate) {
+        this.receivedDate = receivedDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getWard() {
@@ -243,21 +233,5 @@ public class SampleFile {
 
     public void setCreatedUser(String createdUser) {
         this.createdUser = createdUser;
-    }
-
-    public Date getLastUpdatedTime() {
-        return lastUpdatedTime;
-    }
-
-    public void setLastUpdatedTime(Date lastUpdatedTime) {
-        this.lastUpdatedTime = lastUpdatedTime;
-    }
-
-    public String getLastUpdatedUser() {
-        return lastUpdatedUser;
-    }
-
-    public void setLastUpdatedUser(String lastUpdatedUser) {
-        this.lastUpdatedUser = lastUpdatedUser;
     }
 }
