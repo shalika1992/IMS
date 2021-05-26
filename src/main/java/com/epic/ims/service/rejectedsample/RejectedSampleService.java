@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class RejectedSampleService {
     @Autowired
     RejectedSampleRepository rejectedSampleRepository;
 
+    @Autowired
+    RejectedSampleData rejectedSampleData;
+
     @LogService
     public long getCount(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception {
         long count = 0;
@@ -53,7 +57,8 @@ public class RejectedSampleService {
 
 
     @LogService
-    public List<RejectedSampleData> getRejectedSampleSearchResultList(RejectedSampleDataInputBean rejectedSampleDataInputBean) {
+    @PostMapping(value="/pdfReportRejected")
+    public List<RejectedSampleData> getRejectedSampleSearchResultList(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception{
         List<RejectedSampleData> rejectedSampleDataList;
         try {
             rejectedSampleDataList = rejectedSampleRepository.getRejectedSampleSearchList(rejectedSampleDataInputBean);
