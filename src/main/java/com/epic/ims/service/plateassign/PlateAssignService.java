@@ -44,10 +44,13 @@ public class PlateAssignService {
     PlateAssignRepository plateAssignRepository;
 
     @LogService
-    public Map<Integer, List<String>> getDefaultPlate(String receivedDate) {
+    public Map<Integer, List<String>> getDefaultPlate(String receivedDate) throws Exception {
         Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
         try {
-            defaultPlateMap = plateAssignRepository.getDefaultPlateList(receivedDate);
+            String message = plateAssignRepository.createDefaultPlateList(receivedDate);
+            if (message.isEmpty()) {
+                defaultPlateMap = plateAssignRepository.getDefaultPlateList(receivedDate);
+            }
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
