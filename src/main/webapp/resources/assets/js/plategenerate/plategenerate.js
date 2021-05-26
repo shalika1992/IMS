@@ -28,18 +28,57 @@ function _mergeCells(plateArray, mergeArray) {
         }
         newPlateArray[x] = plateArray[x + undefineCount];
     }
-    // --------- just for identify (need to remove)
-    // _generatePlates(plateArray);
-    // ---------
 
     // remove undefined values form new array
     Object.keys(newPlateArray).map(e => {
         if (newPlateArray[e] === undefined) {
-        delete newPlateArray[e];
-    }
-});
+            delete newPlateArray[e];
+        }
+    });
 
     return newPlateArray;
+}
+
+function _storeMergePlate(platesArray) {
+    let finalArr = [];
+    $(this).addClass("active");
+    // get modulus
+    let module = Object.keys(platesArray).length % 93;
+    // get plate count
+    let round = Math.floor(Object.keys(platesArray).length / 93);
+
+    // plate count final
+    if (module != 0) {
+        round++;
+    }
+    let shift = 0;
+
+    // plate rounds
+    for (let k = 0; k < round; k++) {
+        let val;
+        let tmp = [];
+        for (let j = 0; j < 12; j++) {
+            for (let i = 0; i < 8; i++) {
+                val = i + (8 * j);
+                if (platesArray[val + shift] !== undefined) {
+                    var remember = document.getElementById(k.toString());
+                    if (remember.checked) {
+                        tmp.push(platesArray[val + shift]);
+                    }
+                }
+            }
+        }
+        shift += 96;
+        if (finalArr.length === 0) {
+            finalArr = tmp;
+        } else {
+            console.log("-------------------");
+            let res = finalArr.map((value, index) => {
+                return [value, tmp[index]]
+            });
+            console.log(res);
+        }
+    }
 }
 
 /*
@@ -47,7 +86,6 @@ Generate Plates Function
 @param - platesArray {}
  */
 function _generatePlates(platesArray) {
-
     // get modulus
     let module = Object.keys(platesArray).length % 93;
     // get plate count
@@ -62,10 +100,14 @@ function _generatePlates(platesArray) {
     let html = "";
     // shift for next plate
     let shift = 0;
+    let shift_val = 0;
     // fill plates
     for (let k = 0; k < round; k++) { // plate rounds
+
+        // check box
+        let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,'+(k+1)+')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
         // plate no
-        html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + "</span></div>\n";
+        html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
 
         // plate vertical letters
         html += "<div class='col-1'><div class='row'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
@@ -80,39 +122,47 @@ function _generatePlates(platesArray) {
         for (let y = 1; y < 13; y++) {
             html += "<div class='col-1 horizontal-elmt'>" + y + "</div>\n";
         }
-
         // fill cells
         let val;
-        for (let i = 0; i < 8; i++) { // rows
-            for (let j = 0; j < 12; j++) { // columns
-                val = i + (8 * j); // change normal filling
-                if (val < 93) { // ignore last 3 plates
-                    if (platesArray[val + shift] !== undefined) { // after finish filling
+        for (let j = 0; j < 8; j++) { // columns
+            for (let i = 0; i < 12; i++) { // rows
+                val = i + (12 * j); // change normal filling
+                if ((val + 1) !== 84 && (val + 1) !== 96 && (val + 1) !== 27) {
+                    if (platesArray[val + shift + shift_val] !== undefined) { // after finish filling
                         // tooltip creation
                         let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
                             '<ul style="text-align: left !important;" class="list-group">';
-                        $.each(platesArray[val + shift],(i,e)=>{
-                            ul+='<li style="text-align: left !important;" class="list-group-item">'+e+'</li>';
-                    });
-                        ul+='</ul>';
-                        //
-                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift] + "' title='"+ul+"'>" + platesArray[val + shift][0] + "</div>\n";
+                        $.each(platesArray[val + shift + shift_val], (j, e) => {
+                            ul += '<li style="text-align: left !important;" class="list-group-item">' + e + '</li>';
+                        });
+                        ul += '</ul>';
+
+                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0] + "</div>\n";
                     } else {
-                        // html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0] + "'>N/A</div>\n";
-                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
+                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
                     }
                 } else {
-                    // html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0] + "'>*</div>\n";
-                    html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>*</div>\n";
+                    shift_val--;
+                    // tooltip creation
+                    if ((val + 1) === 84) {
+                        let span = '<span class="label label-success label-inline ">Negative control</span>';
+                        html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                    } else if ((val + 1) === 96) {
+                        let span = '<span class="label label-success label-inline ">Positive control</span>';
+                        html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                    } else {
+                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                    }
                 }
             }
         }
+
         // close tags
         html += "</div>\n";
         html += "</div>\n";
         html += '</div>\n'
         // to next plate
-        shift += 93;
+        shift += 96;
 
     }
     // set final html obj
@@ -123,6 +173,7 @@ function _generatePlates(platesArray) {
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
+
 }
 
 /*
@@ -142,6 +193,17 @@ function _swapCells(platesArray, cellArray) {
     return platesArray;
 
 }
+// function to select all
+function _checkBoxSelect(id,plateNo) {
+    if ($("#" + id).is(':checked')) {
+        console.log("checked");
+        $('.cell-click.plate-'+plateNo).addClass('active');
+    } else {
+        console.log("unchecked");
+        $('.cell-click.plate-'+plateNo).removeClass('active');
+    }
+}
+
 
 // click events
 $(document).on("click", ".cell-click", function () {
