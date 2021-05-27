@@ -184,14 +184,39 @@
                         title: "Result",
                         targets: 11,
                         mDataProp: "resultDescription",
-                        defaultContent: "--"
+                        defaultContent: "--",
+                        render: function (data, type, full, meta) {
+                            var status = {
+                                'Repeated': {
+                                    'title': 'Repeated',
+                                    'class': ' label-light-info'
+                                },
+                                'Not Detected': {
+                                    'title': 'Not Detected',
+                                    'class': ' label-light-success'
+                                },
+                                'In-Conclusive': {
+                                    'title': 'In-Conclusive',
+                                    'class': ' label-light-warning'
+                                },
+                                'Detected': {
+                                    'title': 'Detected',
+                                    'class': ' label-light-danger'
+                                }
+                            };
+                            if (typeof status[data] === 'undefined') {
+                                return data;
+                            }
+                            return '<span class="label label-lg font-weight-bold' + status[data].class + ' label-inline">' + status[data].title + '</span>';
+
+
+                        }
                     },
                     {
                         title: "Status",
                         targets: 12,
                         mDataProp: "statusDescription",
                         defaultContent: "--"
-
                     },
                     {
                         title: "Created User",

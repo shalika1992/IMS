@@ -243,7 +243,7 @@ public class MasterDataReportController {
                 parameterMap.put("result", masterData.getResultDescription());
                 //set parameters to map end
 
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap,new JREmptyDataSource(1));
 
                 response.setContentType("application/pdf");
                 response.setHeader("Content-disposition", "attachment; filename=MasterData-Report-individual.pdf");
@@ -352,7 +352,7 @@ public class MasterDataReportController {
     public void getMasterDataBean(Model map) throws Exception {
         MasterDataInputBeen masterDataInputBeen = new MasterDataInputBeen();
         //get status list
-        List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_REPORT);
+        List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_SAMPLE);
         List<Result> resultList = commonRepository.getResultList();
         List<CommonInstitution> commonInstitutionList = commonRepository.getCommonInstitutionList();
         //set values to task bean
