@@ -12,6 +12,7 @@ import com.epic.ims.util.common.Common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +34,18 @@ public class MasterDataReportService {
 
     @Autowired
     Common common;
+
+    public MasterData getMasterDataRecord(String id) throws Exception {
+        MasterData masterData;
+        try {
+            masterData = reportMgtRepository.getMasterFileRecord(id);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return masterData;
+    }
 
     public long getCount(MasterDataInputBeen masterDataInputBeen) throws Exception {
         long count = 0;

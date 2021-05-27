@@ -17,7 +17,7 @@
     <script type="text/javascript">
         $(document).ready(function (){
             let today = new Date().toISOString().split("T")[0];
-            $("#receivedDate").attr("max", today);
+            $("#sreceivedDate").attr("max", today);
         })
 
         var oTable;
@@ -65,7 +65,7 @@
                     aoData.push(
                         {'name': 'csrf_token', 'value': token},
                         {'name': 'header', 'value': header},
-                        {'name': 'receivedDate', 'value': $('#receivedDate').val()},
+                        {'name': 'receivedDate', 'value': $('#sreceivedDate').val()},
                         {'name': 'referenceNumber', 'value': $('#referenceNumber').val()},
                         {'name': 'name', 'value': $('#name').val()},
                         {'name': 'nic', 'value': $('#nic').val()},
@@ -223,13 +223,64 @@
                         className: "dt-center",
                         mRender: function (data, type, full) {
                             return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"' +
-                                '  title="Download" id=' + full.institutionCode + ' onclick="editInstitution(\'' + full.institutionCode + '\')">' +
+                                '  title="Download" id=' + full.id + ' onclick="downloadRecord(\'' + full.id + '\')">' +
                                 '<span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0,0H24V24H0Z" fill="none"/><path d="M19,9H15V3H9V9H5l7,7ZM5,18v2H19V18Z" fill="#b5b5c3"/></svg></span></a></div>';
                         },
                         targets: 16,
                         defaultContent: "--"
                     }
                 ]
+            });
+        }
+
+        function downloadRecord(id){
+            $.ajax({
+                type: 'GET',
+                url: "${pageContext.request.contextPath}/downloadMasterDataRecordPdf.json",
+                contentType: 'application/json;charset=UTF-8',
+                data:{
+                  id : id
+                },
+                cache: false,
+                xhr: function () {
+                    let xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 2) {
+                            if (xhr.status == 200) {
+                                xhr.responseType = "blob";
+                            } else {
+                                xhr.responseType = "text";
+                            }
+                        }
+                    };
+                    return xhr;
+                },
+                success: function (data){
+                    //Convert the Byte Data to BLOB object.
+                    let blob = new Blob([data], { type: "application/octetstream" });
+                    let filename = "masterDataRecord.pdf"
+
+                    //Check the Browser type and download the File.
+                    let isIE = false || !!document.documentMode;
+                    if (isIE) {
+                        window.navigator.msSaveBlob(blob, filename);
+                    } else {
+                        let url = window.URL || window.webkitURL;
+                        link = url.createObjectURL(blob);
+                        let a = $("<a />");
+                        a.attr("download", filename);
+                        a.attr("href", link);
+                        $("body").append(a);
+                        a[0].click();
+                        $("body").remove(a);
+                    }
+
+                },
+
+                error: function (e) {
+
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
             });
         }
 
@@ -262,7 +313,7 @@
 
             let aoData =[{'name': 'csrf_token', 'value': token},
                 {'name': 'header', 'value': header},
-                {'name': 'receivedDate', 'value': $('#receivedDate').val()},
+                {'name': 'receivedDate', 'value': $('#sreceivedDate').val()},
                 {'name': 'referenceNumber', 'value': $('#referenceNumber').val()},
                 {'name': 'name', 'value': $('#name').val()},
                 {'name': 'nic', 'value': $('#nic').val()},
@@ -324,7 +375,7 @@
         }
 
         function resetSearch() {
-            $('#receivedDate').val("");
+            $('#sreceivedDate').val("");
             $('#referenceNumber').val("");
             $('#name').val("");
             $('#nic').val("");
@@ -377,7 +428,7 @@
 
                                     <div class="col-lg-3">
                                         <label>Received Date:</label>
-                                        <input id="receivedDate" name="receivedDate" type="date" max=""/>
+                                        <input id="sreceivedDate" class="form-control" name="sreceivedDate" type="date" max=""/>
                                         <span class="form-text text-muted">Please enter received date</span>
                                     </div>
 

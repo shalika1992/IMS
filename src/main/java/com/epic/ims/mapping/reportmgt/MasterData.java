@@ -17,6 +17,7 @@ import java.util.Date;
 @Scope("request")
 public class MasterData {
     private long sampleID;
+    private int id;
     private String referenceNumber;
     private String institutionCode;
     private String institutionName;
@@ -24,6 +25,7 @@ public class MasterData {
     private String age;
     private String gender;
     private String nic;
+    private String address;
     private String contactNumber;
     private String serialNumber;
     private String specimenID;
@@ -39,5 +41,6 @@ public class MasterData {
     private Date reportTime;
     private String ct_target1;
     private String ct_target2;
+    private String fontColor;
 
 }

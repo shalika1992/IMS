@@ -312,7 +312,7 @@ public class InstitutionService {
                 String lastUpdatedUser = sessionBean.getUsername();
 
                 institutionInputBean.setCreatedTime(currentDate);
-                institutionInputBean.setLastUpdatedUser("error");
+                institutionInputBean.setLastUpdatedUser(lastUpdatedUser);
                 institutionInputBean.setLastUpdatedTime(currentDate);
                 institutionInputBean.setInstitutionCode(institutionInputBean.getInstitutionCode().trim().toUpperCase(Locale.ROOT));
 
