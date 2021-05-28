@@ -149,7 +149,7 @@ public class InstitutionRepository {
                     institutionInputBean.getAddress(),
                     institutionInputBean.getContactNumber(),
                     institutionInputBean.getStatus(),
-                    "error",
+                    sessionBean.getUsername(),
                     institutionInputBean.getCreatedTime(),
                     institutionInputBean.getLastUpdatedUser(),
                     institutionInputBean.getLastUpdatedTime()
@@ -375,7 +375,7 @@ public class InstitutionRepository {
         String formattedCLastUpdatedTime = formatter.format(institutionInputBean.getLastUpdatedTime());
 
         String status = institutionInputBean.getStatus();
-        String createdUser = "error";
+        String createdUser = sessionBean.getUsername();
         String lastUpdatedUser = institutionInputBean.getLastUpdatedUser();
 
         String commonValues = "'" + status + "', " + "'" + createdUser + "', " + "'" + formattedCCreatedTime + "', " + "'" + lastUpdatedUser + "', " + "'" + formattedCLastUpdatedTime + "'";
