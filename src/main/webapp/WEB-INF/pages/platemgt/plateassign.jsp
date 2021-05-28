@@ -122,14 +122,15 @@
         }
 
         function swap() {
-
+            const swap = [];
             let swapArray = {}
             let activeElements = $('.cell-elmt.active');
             $.each(activeElements, function (x, y) {
                 swapArray[y.dataset.key] = y.dataset.value;
+                swap.push(y.dataset.value);
             });
 
-            let swapModel = {"labCode1": swapArray[0], "labCode2":swapArray[1]};
+            let swapModel = {"labCode1": swap[0], "labCode2":swap[1]};
 
             if (!$.isEmptyObject(swapArray)) {
                 if (Object.keys(swapArray).length == 2) {
