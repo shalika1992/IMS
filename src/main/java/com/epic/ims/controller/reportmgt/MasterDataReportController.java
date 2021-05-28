@@ -196,7 +196,7 @@ public class MasterDataReportController {
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(masterDataList));
 
                 httpServletResponse.setContentType("application/x-download");
-                httpServletResponse.setHeader("Content-disposition", "inline; filename=Individual-Test-Report.pdf");
+                httpServletResponse.setHeader("Content-disposition", "inline; filename=Test-Report.pdf");
 
                 final OutputStream outStream = httpServletResponse.getOutputStream();
                 JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);

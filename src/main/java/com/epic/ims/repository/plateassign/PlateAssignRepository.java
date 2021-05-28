@@ -405,7 +405,7 @@ public class PlateAssignRepository {
                     "inner join master_temp_data b on a.id <> b.id " +
                     "set a.sampleid = b.sampleid,a.referenceno = b.referenceno,a.institutioncode = b.institutioncode,a.name = b.name,a.age = b.age,a.gender = b.gender, a.nic = b.nic,a.address = b.address," +
                     "a.district = b.district,a.contactno = b.contactno,a.receiveddate = b.receiveddate,a.status = b.status,a.plateid = b.plateid,a.blockvalue = b.blockvalue,a.labcode = b.labcode,a.createduser = b.createduser " +
-                    "where a.labcode in (:aLabCodes) and b.labcode (:bLabCodes)";
+                    "where a.labcode in (:aLabCodes) and b.labcode in (:bLabCodes)";
 
             MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
             //create the integer set
@@ -414,7 +414,7 @@ public class PlateAssignRepository {
             idSetParameterMap.addValue("bLabCodes", labNoList);
             //execute the query
             int value = namedParameterJdbcTemplate.update(swapSql, idSetParameterMap);
-            if (value <= 0) {
+            if (value < 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
         } catch (EmptyResultDataAccessException ex) {

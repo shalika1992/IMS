@@ -18,7 +18,7 @@ import java.util.List;
 @ToString
 @MultipartConfig
 public class MasterDataInputBeen extends DataTablesRequest {
-    private long id;
+    private String id;
     private long sampleID;
     private String referenceNumber;
     private String institutionCode;
@@ -41,7 +41,6 @@ public class MasterDataInputBeen extends DataTablesRequest {
     private String createdUser;
     private Date createdTime;
     private Date reportTime;
-
 
     private List<Status> statusList;
     private List<Result> resultList;

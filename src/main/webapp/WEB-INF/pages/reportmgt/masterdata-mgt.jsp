@@ -255,6 +255,7 @@
         }
 
         function downloadPDFReport() {
+            alert();
             form = document.getElementById('masterDataForm');
             form.action = 'downloadMasterDataPdf.htm';
             form.submit();
@@ -306,10 +307,8 @@
 
                                     <div class="col-lg-3" hidden="true">
                                         <label>ID</label>
-                                        <div class="btn-group div-inline input-group input-group-sm input-append date">
-                                            <input id="id" name="id" type="text" maxlength="64" class="form-control"
-                                                   placeholder="ID"/>
-                                        </div>
+                                        <input path="id" name="id" id="id" type="text" maxlength="8"
+                                               class="form-control" placeholder="ID"/>
                                     </div>
 
                                     <div class="col-lg-3">
@@ -457,8 +456,3 @@
     </div>
 </div>
 </html>
-
-<form:form class="form" id="masterDataForm" name="masterDataForm" action=""
-           theme="simple" method="post" modelAttribute="masterData">
-
-</form:form>
