@@ -111,15 +111,15 @@ public class PlateAssignRepository {
 
                     //handle the g12 value in master plate
                     //add 1 to position when checking the length
-                    if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
-                        subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
-                    }
+                    //if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
+                    //    subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
+                    //}
 
                     //handle the h12 value in master plate
                     //add 1 to position when checking the length
-                    if (subList != null && subList.size() > (PLATE_H12_POSITION - 1)) {
-                        subList.add(PLATE_H12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
-                    }
+                    //if (subList != null && subList.size() > (PLATE_H12_POSITION - 1)) {
+                    //    subList.add(PLATE_H12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
+                    //}
 
                     for (int j = 0; j < subList.size(); j++) {
                         SampleFile sFile = subList.get(j);
