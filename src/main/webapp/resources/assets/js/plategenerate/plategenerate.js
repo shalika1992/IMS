@@ -40,7 +40,51 @@ function _mergeCells(plateArray, mergeArray) {
 }
 
 function _storeMergePlate(platesArray) {
-    let finalArr = [];
+    // get modulus
+    let module = Object.keys(platesArray).length % 93;
+    // get plate count
+    let round = Math.floor(Object.keys(platesArray).length / 93);
+
+    // plate count final
+    if (module != 0) {
+        round++;
+    }
+    let count = 0;
+    // plate rounds
+    for (let k = 0; k < round; k++) {
+        var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
+        if (selectedPlate.checked) {
+            count++;
+        }
+    }
+    if (count <= 1) {
+        swal.fire({
+            text: "Need a minimum of 2 plates to pool",
+            icon: "error",
+            buttonsStyling: false,
+            confirmButtonText: "OK",
+            customClass: {
+                confirmButton: "btn font-weight-bold btn-light-primary"
+            }
+        });
+    } else if (count > 4) {
+        swal.fire({
+            text: "Maximum number of plates which can be pooled together is 4",
+            icon: "error",
+            buttonsStyling: false,
+            confirmButtonText: "OK",
+            customClass: {
+                confirmButton: "btn font-weight-bold btn-light-primary"
+            }
+        });
+    } else {
+        _processMergingPlate(platesArray) ;
+    }
+}
+
+
+function _processMergingPlate(platesArray) {
+    let mergedArr = [];
     $(this).addClass("active");
     // get modulus
     let module = Object.keys(platesArray).length % 93;
@@ -52,29 +96,33 @@ function _storeMergePlate(platesArray) {
         round++;
     }
     let shift = 0;
+    let shift_val = 0;
 
     // plate rounds
     for (let k = 0; k < round; k++) {
         let val;
-        let tmp = [];
-        for (let j = 0; j < 12; j++) {
-            for (let i = 0; i < 8; i++) {
-                val = i + (8 * j);
-                if (platesArray[val + shift] !== undefined) {
-                    var remember = document.getElementById(k.toString());
-                    if (remember.checked) {
-                        tmp.push(platesArray[val + shift]);
+        let tmpArr = [];
+        for (let j = 0; j < 8; j++) { // columns
+            for (let i = 0; i < 12; i++) { // rows
+                val = i + (12 * j); // change normal filling
+                if ((val + 1) !== 84 && (val + 1) !== 96 && (val + 1) !== 27) {
+                    if (platesArray[val + shift + shift_val] !== undefined) {
+                        var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
+                        if (selectedPlate.checked) {
+                            tmpArr.push(platesArray[val + shift + shift_val][0]);
+                        }
                     }
+                } else {
+                    shift_val--;
                 }
             }
         }
         shift += 96;
-        if (finalArr.length === 0) {
-            finalArr = tmp;
+        if (mergedArr.length === 0) {
+            mergedArr = tmpArr;
         } else {
-            console.log("-------------------");
-            let res = finalArr.map((value, index) => {
-                return [value, tmp[index]]
+            let res = mergedArr.map((value, index) => {
+                return [value, tmpArr[index]]
             });
             console.log(res);
         }
@@ -105,7 +153,7 @@ function _generatePlates(platesArray) {
     for (let k = 0; k < round; k++) { // plate rounds
 
         // check box
-        let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,'+(k+1)+')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
+        let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,' + (k + 1) + ')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
         // plate no
         html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
 
@@ -151,7 +199,7 @@ function _generatePlates(platesArray) {
                         let span = '<span class="label label-success label-inline ">Positive control</span>';
                         html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
                     } else {
-                        html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                         html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
                     }
                 }
             }
@@ -193,14 +241,15 @@ function _swapCells(platesArray, cellArray) {
     return platesArray;
 
 }
+
 // function to select all
-function _checkBoxSelect(id,plateNo) {
+function _checkBoxSelect(id, plateNo) {
     if ($("#" + id).is(':checked')) {
         console.log("checked");
-        $('.cell-click.plate-'+plateNo).addClass('active');
+        $('.cell-click.plate-' + plateNo).addClass('active');
     } else {
         console.log("unchecked");
-        $('.cell-click.plate-'+plateNo).removeClass('active');
+        $('.cell-click.plate-' + plateNo).removeClass('active');
     }
 }
 
