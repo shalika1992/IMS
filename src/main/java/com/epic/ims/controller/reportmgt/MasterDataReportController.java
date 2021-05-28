@@ -5,19 +5,25 @@ import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
-import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.reportmgt.MasterDataInputBeen;
 import com.epic.ims.bean.session.SessionBean;
-import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.reportmgt.MasterData;
 import com.epic.ims.repository.common.CommonRepository;
-import com.epic.ims.service.institutionmgt.InstitutionService;
 import com.epic.ims.service.reportmgt.MasterDataReportService;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
-import com.epic.ims.util.varlist.*;
+import com.epic.ims.util.varlist.CommonVarList;
+import com.epic.ims.util.varlist.MessageVarList;
+import com.epic.ims.util.varlist.PageVarList;
+import com.epic.ims.util.varlist.SectionVarList;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
 import com.epic.ims.validation.institution.InstitutionBulkValidation;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +35,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -91,32 +100,132 @@ public class MasterDataReportController {
                 List<MasterData> masterDataList = masterDataReportService.getMasterDataSearchResultList(masterDataInputBeen);
                 //set data set to response bean
                 responseBean.data.addAll(masterDataList);
+                responseBean.echo = masterDataInputBeen.echo;
+                responseBean.columns = masterDataInputBeen.columns;
+                responseBean.totalRecords = count;
+                responseBean.totalDisplayRecords = count;
             } else {
                 //set data set to response bean
                 responseBean.data.addAll(new ArrayList<>());
+                responseBean.echo = masterDataInputBeen.echo;
+                responseBean.columns = masterDataInputBeen.columns;
+                responseBean.totalRecords = count;
+                responseBean.totalDisplayRecords = count;
             }
-            responseBean.echo = masterDataInputBeen.echo;
-            responseBean.columns = masterDataInputBeen.columns;
-            responseBean.totalRecords = count;
-            responseBean.totalDisplayRecords = count;
         } catch (Exception exception) {
             logger.error("Exception " + exception);
         }
         return responseBean;
     }
 
+
+    @PostMapping(value = "/downloadMasterDataPdf")
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
+    public void getMasterDataPDF(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA REPORT PDF");
+        OutputStream outputStream = null;
+        try {
+            List<MasterData> masterDataList = masterDataReportService.getMasterDataSearchResultListForReport(masterDataInputBeen);
+            if (masterDataList != null && !masterDataList.isEmpty() && masterDataList.size() > 0) {
+                String currentDateTime = commonRepository.getCurrentDateTimeAsString();
+                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/masterDataPDF.jasper");
+                Map<String, Object> parameterMap = new HashMap<>();
+
+                //set parameters to map
+                parameterMap.put("reportTime", currentDateTime);
+                parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getReceivedDate()));
+                parameterMap.put("collectionDate", "--");
+                parameterMap.put("serialNo", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getSerialNumber()));
+                parameterMap.put("name", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getName()));
+                parameterMap.put("nic", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getNic()));
+                parameterMap.put("institution", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getInstitutionCode()));
+                parameterMap.put("status", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getStatus()));
+                parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getResult()));
+                parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
+                parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
+                parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);
+
+                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(masterDataList));
+
+                httpServletResponse.setContentType("application/x-download");
+                httpServletResponse.setHeader("Content-disposition", "inline; filename=Full-Test-Report.pdf");
+
+                final OutputStream outStream = httpServletResponse.getOutputStream();
+                JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
+            }
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    @PostMapping(value = "/downloadMasterDataIndividualPdf")
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
+    public void getMasterDataIndividualPdf(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        logger.info("[" + sessionBean.getSessionid() + "]  MASTER DATA INDIVIDUAL REPORT PDF");
+        OutputStream outputStream = null;
+        try {
+            MasterData masterData = masterDataReportService.getMasterDataSearchObjectForIndividualReport(masterDataInputBeen);
+            if (masterData != null) {
+                List<MasterData> masterDataList = new ArrayList<MasterData>() {{
+                    add(masterData);
+                }};
+
+                String currentDateTime = commonRepository.getCurrentDateTimeAsString();
+                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/masterDataIndividualPDF.jasper");
+                Map<String, Object> parameterMap = new HashMap<>();
+
+                //set parameters to map
+                parameterMap.put("reportTime", currentDateTime);
+                parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterData.getReceivedDate()));
+                parameterMap.put("collectionDate", "--");
+                parameterMap.put("institution", common.replaceEmptyorNullStringToALL(masterData.getInstitutionCode()));
+                parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
+                parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
+                parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);
+
+                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(masterDataList));
+
+                httpServletResponse.setContentType("application/x-download");
+                httpServletResponse.setHeader("Content-disposition", "inline; filename=Individual-Test-Report.pdf");
+
+                final OutputStream outStream = httpServletResponse.getOutputStream();
+                JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
+            }
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+
     @ModelAttribute
     public void getMasterDataBean(Model map) throws Exception {
         MasterDataInputBeen masterDataInputBeen = new MasterDataInputBeen();
         //get status list
-        List<Status> statusList = commonRepository.getStatusList(StatusVarList.STATUS_CATEGORY_REPORT);
+        List<Status> statusList = commonRepository.getReportStatusList();
         List<Result> resultList = commonRepository.getResultList();
         List<CommonInstitution> commonInstitutionList = commonRepository.getCommonInstitutionList();
         //set values to task bean
         masterDataInputBeen.setStatusList(statusList);
         masterDataInputBeen.setResultList(resultList);
         masterDataInputBeen.setCommonInstitutionList(commonInstitutionList);
-
         //add values to model map
         map.addAttribute("masterData", masterDataInputBeen);
     }

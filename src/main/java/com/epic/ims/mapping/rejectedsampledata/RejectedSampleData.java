@@ -195,4 +195,6 @@ public class RejectedSampleData {
     public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
+
+
 }

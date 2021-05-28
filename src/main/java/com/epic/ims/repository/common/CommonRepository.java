@@ -55,6 +55,7 @@ public class CommonRepository {
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
     private final String SQL_GET_RESULT_LIST = "select code,description from result";
     private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?)";
+    private final String SQL_GET_STATUS_LIST_REPORT = "select code, description from status where code in (?, ?, ?)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -75,6 +76,21 @@ public class CommonRepository {
             throw e;
         }
         return statusBeanList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String getCurrentDateTimeAsString() throws Exception {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentDateAsString = "";
+        try {
+            Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
+            Date formattedCurrentDate = formatter.parse(currentDate.get("currentdate").toString());
+            currentDateAsString = formatter.format(formattedCurrentDate);
+        } catch (Exception e) {
+            throw e;
+        }
+        return currentDateAsString;
     }
 
     @LogRepository
@@ -277,10 +293,31 @@ public class CommonRepository {
 
     @LogRepository
     @Transactional(readOnly = true)
-    public List<Status> getStatusListForSampleVeridy() throws Exception {
+    public List<Status> getStatusListForSampleVerify() throws Exception {
         List<Status> statusBeanList;
         try {
             List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED});
+            statusBeanList = statusList.stream().map((record) -> {
+                Status statusBean = new Status();
+                statusBean.setStatusCode(record.get("code").toString());
+                statusBean.setDescription(record.get("description").toString());
+                return statusBean;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            statusBeanList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return statusBeanList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<Status> getReportStatusList() {
+        List<Status> statusBeanList;
+        try {
+            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_REPORT, new Object[]{commonVarList.STATUS_PLATEASSIGNED, commonVarList.STATUS_COMPLETED, commonVarList.STATUS_REPEATED});
             statusBeanList = statusList.stream().map((record) -> {
                 Status statusBean = new Status();
                 statusBean.setStatusCode(record.get("code").toString());

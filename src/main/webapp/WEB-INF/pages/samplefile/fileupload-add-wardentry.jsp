@@ -160,7 +160,7 @@
                     <button id="entryReset" type="button" class="btn btn-default" onclick="resetEntry()">
                         Reset
                     </button>
-                    <button id="entryBtn" type="button" onclick="add()" class="btn btn-primary">
+                    <button id="entryBtn" type="button" onclick="addWardEntry()" class="btn btn-primary">
                         Submit
                     </button>
                 </div>
@@ -174,7 +174,7 @@
         $('#responseMsgEntry').hide();
     }
 
-    function add() {
+    function addWardEntry() {
         $.ajax({
             type: 'POST',
             url: '${pageContext.request.contextPath}/addSampleWardEntry.json',

@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 @Component
 @Setter
@@ -17,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Scope("request")
 public class MasterData {
+    private long id;
     private long sampleID;
     private String referenceNumber;
     private String institutionCode;
@@ -29,7 +29,7 @@ public class MasterData {
     private String serialNumber;
     private String specimenID;
     private String barcode;
-    private Date receivedDate;
+    private String receivedDate;
     private String statusDescription;
     private String result;
     private String resultDescription;
@@ -38,5 +38,6 @@ public class MasterData {
     private String createdUser;
     private Date createdTime;
     private Date reportTime;
-
+    private String ct_target1;
+    private String ct_target2;
 }

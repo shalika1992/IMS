@@ -2,7 +2,9 @@ package com.epic.ims.controller.plateassign;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PlateBean;
+import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.plateassign.PlateAssignService;
@@ -68,8 +70,8 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/generateDefaultPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<Integer, List<String>> getDefaultPlate(@RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
-        Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
+    Map<Integer, List<DefaultBean>> getDefaultPlate(@RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
             defaultPlateMap = plateAssignService.getDefaultPlate(receivedDate);
         } catch (Exception e) {
@@ -82,15 +84,14 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/swapBlockPlate", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public String postSwapBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
-        String message = "";
+    public Map<Integer, List<DefaultBean>> postSwapBlockPlate(@RequestBody SwapBean swapBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
-            message = plateAssignService.swapBlockPlate(plateBean);
+            defaultPlateMap = plateAssignService.swapBlockPlate(swapBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
-            message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
         }
-        return message;
+        return defaultPlateMap;
     }
 
     @LogController

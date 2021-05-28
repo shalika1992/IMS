@@ -179,7 +179,7 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
         SampleFileVerificationInputBean sampleFileVerificationInputBean = new SampleFileVerificationInputBean();
         //get status list and institution list
         List<Institution> institutionList = commonRepository.getInstitutionList();
-        List<Status> statusList = commonRepository.getStatusListForSampleVeridy();
+        List<Status> statusList = commonRepository.getStatusListForSampleVerify();
         //set values to input bean
         sampleFileVerificationInputBean.setInstitutionList(institutionList);
         sampleFileVerificationInputBean.setStatusList(statusList);

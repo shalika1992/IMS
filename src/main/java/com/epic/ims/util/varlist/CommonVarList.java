@@ -152,5 +152,17 @@ public class CommonVarList {
     @Value("${result.code.pending}")
     public String RESULT_CODE_PENDING;
     //-------------------------------result codes---------------------------------------------------------------------//
+
+    //-------------------------------report content codes-------------------------------------------------------------//
+    @Value("${report.consultant.name}")
+    public String REPORT_CONSULTANT_NAME;
+
+    @Value("${report.consultant.description}")
+    public String REPORT_CONSULTANT_DESCRIPTION;
+
+    @Value("${report.test.method}")
+    public String REPORT_TEST_METHOD;
+    //-------------------------------report content codes-------------------------------------------------------------//
+
 }
 

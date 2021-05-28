@@ -50,7 +50,7 @@ public class SampleFileUploadRepository {
     private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? ,ward = ? where sd.id = ?";
     private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_INSERT_SAMPLEWARDENTRY = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,ward,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.receiveddate = ? and sd.institutioncode = ? and sd.receiveddate = ? and sd.ward = ?";
+    private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.receiveddate = ? and sd.institutioncode = ? and sd.ward = ?";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -95,9 +95,9 @@ public class SampleFileUploadRepository {
             sampleFileList = jdbcTemplate.query(sql, (rs, id) -> {
                 SampleFile sampleFile = new SampleFile();
                 try {
-                    sampleFile.setId(rs.getInt("id"));
+                    sampleFile.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    sampleFile.setId(0);
+                    sampleFile.setId(0 + "");
                 }
 
                 try {
@@ -234,9 +234,9 @@ public class SampleFileUploadRepository {
                 SampleFile s = new SampleFile();
 
                 try {
-                    s.setId(rs.getInt("id"));
+                    s.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    s.setId(0);
+                    s.setId(0 + "");
                 }
 
                 try {
@@ -309,12 +309,6 @@ public class SampleFileUploadRepository {
                     s.setSecondaryContactNumber(rs.getString("secondarycontactno"));
                 } catch (Exception e) {
                     s.setSecondaryContactNumber(null);
-                }
-
-                try {
-                    s.setSpecimenid(rs.getString("specimenid"));
-                } catch (Exception e) {
-                    s.setSpecimenid(null);
                 }
 
                 try {
@@ -494,9 +488,9 @@ public class SampleFileUploadRepository {
             sampleFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEFILERECORD, new Object[]{id}, (rs, rowNum) -> {
                 SampleFile s = new SampleFile();
                 try {
-                    s.setId(rs.getInt("id"));
+                    s.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    s.setId(0);
+                    s.setId(0 + "");
                 }
 
                 try {

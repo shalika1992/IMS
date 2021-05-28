@@ -1,7 +1,9 @@
 package com.epic.ims.service.plateassign;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PlateBean;
+import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.plateassign.PlateAssignRepository;
@@ -44,10 +46,13 @@ public class PlateAssignService {
     PlateAssignRepository plateAssignRepository;
 
     @LogService
-    public Map<Integer, List<String>> getDefaultPlate(String receivedDate) {
-        Map<Integer, List<String>> defaultPlateMap = new HashMap<>();
+    public Map<Integer, List<DefaultBean>> getDefaultPlate(String receivedDate) throws Exception {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
-            defaultPlateMap = plateAssignRepository.getDefaultPlateList(receivedDate);
+            String message = plateAssignRepository.createDefaultPlateList(receivedDate);
+            if (message.isEmpty()) {
+                defaultPlateMap = plateAssignRepository.getDefaultPlateList();
+            }
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
@@ -57,16 +62,19 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String swapBlockPlate(PlateBean plateBean) {
-        String message = "";
+    public Map<Integer, List<DefaultBean>> swapBlockPlate(SwapBean swapBean) {
+        Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
         try {
-            message = plateAssignRepository.swapBlockPlate(plateBean);
+            String message = plateAssignRepository.swapBlockPlate(swapBean);
+            if (message.isEmpty()) {
+                plateMap = plateAssignRepository.getDefaultPlateList();
+            }
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {
             throw e;
         }
-        return message;
+        return plateMap;
     }
 
     @LogService
@@ -74,6 +82,9 @@ public class PlateAssignService {
         String message = "";
         try {
             message = plateAssignRepository.MergeBlockPlate(plateBean);
+            if (message.isEmpty()) {
+                //defaultPlateMap = plateAssignRepository.getDefaultPlateList();
+            }
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {

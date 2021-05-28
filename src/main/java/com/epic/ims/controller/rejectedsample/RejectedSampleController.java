@@ -9,10 +9,17 @@ import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.institutionmgt.InstitutionRepository;
 import com.epic.ims.service.rejectedsample.RejectedSampleService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.PageVarList;
 import com.epic.ims.util.varlist.SectionVarList;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +34,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -50,9 +56,13 @@ public class RejectedSampleController {
     SessionBean sessionBean;
 
     @Autowired
+    Common common;
+
+    @Autowired
     RejectedSampleService rejectedSampleService;
 
     @GetMapping(value = "/viewRejectSample")
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     public ModelAndView viewRejectSamplePage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM REJECTED SAMPLE PAGE VIEW");
         ModelAndView modelAndView;
@@ -66,7 +76,7 @@ public class RejectedSampleController {
     }
 
     @ResponseBody
-    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     @PostMapping(value = "/listRejectedSample", headers = {"content-type=application/json"})
     public DataTablesResponse<RejectedSampleData> searchRejectedSample(@RequestBody RejectedSampleDataInputBean rejectedSampleInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE SEARCH");
@@ -96,13 +106,31 @@ public class RejectedSampleController {
     }
 
     @PostMapping(value = "/pdfReportRejected")
-    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     public void pdfReportRejectedSample(@ModelAttribute("rejectedsample") RejectedSampleDataInputBean rejectedSampleDataInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE REPORT");
         OutputStream outputStream = null;
         try {
-            List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleDataInputBean);
+            List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultListForReport(rejectedSampleDataInputBean);
+            if (rejectedSampleDataList != null && !rejectedSampleDataList.isEmpty() && rejectedSampleDataList.size() > 0) {
+                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/rejectsamples/rejectsamples_report.jasper");
+                Map<String, Object> parameterMap = new HashMap<>();
+                //set parameters to map
+                parameterMap.put("receiveddate", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReceivedDate()));
+                parameterMap.put("referenceno", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReferenceNo()));
+                parameterMap.put("institutioncode", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getInstitutionCode()));
+                parameterMap.put("name", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getName()));
+                parameterMap.put("nic", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getNic()));
 
+                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(rejectedSampleDataList));
+
+                httpServletResponse.setContentType("application/x-download");
+                httpServletResponse.setHeader("Content-disposition", "inline; filename=Rejectsample-Report.pdf");
+
+                final OutputStream outStream = httpServletResponse.getOutputStream();
+                JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
+            }
         } catch (Exception ex) {
             logger.error("Exception  :  ", ex);
         } finally {
