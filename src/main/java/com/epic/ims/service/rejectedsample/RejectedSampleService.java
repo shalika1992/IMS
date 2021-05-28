@@ -57,11 +57,21 @@ public class RejectedSampleService {
 
 
     @LogService
-    @PostMapping(value="/pdfReportRejected")
     public List<RejectedSampleData> getRejectedSampleSearchResultList(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception{
         List<RejectedSampleData> rejectedSampleDataList;
         try {
             rejectedSampleDataList = rejectedSampleRepository.getRejectedSampleSearchList(rejectedSampleDataInputBean);
+        } catch (Exception exception) {
+            throw exception;
+        }
+        return rejectedSampleDataList;
+    }
+
+    @LogService
+    public List<RejectedSampleData> getRejectedSampleSearchResultListForReport(RejectedSampleDataInputBean rejectedSampleDataInputBean) throws Exception{
+        List<RejectedSampleData> rejectedSampleDataList;
+        try {
+            rejectedSampleDataList = rejectedSampleRepository.getRejectedSampleSearchResultListForReport(rejectedSampleDataInputBean);
         } catch (Exception exception) {
             throw exception;
         }

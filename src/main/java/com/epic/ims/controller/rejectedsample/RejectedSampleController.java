@@ -9,6 +9,7 @@ import com.epic.ims.mapping.rejectedsampledata.RejectedSampleData;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.institutionmgt.InstitutionRepository;
 import com.epic.ims.service.rejectedsample.RejectedSampleService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.PageVarList;
@@ -21,7 +22,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.epic.ims.util.common.Common;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -62,6 +62,7 @@ public class RejectedSampleController {
     RejectedSampleService rejectedSampleService;
 
     @GetMapping(value = "/viewRejectSample")
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     public ModelAndView viewRejectSamplePage(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  SYSTEM REJECTED SAMPLE PAGE VIEW");
         ModelAndView modelAndView;
@@ -75,7 +76,7 @@ public class RejectedSampleController {
     }
 
     @ResponseBody
-    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     @PostMapping(value = "/listRejectedSample", headers = {"content-type=application/json"})
     public DataTablesResponse<RejectedSampleData> searchRejectedSample(@RequestBody RejectedSampleDataInputBean rejectedSampleInputBean) {
         logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE SEARCH");
@@ -105,53 +106,44 @@ public class RejectedSampleController {
     }
 
     @PostMapping(value = "/pdfReportRejected")
-    @AccessControl(sectionCode = SectionVarList.SECTION_SYS_CONFIGURATION_MGT, pageCode = PageVarList.USER_MGT)
+    @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
     public void pdfReportRejectedSample(@ModelAttribute("rejectedsample") RejectedSampleDataInputBean rejectedSampleDataInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         logger.info("[" + sessionBean.getSessionid() + "]  REJECTED SAMPLE REPORT");
         OutputStream outputStream = null;
         try {
-            List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultList(rejectedSampleDataInputBean);
+            List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultListForReport(rejectedSampleDataInputBean);
             if (rejectedSampleDataList != null && !rejectedSampleDataList.isEmpty() && rejectedSampleDataList.size() > 0) {
                 InputStream jasperStream = this.getClass().getResourceAsStream("/reports/rejectsamples/rejectsamples_report.jasper");
                 Map<String, Object> parameterMap = new HashMap<>();
                 //set parameters to map
+                parameterMap.put("receiveddate", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReceivedDate()));
                 parameterMap.put("referenceno", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReferenceNo()));
                 parameterMap.put("institutioncode", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getInstitutionCode()));
                 parameterMap.put("name", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getName()));
-                parameterMap.put("age", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getAge()));
-                parameterMap.put("gender", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getGender()));
-                parameterMap.put("symptomatic", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getSymptomatic()));
-                parameterMap.put("contacttype", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getContactType()));
                 parameterMap.put("nic", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getNic()));
-                parameterMap.put("address", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getAddress()));
-                parameterMap.put("district", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getDistrict()));
-                parameterMap.put("contactno", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getContactNo()));
-                parameterMap.put("receiveddate", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReceivedDate()));
-                parameterMap.put("status", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getStatus()));
-                parameterMap.put("remark", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getRemark()));
-                parameterMap.put("createdtime", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getCreatedTime().toString()));
 
                 JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(rejectedSampleDataList));
 
                 httpServletResponse.setContentType("application/x-download");
                 httpServletResponse.setHeader("Content-disposition", "inline; filename=Rejectsample-Report.pdf");
+
                 final OutputStream outStream = httpServletResponse.getOutputStream();
                 JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
             }
-            } catch(Exception ex){
-                logger.error("Exception  :  ", ex);
-            } finally{
-                try {
-                    if (outputStream != null) {
-                        outputStream.flush();
-                        outputStream.close();
-                    }
-                } catch (IOException ex) {
-                    //do nothing
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
                 }
+            } catch (IOException ex) {
+                //do nothing
             }
         }
+    }
 
     @ModelAttribute
     public void getRejectedSampleBean(Model map) throws Exception {

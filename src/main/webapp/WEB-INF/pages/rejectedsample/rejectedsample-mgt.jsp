@@ -409,7 +409,7 @@
                                                 onclick="searchStart()">
                                             Search
                                         </button>
-                                        <button type="reset" class="btn btn-secondary btn-sm" onclick="resetSearch()">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetSearch()">
                                             Reset
                                         </button>
                                     </div>

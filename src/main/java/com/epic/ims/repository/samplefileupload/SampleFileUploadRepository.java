@@ -95,9 +95,9 @@ public class SampleFileUploadRepository {
             sampleFileList = jdbcTemplate.query(sql, (rs, id) -> {
                 SampleFile sampleFile = new SampleFile();
                 try {
-                    sampleFile.setId(rs.getInt("id"));
+                    sampleFile.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    sampleFile.setId(0);
+                    sampleFile.setId(0 + "");
                 }
 
                 try {
@@ -234,9 +234,9 @@ public class SampleFileUploadRepository {
                 SampleFile s = new SampleFile();
 
                 try {
-                    s.setId(rs.getInt("id"));
+                    s.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    s.setId(0);
+                    s.setId(0 + "");
                 }
 
                 try {
@@ -488,9 +488,9 @@ public class SampleFileUploadRepository {
             sampleFile = jdbcTemplate.queryForObject(SQL_FIND_SAMPLEFILERECORD, new Object[]{id}, (rs, rowNum) -> {
                 SampleFile s = new SampleFile();
                 try {
-                    s.setId(rs.getInt("id"));
+                    s.setId(rs.getInt("id") + "");
                 } catch (Exception e) {
-                    s.setId(0);
+                    s.setId(0 + "");
                 }
 
                 try {

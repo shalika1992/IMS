@@ -15,21 +15,23 @@
 
 <head>
     <script type="text/javascript">
-        $(document).ready(function (){
-            let today = new Date().toISOString().split("T")[0];
-            $("#receivedDate").attr("max", today);
-        })
-
         var oTable;
 
         var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");
 
         $(document).ready(function () {
+            $('#receivedDate').datepicker({
+                format: 'yyyy-mm-dd',
+                endDate: '+0d',
+                setDate: new Date(),
+                todayHighlight: true,
+                forceParse: false,
+                autoclose: true
+            });
+            setReceivedDate();
             loadDataTable();
         });
-
-
 
         function loadDataTable() {
             var token = $("meta[name='_csrf']").attr("content");
@@ -79,16 +81,7 @@
                         url: "${pageContext.request.contextPath}/listMasterData.json",
                         contentType: "application/json",
                         data: stringify_aoData(aoData),
-                        success: function (data) {
-
-                            if(data.iTotalRecords===0){
-                                $("#viewPDF").attr("disabled","true");
-                            }else{
-                                $("#viewPDF").removeAttr("disabled");
-                            }
-
-                            fnCallback(data);
-                        },
+                        success: fnCallback,
                         error: function (e) {
                             window.location = "${pageContext.request.contextPath}/logout.htm";
                         }
@@ -100,9 +93,6 @@
                 responsive: true,
                 lengthMenu: [5, 10, 20, 50, 100],
                 searching: false,
-                scrollY: '50vh',
-                scrollX: true,
-                scrollCollapse: true,
                 initComplete: function (settings, json) {
                     document.getElementById('data-table-loading').style.display = "none";
                     document.getElementById('data-table-wrapper').style.display = "block";
@@ -112,68 +102,56 @@
                 },
                 columnDefs: [
                     {
-                        title: "Reference Number",
+                        title: "Lab Number",
                         targets: 0,
+                        mDataProp: "barcode",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Serial Number",
+                        targets: 1,
                         mDataProp: "referenceNumber",
                         defaultContent: "--"
                     },
                     {
                         title: "Institution Name",
-                        targets: 1,
+                        targets: 2,
                         mDataProp: "institutionName",
                         defaultContent: "--"
                     },
                     {
                         title: "Name",
-                        targets: 2,
+                        targets: 3,
                         mDataProp: "name",
                         defaultContent: "--"
                     },
                     {
                         title: "Age",
-                        targets: 3,
+                        targets: 4,
                         mDataProp: "age",
                         defaultContent: "--"
                     },
                     {
                         title: "Gender",
-                        targets: 4,
+                        targets: 5,
                         mDataProp: "gender",
                         defaultContent: "--"
                     },
                     {
                         title: "NIC",
-                        targets: 5,
+                        targets: 6,
                         mDataProp: "nic",
                         defaultContent: "--"
                     },
                     {
                         title: "Contact Number",
-                        targets: 6,
+                        targets: 7,
                         mDataProp: "contactNumber",
                         defaultContent: "--"
                     },
                     {
-                        title: "Serial Number",
-                        targets: 7,
-                        mDataProp: "serialNumber",
-                        defaultContent: "--"
-                    },
-                    {
-                        title: "Specimen ID",
-                        targets: 8,
-                        mDataProp: "specimenID",
-                        defaultContent: "--"
-                    },
-                    {
-                        title: "Barcode Number",
-                        targets: 9,
-                        mDataProp: "barcode",
-                        defaultContent: "--"
-                    },
-                    {
                         title: "Received Date",
-                        targets: 10,
+                        targets: 8,
                         mDataProp: "receivedDate;",
                         defaultContent: "--",
                         render: function (data) {
@@ -182,39 +160,30 @@
                     },
                     {
                         title: "Result",
-                        targets: 11,
+                        targets: 9,
                         mDataProp: "resultDescription",
                         defaultContent: "--"
                     },
                     {
                         title: "Status",
-                        targets: 12,
+                        targets: 10,
                         mDataProp: "statusDescription",
                         defaultContent: "--"
 
                     },
                     {
                         title: "Created User",
-                        targets: 13,
+                        targets: 11,
                         mDataProp: "createdUser",
                         defaultContent: "--"
                     },
                     {
                         title: "Created Time",
-                        targets: 14,
+                        targets: 12,
                         mDataProp: "createdTime",
                         defaultContent: "--",
                         render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
-                        }
-                    },
-                    {
-                        title: "Report Time",
-                        targets: 15,
-                        mDataProp: "reportTime",
-                        defaultContent: "--",
-                        render: function (data) {
-                            return moment(data).format("YYYY-MM-DD hh:mm a")
+                            return moment(data).format("YYYY-MM-DD HH:mm:ss A")
                         }
                     },
                     {
@@ -223,98 +192,20 @@
                         className: "dt-center",
                         mRender: function (data, type, full) {
                             return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"' +
-                                '  title="Download" id=' + full.institutionCode + ' onclick="editInstitution(\'' + full.institutionCode + '\')">' +
+                                '  title="Download" id=' + full.institutionCode + ' onclick="downloadIndividualReport(\'' + full.id + '\')">' +
                                 '<span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0,0H24V24H0Z" fill="none"/><path d="M19,9H15V3H9V9H5l7,7ZM5,18v2H19V18Z" fill="#b5b5c3"/></svg></span></a></div>';
                         },
-                        targets: 16,
+                        targets: 13,
                         defaultContent: "--"
                     }
-                ]
-            });
-        }
-
-        function downloadPDF() {
-            let token = $("meta[name='_csrf']").attr("content");
-            let header = $("meta[name='_csrf_header']").attr("content");
-            let stringify_aoData = function (aoData) {
-                let o = {};
-                let modifiers = ['mDataProp_', 'sSearch_', 'iSortCol_', 'bSortable_', 'bRegex_', 'bSearchable_', 'sSortDir_'];
-                jQuery.each(aoData, function (idx, obj) {
-                    if (obj.name) {
-                        for (var i = 0; i < modifiers.length; i++) {
-                            if (obj.name.substring(0, modifiers[i].length) == modifiers[i]) {
-                                let index = parseInt(obj.name.substring(modifiers[i].length));
-                                let key = 'a' + modifiers[i].substring(0, modifiers[i].length - 1);
-                                if (!o[key]) {
-                                    o[key] = [];
-                                }
-                                o[key][index] = obj.value;
-                                return;
-                            }
-                        }
-                        o[obj.name] = obj.value;
+                ],
+                fnDrawCallback: function (oSettings, json) {
+                    //disable and enable the select_all input
+                    if (oTable.fnGetData().length > 0) {
+                        $("#viewPDF").prop("disabled", false);
                     } else {
-                        o[idx] = obj;
+                        $("#viewPDF").prop("disabled", true);
                     }
-                });
-                return JSON.stringify(o);
-            };
-
-            let aoData =[{'name': 'csrf_token', 'value': token},
-                {'name': 'header', 'value': header},
-                {'name': 'receivedDate', 'value': $('#receivedDate').val()},
-                {'name': 'referenceNumber', 'value': $('#referenceNumber').val()},
-                {'name': 'name', 'value': $('#name').val()},
-                {'name': 'nic', 'value': $('#nic').val()},
-                {'name': 'institutionCode', 'value': $('#institutionCode').val()},
-                {'name': 'status', 'value': $('#status').val()},
-                {'name': 'result', 'value': $('#result').val()}];
-
-
-            $.ajax({
-                type: 'POST',
-                url: "${pageContext.request.contextPath}/downloadMasterDataPdf.json",
-                contentType: 'application/json;charset=UTF-8',
-                cache: false,
-                xhr: function () {
-                    let xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState == 2) {
-                            if (xhr.status == 200) {
-                                xhr.responseType = "blob";
-                            } else {
-                                xhr.responseType = "text";
-                            }
-                        }
-                    };
-                    return xhr;
-                },
-                data: stringify_aoData(aoData),
-                success: function (data){
-                    //Convert the Byte Data to BLOB object.
-                    let blob = new Blob([data], { type: "application/octetstream" });
-                    let filename = "masterData.pdf"
-
-                    //Check the Browser type and download the File.
-                    let isIE = false || !!document.documentMode;
-                    if (isIE) {
-                        window.navigator.msSaveBlob(blob, filename);
-                    } else {
-                        let url = window.URL || window.webkitURL;
-                        link = url.createObjectURL(blob);
-                        let a = $("<a />");
-                        a.attr("download", filename);
-                        a.attr("href", link);
-                        $("body").append(a);
-                        a[0].click();
-                        $("body").remove(a);
-                    }
-
-                },
-
-                error: function (e) {
-
-                    window.location = "${pageContext.request.contextPath}/logout.htm";
                 }
             });
         }
@@ -324,7 +215,8 @@
         }
 
         function resetSearch() {
-            $('#receivedDate').val("");
+            $('#id').val("");
+            $("#receivedDate").datepicker('setDate', getReceivedDate());
             $('#referenceNumber').val("");
             $('#name').val("");
             $('#nic').val("");
@@ -335,7 +227,45 @@
             oTable.fnDraw();
         }
 
+        function setReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            var today = (date.getFullYear() + "-" + month + "-" + day);
+            $('#receivedDate').val(today);
+        }
 
+        function getReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return (date.getFullYear() + "-" + month + "-" + day);
+        }
+
+        function downloadPDFReport() {
+            form = document.getElementById('masterDataForm');
+            form.action = 'downloadMasterDataPdf.htm';
+            form.submit();
+        }
+
+        function downloadIndividualReport(id) {
+            $('#id').val(id);
+            form = document.getElementById('masterDataForm');
+            form.action = 'downloadMasterDataIndividualPdf.htm';
+            form.submit();
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -369,25 +299,36 @@
                             <h3 class="card-title">Search Master Data</h3>
                         </div>
                         <!--begin::Form-->
-                        <form:form class="form" id="masterDataForm" name="masterDataForm" action="MasterData"
+                        <form:form class="form" id="masterDataForm" name="masterDataForm" action=""
                                    theme="simple" method="post" modelAttribute="masterData">
-                            <%--                        <form class="form">--%>
                             <div class="card-body">
                                 <div class="form-group row">
 
+                                    <div class="col-lg-3" hidden="true">
+                                        <label>ID</label>
+                                        <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                            <input id="id" name="id" type="text" maxlength="64" class="form-control"
+                                                   placeholder="ID"/>
+                                        </div>
+                                    </div>
+
                                     <div class="col-lg-3">
                                         <label>Received Date:</label>
-                                        <input id="receivedDate" name="receivedDate" type="date" max=""/>
+                                        <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                            <input path="receivedDate" name="receivedDate" id="receivedDate"
+                                                   class="form-control" readonly="true"
+                                                   autocomplete="off" type="text" onkeydown="return false"/>
+                                        </div>
                                         <span class="form-text text-muted">Please enter received date</span>
                                     </div>
 
                                     <div class="col-lg-3">
                                         <label>Reference Number:</label>
-                                        <input id="referenceNumber" name="referenceNumber" type="text" onkeyup="" maxlength="64"
+                                        <input id="referenceNumber" name="referenceNumber" type="text"
+                                               maxlength="64"
                                                class="form-control" placeholder="Reference Number"/>
                                         <span class="form-text text-muted">Please enter reference number</span>
                                     </div>
-
 
                                     <div class="col-lg-3">
                                         <label>Name:</label>
@@ -403,7 +344,6 @@
                                         <input id="nic" name="nic" type="text"
                                                maxlength="16"
                                                class="form-control form-control-sm" placeholder="NIC"/>
-
                                         <span class="form-text text-muted">Please enter NIC</span>
                                     </div>
 
@@ -412,10 +352,10 @@
                                         <select id="institutionCode" name="institutionCode" class="form-control">
                                             <option selected value="">Select Institution</option>
                                             <c:forEach items="${masterData.commonInstitutionList}" var="institution">
-                                                <option value="${institution.institutionCode}">${institution.institutionCode} - ${institution.institutionName} </option>
+                                                <option value="${institution.institutionCode}">${institution.institutionCode}
+                                                    - ${institution.institutionName} </option>
                                             </c:forEach>
                                         </select>
-
                                         <span class="form-text text-muted">Please enter institution code</span>
                                     </div>
 
@@ -450,77 +390,75 @@
                                                 onclick="searchStart()">
                                             Search
                                         </button>
-                                        <button type="reset" class="btn btn-secondary btn-sm" onclick="resetSearch()">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetSearch()">
                                             Reset
                                         </button>
                                     </div>
+
+                                    <div class="col-lg-4"></div>
+
+                                    <div class="col-lg-2">
+                                        <button id="viewPDF" type="button" class="btn btn-primary mr-2"
+                                                onclick="downloadPDFReport()">
+                                            View Report
+                                        </button>
+                                    </div>
                                 </div>
-
-                                <!--end::Form-->
-                            </div>
-
-                            <div class="col-md-2 col-sm-4">
-                                <button id="viewPDF" type="button"
-                                        class="btn btn-block btn-primary btn-sm"
-                                        onclick="downloadPDF()" >View PDF
-                                </button>
                             </div>
                         </form:form>
                         <!--end::Card-->
                     </div>
                 </div>
             </div>
-            <%--                <!--begin::Card-->--%>
-                            <div class="card card-custom gutter-b">
-                                <div class="card-header flex-wrap border-0 pt-6 pb-0">
-                                    <div class="card-title">
-                                        <h3 class="card-label">Master Data Report
-                                            <span class="d-block text-muted pt-2 font-size-sm">Master Data List</span></h3>
-                                    </div>
-                                    <div class="card-toolbar">
-                                        <!--begin::Button-->
-<%--                                        --%>
-                                        <!--end::Button-->
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <!--begin: Datatable-->
-                                    <div id="data-table-loading" style="display: block;">
-                                        <div class="loader"></div>
-                                        <div class="loading-text">Loading..</div>
-                                    </div>
-                                    <div id="data-table-wrapper" style="display: none;">
-                                        <table class="table table-separate table-head-custom table-checkable" id="table">
-                                            <thead>
-                                            <tr>
-                                                <th>Reference Number</th>
-                                                <th>Institution Name</th>
-                                                <th>Name</th>
-                                                <th>Age</th>
-                                                <th>Gender</th>
-                                                <th>NIC</th>
-                                                <th>Contact Number</th>
-                                                <th>Serial Number</th>
-                                                <th>Specimen ID</th>
-                                                <th>Barcode Number</th>
-                                                <th>Received Date</th>
-                                                <th>Result</th>
-                                                <th>Status</th>
-                                                <th>Created User</th>
-                                                <th>Created Time</th>
-                                                <th>Report Time</th>
-                                                <th>Download</th >
-                                            </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                        <!--end: Datatable-->
-                                    </div>
-                                </div>
-                            </div>
+            <!--begin::Card-->
+            <div class="card card-custom gutter-b">
+                <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                    <div class="card-title">
+                        <h3 class="card-label">Master Data Report
+                            <span class="d-block text-muted pt-2 font-size-sm">Master Data List</span></h3>
+                    </div>
+                    <div class="card-toolbar"></div>
+                </div>
+                <div class="card-body">
+                    <!--begin: Datatable-->
+                    <div id="data-table-loading" style="display: block;">
+                        <div class="loader"></div>
+                        <div class="loading-text">Loading..</div>
+                    </div>
+                    <div id="data-table-wrapper" style="display: none;">
+                        <table class="table table-separate table-head-custom table-checkable" id="table">
+                            <thead>
+                            <tr>
+                                <th>Lab Number</th>
+                                <th>Serial Number</th>
+                                <th>Institution Name</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>NIC</th>
+                                <th>Contact Number</th>
+                                <th>Received Date</th>
+                                <th>Result</th>
+                                <th>Status</th>
+                                <th>Created User</th>
+                                <th>Created Time</th>
+                                <th>Download</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <!--end: Datatable-->
+                    </div>
+                </div>
+            </div>
             <!--end::Card-->
 
         </div>
     </div>
 </div>
 </html>
+
+<form:form class="form" id="masterDataForm" name="masterDataForm" action=""
+           theme="simple" method="post" modelAttribute="masterData">
+
+</form:form>

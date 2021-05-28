@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Scope("request")
 public class MasterData {
+    private long id;
     private long sampleID;
     private String referenceNumber;
     private String institutionCode;
@@ -28,7 +29,7 @@ public class MasterData {
     private String serialNumber;
     private String specimenID;
     private String barcode;
-    private Date receivedDate;
+    private String receivedDate;
     private String statusDescription;
     private String result;
     private String resultDescription;
@@ -39,5 +40,4 @@ public class MasterData {
     private Date reportTime;
     private String ct_target1;
     private String ct_target2;
-
 }

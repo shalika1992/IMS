@@ -12,8 +12,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 public class PlateBean {
-    private Map<String, List<String>> plateArray;
-    private Map<String, String> swapArray;
-    private Map<String, String> mergeArray;
     private long id;
+    private Map<String, List<String>> plateArray;
+    private Map<String, String> mergeArray;
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 @Scope("prototype")
 public class MasterTemp {
     private int id;
-    private int sampleId;
+    private String sampleId;
     private String referenceNo;
     private String institutionCode;
     private String name;
@@ -34,7 +34,7 @@ public class MasterTemp {
     public MasterTemp() {
     }
 
-    public MasterTemp(int id, int sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String barcode, String receivedDate, String status, String ward, String plateId, String blockValue, Date createdTime, String createdUser) {
+    public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String barcode, String receivedDate, String status, String ward, String plateId, String blockValue, Date createdTime, String createdUser) {
         this.id = id;
         this.sampleId = sampleId;
         this.referenceNo = referenceNo;
@@ -67,11 +67,11 @@ public class MasterTemp {
         this.id = id;
     }
 
-    public int getSampleId() {
+    public String getSampleId() {
         return sampleId;
     }
 
-    public void setSampleId(int sampleId) {
+    public void setSampleId(String sampleId) {
         this.sampleId = sampleId;
     }
 

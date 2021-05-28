@@ -18,7 +18,7 @@ import java.util.List;
 @ToString
 @MultipartConfig
 public class MasterDataInputBeen extends DataTablesRequest {
-
+    private long id;
     private long sampleID;
     private String referenceNumber;
     private String institutionCode;
@@ -30,7 +30,7 @@ public class MasterDataInputBeen extends DataTablesRequest {
     private String serialNumber;
     private String specimenID;
     private String barcode;
-    private Date receivedDate;
+    private String receivedDate;
     private String status;
     private int plateID;
     private String blockValue;
@@ -46,5 +46,4 @@ public class MasterDataInputBeen extends DataTablesRequest {
     private List<Status> statusList;
     private List<Result> resultList;
     private List<CommonInstitution> commonInstitutionList;
-
 }
