@@ -129,7 +129,7 @@
                 swapArray[y.dataset.key] = y.dataset.value;
             });
 
-            console.log("Swap array", swapArray);
+            let swapModel = {"labCode1": swapArray[0], "labCode2":swapArray[1]};
 
             if (!$.isEmptyObject(swapArray)) {
                 if (Object.keys(swapArray).length == 2) {
@@ -147,7 +147,8 @@
                         if (result.isConfirmed) {
                             platesNum = _swapCells(platesNum, swapArray);
                             _generatePlates(platesNum);
-                            _updateDatabase(platesNum, swapArray, 'SWAP');
+                            console.log(swapModel);
+                            _updateDatabase(platesNum, swapModel, 'SWAP');
                         } else {
                             Swal.fire('Changes are not saved', '', 'info');
                         }
@@ -168,8 +169,6 @@
             $.each(activeElements, function (x, y) {
                 mergeArray[y.dataset.key] = y.dataset.value;
             });
-
-            console.log("Merge Array", mergeArray);
 
             if (!$.isEmptyObject(mergeArray)) {
                 if (Object.keys(mergeArray).length != 1) {
@@ -203,14 +202,12 @@
 
         function _updateDatabase(plateArray, updateArray, operation) {
             if (operation === 'SWAP') {
-                let dataS = {"plateArray": plateArray, "swapArray": updateArray};
-
                 $.ajax({
                     type: 'POST',
                     url: '${pageContext.request.contextPath}/swapBlockPlate.json',
                     contentType: "application/json",
-                    data: JSON.stringify(dataS),
-                    dataType: 'text',
+                    data: JSON.stringify(updateArray),
+                    dataType: 'json',
                     success: function (res) {
                         console.log("message", res);
                         swal.fire({

@@ -109,7 +109,7 @@ function _processMergingPlate(platesArray) {
                     if (platesArray[val + shift + shift_val] !== undefined) {
                         var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
                         if (selectedPlate.checked) {
-                            tmpArr.push(platesArray[val + shift + shift_val][0]);
+                            tmpArr.push(platesArray[val + shift + shift_val][0]['labcode']);
                         }
                     }
                 } else {
@@ -181,11 +181,16 @@ function _generatePlates(platesArray) {
                         let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
                             '<ul style="text-align: left !important;" class="list-group">';
                         $.each(platesArray[val + shift + shift_val], (j, e) => {
-                            ul += '<li style="text-align: left !important;" class="list-group-item">' + e + '</li>';
+                            for (let i = 0; i < e['id'].length; i++) {
+                                ul += '<li style="text-align: left !important;" class="list-group-item">' + e['id'][i] + '</li>';
+                                ul += '<li style="text-align: left !important;" class="list-group-item">' + e['referenceNo'][i] + '</li>';
+                                ul += '<li style="text-align: left !important;" class="list-group-item">' + e['name'][i] + '</li>';
+                                ul += '<li style="text-align: left !important;" class="list-group-item">' + e['nic'][i] + '</li>';
+                            }
+                            ul += '<li style="text-align: left !important;" class="list-group-item">' + e['labcode'] + '</li>';
                         });
                         ul += '</ul>';
-
-                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0] + "</div>\n";
+                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['id'][0] + "</div>\n";
                     } else {
                         html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
                     }
