@@ -450,7 +450,7 @@ public class PlateAssignRepository {
     }
 
     @LogRepository
-    @Transactional(readOnly = true)
+    @Transactional
     public String MergeBlockPlate(PoolBean poolBean) {
         String message = "";
         try {
@@ -462,7 +462,7 @@ public class PlateAssignRepository {
                     if (arrayList != null && !arrayList.isEmpty() && arrayList.size() > 0) {
                         //validate the staring index
                         String startIndexValue = arrayList.get(0);
-                        if (startIndexValue != null && startIndexValue.isEmpty()) {
+                        if (startIndexValue != null && !startIndexValue.isEmpty()) {
                             logger.info("--Executing pool list index no --" + poolList.indexOf(arrayList) + "-start");
                             MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
                             idSetParameterMap.addValue("ispool", 1);

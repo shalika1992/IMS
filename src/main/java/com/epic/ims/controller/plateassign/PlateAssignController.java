@@ -28,10 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -102,14 +99,29 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody PoolBean poolBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+    Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody Map<String,String[]> mergedPool, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
+            PoolBean poolBean = convertMergedPoolToBean(mergedPool);
             defaultPlateMap = plateAssignService.MergeBlockPlate(poolBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }
         return defaultPlateMap;
+    }
+
+    PoolBean convertMergedPoolToBean(Map<String,String[]> mergedPool) {
+        PoolBean poolBean = new PoolBean();
+        List<ArrayList<String>> poolList = new ArrayList<>();
+        Iterator it = mergedPool.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            String[] pools = (String[]) pair.getValue();
+            ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pools));
+            poolList.add(arrayList);
+        }
+        poolBean.setPoolList(poolList);
+        return poolBean;
     }
 
     @LogController

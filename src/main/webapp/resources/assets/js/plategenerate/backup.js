@@ -82,3 +82,41 @@ function _generatePlates(platesArray) {
         $('[data-toggle="tooltip"]').tooltip()
     })
 }
+
+
+function merge() {
+    let mergeArray = {}
+    let activeElements = $('.cell-elmt.active');
+    $.each(activeElements, function (x, y) {
+        mergeArray[y.dataset.key] = y.dataset.value;
+    });
+
+    if (!$.isEmptyObject(mergeArray)) {
+        if (Object.keys(mergeArray).length != 1) {
+            swal.fire({
+                text: "Are you sure to proceed the operation?",
+                // icon: "success",
+                buttonsStyling: false,
+                confirmButtonText: "Proceed",
+                showCancelButton: true,
+                customClass: {
+                    confirmButton: "btn font-weight-bold btn-light-primary",
+                    cancelButton: "btn font-weight-bold btn-light-primary"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    platesNum = _mergeCells(platesNum, mergeArray);
+                    _generatePlates(platesNum);
+                    // _updateDatabase(platesNum, mergeArray);
+                } else {
+                    Swal.fire('Changes are not saved', '', 'info');
+                }
+            });
+        } else {
+            Swal.fire('Less values to merge', '', 'error')
+        }
+    } else {
+        Swal.fire('No values to merge', '', 'error');
+    }
+
+}
