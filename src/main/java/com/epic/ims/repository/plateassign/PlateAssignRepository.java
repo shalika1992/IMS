@@ -54,6 +54,7 @@ public class PlateAssignRepository {
                             rs.getString("nic")
                     ));
                 }
+                System.out.println("repo1:"+ defaultPlateMap);
                 return defaultPlateMap;
             });
         } catch (EmptyResultDataAccessException ex) {

@@ -20,7 +20,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Scope("prototype")
@@ -44,6 +46,19 @@ public class ResultUpdateService {
 
     @Autowired
     ResultUpdateRepository resultUpdateRepository;
+
+    @LogService
+    public Map<Integer, List<String>> getDefaultResult(String receivedDate, String plateId) {
+        Map<Integer, List<String>> defaultResultMap = new HashMap<>();
+        try {
+            defaultResultMap = resultUpdateRepository.getDefaultResultList(receivedDate, plateId);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return defaultResultMap;
+    }
 
     @LogService
     public long getCount(ResultUpdateInputBean resultUpdateInputBean) {

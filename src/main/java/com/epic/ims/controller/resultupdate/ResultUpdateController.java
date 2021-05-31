@@ -28,9 +28,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -51,6 +49,20 @@ public class ResultUpdateController {
 
     @Autowired
     CommonRepository commonRepository;
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/generateDefaultResult", method = RequestMethod.POST)
+    public @ResponseBody
+    Map<Integer, List<String>> getDefaultResultPage(@RequestParam("receivedDate") String receivedDate,@RequestParam("plateId") String plateId, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<String>> defaultResultMap = new HashMap<>();
+        try {
+            defaultResultMap = resultUpdateService.getDefaultResult(receivedDate, plateId);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return defaultResultMap;
+    }
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)

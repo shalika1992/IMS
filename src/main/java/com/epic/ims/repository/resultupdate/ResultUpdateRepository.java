@@ -21,9 +21,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -53,6 +52,36 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_LIST_DETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_NOTDETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_PENDING = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
+    private final String SQL_GET_DEFAULT_RESULT_LIST = "select @n := @n + 1 n,plateid,serialno,name,nic from master_data, (select @n := -1) m where receiveddate=? and plateid=? order by id";
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public Map<Integer, List<String>> getDefaultResultList(String receivedDate, String plateId) {
+        Map<Integer, List<String>> defaultResultMap = new HashMap<>();
+        try {
+            jdbcTemplate.query(SQL_GET_DEFAULT_RESULT_LIST, new Object[]{receivedDate, plateId}, (ResultSet rs) -> {
+                while (rs.next()) {
+                    defaultResultMap.put(rs.getInt("n"), Arrays.asList(
+                            rs.getString("plateid"),
+                            rs.getString("serialno"),
+                            rs.getString("name"),
+                            rs.getString("nic")
+                    ));
+                }
+
+                System.out.println("repo1:"+defaultResultMap);
+                return defaultResultMap;
+            });
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+            return defaultResultMap;
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        System.out.println("repo2:"+defaultResultMap);
+        return defaultResultMap;
+    }
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -69,6 +98,7 @@ public class ResultUpdateRepository {
         } catch (Exception e) {
             throw e;
         }
+        System.out.println("repo3:"+count);
         return count;
     }
 
