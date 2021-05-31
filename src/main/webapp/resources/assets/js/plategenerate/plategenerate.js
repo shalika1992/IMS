@@ -175,7 +175,8 @@ function _generatePlates(platesArray) {
         for (let j = 0; j < 8; j++) { // columns
             for (let i = 0; i < 12; i++) { // rows
                 val = i + (12 * j); // change normal filling
-                if ((val + 1) !== 84 && (val + 1) !== 96 && (val + 1) !== 27) {
+                // [&& (val + 1) !== 27] => C3
+                if ((val + 1) !== 84 && (val + 1) !== 96) {
                     if (platesArray[val + shift + shift_val] !== undefined) { // after finish filling
                         // tooltip creation
                         let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
@@ -190,7 +191,7 @@ function _generatePlates(platesArray) {
                             ul += '<li style="text-align: left !important;" class="list-group-item">' + e['labcode'] + '</li>';
                         });
                         ul += '</ul>';
-                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['id'][0] + "</div>\n";
+                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['labcode'] + "</div>\n";
                     } else {
                         html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
                     }
