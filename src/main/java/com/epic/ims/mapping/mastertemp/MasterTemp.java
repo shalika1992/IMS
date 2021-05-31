@@ -22,19 +22,23 @@ public class MasterTemp {
     private String residentDistrict;
     private String contactNumber;
     private String secondaryContactNumber;
+    private String serialNo;
+    private String specimenid;
     private String barcode;
     private String receivedDate;
     private String status;
-    private String ward;
     private String plateId;
     private String blockValue;
+    private String indexValue;
+    private String isPool;
+    private String ward;
     private Date createdTime;
     private String createdUser;
 
     public MasterTemp() {
     }
 
-    public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String barcode, String receivedDate, String status, String ward, String plateId, String blockValue, Date createdTime, String createdUser) {
+    public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String serialNo, String specimenid, String barcode, String receivedDate, String status, String plateId, String blockValue, String indexValue, String isPool, String ward, Date createdTime, String createdUser) {
         this.id = id;
         this.sampleId = sampleId;
         this.referenceNo = referenceNo;
@@ -49,12 +53,16 @@ public class MasterTemp {
         this.residentDistrict = residentDistrict;
         this.contactNumber = contactNumber;
         this.secondaryContactNumber = secondaryContactNumber;
+        this.serialNo = serialNo;
+        this.specimenid = specimenid;
         this.barcode = barcode;
         this.receivedDate = receivedDate;
         this.status = status;
-        this.ward = ward;
         this.plateId = plateId;
         this.blockValue = blockValue;
+        this.indexValue = indexValue;
+        this.isPool = isPool;
+        this.ward = ward;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
     }
@@ -171,6 +179,22 @@ public class MasterTemp {
         this.secondaryContactNumber = secondaryContactNumber;
     }
 
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo;
+    }
+
+    public String getSpecimenid() {
+        return specimenid;
+    }
+
+    public void setSpecimenid(String specimenid) {
+        this.specimenid = specimenid;
+    }
+
     public String getBarcode() {
         return barcode;
     }
@@ -195,14 +219,6 @@ public class MasterTemp {
         this.status = status;
     }
 
-    public String getWard() {
-        return ward;
-    }
-
-    public void setWard(String ward) {
-        this.ward = ward;
-    }
-
     public String getPlateId() {
         return plateId;
     }
@@ -217,6 +233,30 @@ public class MasterTemp {
 
     public void setBlockValue(String blockValue) {
         this.blockValue = blockValue;
+    }
+
+    public String getIndexValue() {
+        return indexValue;
+    }
+
+    public void setIndexValue(String indexValue) {
+        this.indexValue = indexValue;
+    }
+
+    public String getIsPool() {
+        return isPool;
+    }
+
+    public void setIsPool(String isPool) {
+        this.isPool = isPool;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
     }
 
     public Date getCreatedTime() {

@@ -10,7 +10,6 @@ import java.util.Date;
 public class SampleVerifyFile {
     private int id;
     private String referenceNo;
-    private String receivedDate;
     private String institutionCode;
     private String name;
     private String age;
@@ -19,12 +18,14 @@ public class SampleVerifyFile {
     private String contactType;
     private String nic;
     private String address;
-    private String status;
     private String residentDistrict;
     private String contactNumber;
     private String secondaryContactNumber;
     private String specimenid;
     private String barcode;
+    private String receivedDate;
+    private String status;
+    private String ward;
     private Date createdTime;
     private String createdUser;
     private Date lastUpdatedTime;
@@ -33,10 +34,9 @@ public class SampleVerifyFile {
     public SampleVerifyFile() {
     }
 
-    public SampleVerifyFile(int id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public SampleVerifyFile(int id, String referenceNo, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String receivedDate, String status, String ward, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
         this.id = id;
         this.referenceNo = referenceNo;
-        this.receivedDate = receivedDate;
         this.institutionCode = institutionCode;
         this.name = name;
         this.age = age;
@@ -45,12 +45,14 @@ public class SampleVerifyFile {
         this.contactType = contactType;
         this.nic = nic;
         this.address = address;
-        this.status = status;
         this.residentDistrict = residentDistrict;
         this.contactNumber = contactNumber;
         this.secondaryContactNumber = secondaryContactNumber;
         this.specimenid = specimenid;
         this.barcode = barcode;
+        this.receivedDate = receivedDate;
+        this.status = status;
+        this.ward = ward;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
         this.lastUpdatedTime = lastUpdatedTime;
@@ -71,14 +73,6 @@ public class SampleVerifyFile {
 
     public void setReferenceNo(String referenceNo) {
         this.referenceNo = referenceNo;
-    }
-
-    public String getReceivedDate() {
-        return receivedDate;
-    }
-
-    public void setReceivedDate(String receivedDate) {
-        this.receivedDate = receivedDate;
     }
 
     public String getInstitutionCode() {
@@ -145,14 +139,6 @@ public class SampleVerifyFile {
         this.address = address;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getResidentDistrict() {
         return residentDistrict;
     }
@@ -191,6 +177,30 @@ public class SampleVerifyFile {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public String getReceivedDate() {
+        return receivedDate;
+    }
+
+    public void setReceivedDate(String receivedDate) {
+        this.receivedDate = receivedDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
     }
 
     public Date getCreatedTime() {

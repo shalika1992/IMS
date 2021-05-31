@@ -25,6 +25,7 @@ public class MasterData {
     private String age;
     private String gender;
     private String nic;
+    private String address;
     private String contactNumber;
     private String serialNumber;
     private String specimenID;

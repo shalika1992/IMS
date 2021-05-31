@@ -3,7 +3,8 @@ package com.epic.ims.controller.plateassign;
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.plate.DefaultBean;
-import com.epic.ims.bean.plate.PlateBean;
+import com.epic.ims.bean.plate.PlateInputBean;
+import com.epic.ims.bean.plate.PoolBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
@@ -18,12 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -56,7 +60,7 @@ public class PlateAssignController {
         logger.info("[" + sessionBean.getSessionid() + "]  PLATE ASSIGN PAGE VIEW");
         ModelAndView modelAndView = null;
         try {
-            return new ModelAndView("plate/assign", "plate", new PlateBean());
+            modelAndView = new ModelAndView("plate/assign", "beanmap", new ModelMap());
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             //set the error message to model map
@@ -98,14 +102,42 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    String postMergeBlockPlate(@RequestBody PlateBean plateBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
-        String message = "";
+    Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody PoolBean poolBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
-            message = plateAssignService.MergeBlockPlate(plateBean);
+            defaultPlateMap = plateAssignService.MergeBlockPlate(poolBean);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
-            message = messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale);
         }
-        return message;
+        return defaultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
+    @RequestMapping(value = "/createPlate", method = RequestMethod.POST)
+    public void createPlate(@ModelAttribute("plate") PlateInputBean plateInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        logger.info("[" + sessionBean.getSessionid() + "]  MASTER PLATE CREATION");
+        OutputStream outputStream = null;
+        try {
+            List<String> fileList = plateAssignService.getFilePathList();
+        } catch (Exception ex) {
+            logger.error("Exception  :  ", ex);
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.flush();
+                    outputStream.close();
+                }
+            } catch (IOException ex) {
+            }
+        }
+
+    }
+
+    @ModelAttribute
+    public void getPlateBean(Model map) throws Exception {
+        PlateInputBean plateInputBean = new PlateInputBean();
+        //add values to model map
+        map.addAttribute("plate", plateInputBean);
     }
 }

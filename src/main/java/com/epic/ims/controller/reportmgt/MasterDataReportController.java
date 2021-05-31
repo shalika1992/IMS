@@ -18,10 +18,7 @@ import com.epic.ims.util.varlist.PageVarList;
 import com.epic.ims.util.varlist.SectionVarList;
 import com.epic.ims.validation.institution.InstitutionBeanValidator;
 import com.epic.ims.validation.institution.InstitutionBulkValidation;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.commons.logging.Log;
@@ -118,7 +115,7 @@ public class MasterDataReportController {
         return responseBean;
     }
 
-
+    @LogController
     @PostMapping(value = "/downloadMasterDataPdf")
     @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
     public void getMasterDataPDF(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -167,6 +164,7 @@ public class MasterDataReportController {
         }
     }
 
+    @LogController
     @PostMapping(value = "/downloadMasterDataIndividualPdf")
     @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPORT_GENERATION)
     public void getMasterDataIndividualPdf(@ModelAttribute("masterData") MasterDataInputBeen masterDataInputBeen, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -175,12 +173,8 @@ public class MasterDataReportController {
         try {
             MasterData masterData = masterDataReportService.getMasterDataSearchObjectForIndividualReport(masterDataInputBeen);
             if (masterData != null) {
-                List<MasterData> masterDataList = new ArrayList<MasterData>() {{
-                    add(masterData);
-                }};
-
                 String currentDateTime = commonRepository.getCurrentDateTimeAsString();
-                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/masterDataIndividualPDF.jasper");
+                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/individualfinalreport.jasper");
                 Map<String, Object> parameterMap = new HashMap<>();
 
                 //set parameters to map
@@ -188,12 +182,24 @@ public class MasterDataReportController {
                 parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterData.getReceivedDate()));
                 parameterMap.put("collectionDate", "--");
                 parameterMap.put("institution", common.replaceEmptyorNullStringToALL(masterData.getInstitutionCode()));
+                parameterMap.put("name", common.replaceEmptyorNullStringToALL(masterData.getName()));
+                parameterMap.put("age", common.replaceEmptyorNullStringToALL(masterData.getAge()));
+                parameterMap.put("gender", common.replaceEmptyorNullStringToALL(masterData.getGender()));
+                parameterMap.put("nic", common.replaceEmptyorNullStringToALL(masterData.getNic()));
+                parameterMap.put("contactNumber", common.replaceEmptyorNullStringToALL(masterData.getContactNumber()));
+                parameterMap.put("address", common.replaceEmptyorNullStringToALL(masterData.getAddress()));
+                parameterMap.put("serialNumber", common.replaceEmptyorNullStringToALL(masterData.getReferenceNumber()));
+                parameterMap.put("barcode", common.replaceEmptyorNullStringToALL(masterData.getBarcode()));
                 parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
+                parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterData.getResultDescription()));
+                parameterMap.put("ct_target1", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
+                parameterMap.put("ct_target2", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
+
                 parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
                 parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);
 
                 JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(masterDataList));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JREmptyDataSource());
 
                 httpServletResponse.setContentType("application/x-download");
                 httpServletResponse.setHeader("Content-disposition", "inline; filename=Test-Report.pdf");

@@ -73,7 +73,10 @@ public class SampleVerifyFileService {
     public String validateSample(SampleIdListBean sampleIdListBean) {
         String message = "";
         try {
-            message = sampleVerifyFileRepository.validateSample(sampleIdListBean);
+            message = sampleVerifyFileRepository.validateSampleList(sampleIdListBean);
+            if (message.isEmpty()) {
+                message = sampleVerifyFileRepository.validateSample(sampleIdListBean);
+            }
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }

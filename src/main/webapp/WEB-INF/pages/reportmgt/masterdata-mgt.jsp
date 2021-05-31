@@ -255,7 +255,6 @@
         }
 
         function downloadPDFReport() {
-            alert();
             form = document.getElementById('masterDataForm');
             form.action = 'downloadMasterDataPdf.htm';
             form.submit();

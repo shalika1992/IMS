@@ -36,12 +36,13 @@ public class SampleFile {
     public SampleFile() {
     }
 
-    public SampleFile(String id, String referenceNo, String receivedDate, String name, String nic) {
+    public SampleFile(String id, String referenceNo, String receivedDate, String name, String nic, String barcode) {
         this.id = id;
         this.referenceNo = referenceNo;
         this.receivedDate = receivedDate;
         this.name = name;
         this.nic = nic;
+        this.barcode = barcode;
     }
 
     public SampleFile(String id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String ward, String plateId, String blockValue, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {

@@ -6,6 +6,7 @@ public class MessageVarList {
     public static final String COMMON_ERROR_RECORD_DOESNOT_EXISTS = "common.error.record.doesnot.exists";
     public static final String COMMON_ERROR_NO_VALUE_CHANGE = "common.error.no.value.change";
     public static final String COMMON_ERROR_ALRADY_USE = "common.error.alreadyuse";
+    public static final String COMMON_ERROR_RECORD_ALREADY_EXISTS = "common.error.record.alreadyexists";
     //-------------------------- end common messages------------------------------------------------------------------//
 
     //-------------------------- start user login messages------------------------------------------------------------//
@@ -120,6 +121,6 @@ public class MessageVarList {
 
     //-------------------------- sample verify file mgt---------------------------------------------------------------//
     public static final String SAMPLE_VERIFY_FILE_RECORD_UPDATE_SUCCESSFULLY = "sampleverifyfilerecord.updated.success";
-
+    public static final String SAMPLE_VERIFY_FILE_RECORD_EMPTY_LABCODE = "sampleverifyfilerecord.empty.labcode";
     //------------------------- sample verify file mgt---------------------------------------------------------------//
 }

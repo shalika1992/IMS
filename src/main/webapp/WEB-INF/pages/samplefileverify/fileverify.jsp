@@ -448,11 +448,19 @@
                 url: "${pageContext.request.contextPath}/validsample.json",
                 contentType: "application/json",
                 data: JSON.stringify(dataS),
-                success: function (e) {
+                success: function (data) {
                     //hide the modal
                     $('#modalValid').modal('hide');
-                    //reset the search
-                    resetSearch();
+                    if (data.errorMessage) {
+                        $('#responseHeader').text('Sample Verification');
+                        $('#responseMsg').text(data.errorMessage);
+                        $('#modalResponse').modal('show');
+                    } else {
+                        $('#responseHeader').text('Sample Verification');
+                        $('#responseMsg').text('Sample verification executed successfully');
+                        $('#modalResponse').modal('show');
+                    }
+                    oTable.fnDraw();
                 },
                 error: function (e) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -474,8 +482,16 @@
                 success: function (e) {
                     //hide the modal
                     $('#modalNotFound').modal('hide');
-                    //reset the search
-                    resetSearch();
+                    if (data.errorMessage) {
+                        $('#responseHeader').text('Samples Mark as Not Found');
+                        $('#responseMsg').text(data.errorMessage);
+                        $('#modalResponse').modal('show');
+                    } else {
+                        $('#responseHeader').text('Samples Mark as Not Found');
+                        $('#responseMsg').text('Samples updated successfully');
+                        $('#modalResponse').modal('show');
+                    }
+                    oTable.fnDraw();
                 },
                 error: function (e) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -497,8 +513,16 @@
                 success: function (e) {
                     //hide the modal
                     $('#modalInvalid').modal('hide');
-                    //reset the search
-                    resetSearch();
+                    if (data.errorMessage) {
+                        $('#responseHeader').text('Samples Invalid');
+                        $('#responseMsg').text(data.errorMessage);
+                        $('#modalResponse').modal('show');
+                    } else {
+                        $('#responseHeader').text('Samples Invalid');
+                        $('#responseMsg').text('Samples updated successfully');
+                        $('#modalResponse').modal('show');
+                    }
+                    oTable.fnDraw();
                 },
                 error: function (e) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -720,5 +744,6 @@
 <jsp:include page="fileverify_confirm.jsp"/>
 <jsp:include page="fileverify_invalid.jsp"/>
 <jsp:include page="fileverify_notfound.jsp"/>
+<jsp:include page="fileverify_response.jsp"/>
 <!-- end include jsp files -->
 </html>

@@ -447,7 +447,7 @@ public class ReportMgtRepository {
         MasterData masterData;
         try {
             String sql = "" +
-                    "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
+                    "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic,m.address as address, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
                     "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2 " +
                     "from master_data m " +
                     "left join status s on s.code = m.status " +
@@ -511,6 +511,12 @@ public class ReportMgtRepository {
                         m.setNic(rs.getString("nic"));
                     } catch (Exception e) {
                         m.setNic(null);
+                    }
+
+                    try {
+                        m.setAddress(rs.getString("address"));
+                    } catch (Exception e) {
+                        m.setAddress(null);
                     }
 
                     try {

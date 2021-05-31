@@ -3,6 +3,7 @@ package com.epic.ims.util.common;
 import com.epic.ims.bean.common.Status;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.util.varlist.CommonVarList;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
@@ -267,12 +268,12 @@ public class Common {
     }
 
     /**
-     *   @Author shalika_w
-     *   @CreatedTime 2021-05-12 02:04:35 PM				
-     *   @Version V1.00				
-     *   @MethodName handleNullAndEmptyValue			
-     *   @MethodParams [value]		
-     *   @MethodDescription - Handle null and empty in data grid
+     * @Author shalika_w
+     * @CreatedTime 2021-05-12 02:04:35 PM
+     * @Version V1.00
+     * @MethodName handleNullAndEmptyValue
+     * @MethodParams [value]
+     * @MethodDescription - Handle null and empty in data grid
      */
     public String handleNullAndEmptyValue(String value) {
         try {
@@ -285,5 +286,31 @@ public class Common {
             value = "--";
         }
         return value;
+    }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-30 07:17:41 PM
+     * @Version V1.00
+     * @MethodName createFolderPath
+     * @MethodParams [folderPath]
+     * @MethodDescription - This method create folder for given path
+     */
+    public void createFolderPath(String folderPath) throws IOException {
+        try {
+            File pdfFile = new File(folderPath);
+            //set permission to newly created folder
+            if (SystemUtils.IS_OS_LINUX) {
+                Runtime.getRuntime().exec("chmod 777 " + folderPath);
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                pdfFile.setExecutable(true);
+                pdfFile.setReadable(true);
+                pdfFile.setWritable(true);
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

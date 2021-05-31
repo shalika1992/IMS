@@ -21,14 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
-public class SampleVerifyFileRepository<yes> {
+public class SampleVerifyFileRepository {
     private final Log logger = LogFactory.getLog(getClass());
 
     @Autowired
@@ -151,8 +150,8 @@ public class SampleVerifyFileRepository<yes> {
             String sql = "" +
                     "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
                     " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
-                    " i.address as address, i.district as residentdistrict, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
-                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.createduser as createduser, i.createdtime as createdtime " +
+                    " i.address as address, i.district as residentdistrict,i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
+                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.ward as ward , i.createdtime as createdtime, i.createduser as createduser   " +
                     " from sample_data i left join status s on s.code = i.status where " + dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileVerificationInputBean.displayLength + " offset " + sampleFileVerificationInputBean.displayStart;
 
@@ -169,12 +168,6 @@ public class SampleVerifyFileRepository<yes> {
                     sampleVerifyFile.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
                 } catch (Exception e) {
                     sampleVerifyFile.setReferenceNo("--");
-                }
-
-                try {
-                    sampleVerifyFile.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
-                } catch (Exception e) {
-                    sampleVerifyFile.setReceivedDate("--");
                 }
 
                 try {
@@ -226,9 +219,152 @@ public class SampleVerifyFileRepository<yes> {
                 }
 
                 try {
+                    sampleVerifyFile.setResidentDistrict(common.handleNullAndEmptyValue(rs.getString("residentdistrict")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setResidentDistrict("--");
+                }
+
+                try {
+                    sampleVerifyFile.setContactNumber(common.handleNullAndEmptyValue(rs.getString("contactnumber")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setContactNumber("--");
+                }
+
+                try {
+                    sampleVerifyFile.setSecondaryContactNumber(common.handleNullAndEmptyValue(rs.getString("secondarycontactnumber")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setSecondaryContactNumber("--");
+                }
+
+                try {
+                    sampleVerifyFile.setSpecimenid(common.handleNullAndEmptyValue(rs.getString("specimenid")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setSpecimenid("--");
+                }
+
+                try {
+                    sampleVerifyFile.setBarcode(common.handleNullAndEmptyValue(rs.getString("barcode")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setBarcode("--");
+                }
+
+                try {
+                    sampleVerifyFile.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setReceivedDate("--");
+                }
+
+                try {
                     sampleVerifyFile.setStatus(common.handleNullAndEmptyValue(rs.getString("status")));
                 } catch (Exception e) {
                     sampleVerifyFile.setStatus("--");
+                }
+
+                try {
+                    sampleVerifyFile.setWard(common.handleNullAndEmptyValue(rs.getString("ward")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setWard("--");
+                }
+
+                try {
+                    sampleVerifyFile.setCreatedTime(rs.getTimestamp("createdtime"));
+                } catch (Exception e) {
+                    sampleVerifyFile.setCreatedTime(null);
+                }
+
+                try {
+                    sampleVerifyFile.setCreatedUser(common.handleNullAndEmptyValue(rs.getString("createduser")));
+                } catch (SQLException e) {
+                    sampleVerifyFile.setCreatedUser("--");
+                }
+
+                return sampleVerifyFile;
+            });
+        } catch (Exception exception) {
+            throw exception;
+        }
+        return sampleVerifyFileList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String validateSampleList(SampleIdListBean sampleIdListBean) {
+        String message = "";
+        List<SampleVerifyFile> sampleVerifyFileList;
+        try {
+            String sql = "" +
+                    "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, i.name as name, i.age as age,i.gender as gender," +
+                    "i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, i.address as address, i.district as residentdistrict," +
+                    "i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, i.barcode as barcode, " +
+                    "i.receiveddate as receiveddate, s.description as status, i.createduser as createduser, i.createdtime as createdtime , i.ward as ward " +
+                    "from sample_data i " +
+                    "left join status s on s.code = i.status where i.id in (:ids) order by i.id";
+
+            Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
+            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            idSetParameterMap.addValue("ids", idSet);
+
+            sampleVerifyFileList = namedParameterJdbcTemplate.query(sql, idSetParameterMap, (rs, rowNum) -> {
+                SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
+
+                try {
+                    sampleVerifyFile.setId(rs.getInt("id"));
+                } catch (Exception e) {
+                    sampleVerifyFile.setId(0);
+                }
+
+                try {
+                    sampleVerifyFile.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setReferenceNo("--");
+                }
+
+                try {
+                    sampleVerifyFile.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setInstitutionCode("--");
+                }
+
+                try {
+                    sampleVerifyFile.setName(common.handleNullAndEmptyValue(rs.getString("name")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setName("--");
+                }
+
+                try {
+                    sampleVerifyFile.setAge(common.handleNullAndEmptyValue(rs.getString("age")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setAge("--");
+                }
+
+                try {
+                    sampleVerifyFile.setGender(common.handleNullAndEmptyValue(rs.getString("gender")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setGender("--");
+                }
+
+                try {
+                    sampleVerifyFile.setSymptomatic(common.handleNullAndEmptyValue(rs.getString("symptomatic")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setSymptomatic("--");
+                }
+
+                try {
+                    sampleVerifyFile.setContactType(common.handleNullAndEmptyValue(rs.getString("contacttype")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setContactType("--");
+                }
+
+                try {
+                    sampleVerifyFile.setNic(common.handleNullAndEmptyValue(rs.getString("nic")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setNic("--");
+                }
+
+                try {
+                    sampleVerifyFile.setAddress(common.handleNullAndEmptyValue(rs.getString("address")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setAddress("--");
                 }
 
                 try {
@@ -262,6 +398,24 @@ public class SampleVerifyFileRepository<yes> {
                 }
 
                 try {
+                    sampleVerifyFile.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setReceivedDate("--");
+                }
+
+                try {
+                    sampleVerifyFile.setStatus(common.handleNullAndEmptyValue(rs.getString("status")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setStatus("--");
+                }
+
+                try {
+                    sampleVerifyFile.setWard(common.handleNullAndEmptyValue(rs.getString("ward")));
+                } catch (Exception e) {
+                    sampleVerifyFile.setWard("--");
+                }
+
+                try {
                     sampleVerifyFile.setCreatedTime(rs.getTimestamp("createdtime"));
                 } catch (Exception e) {
                     sampleVerifyFile.setCreatedTime(null);
@@ -272,12 +426,23 @@ public class SampleVerifyFileRepository<yes> {
                 } catch (SQLException e) {
                     sampleVerifyFile.setCreatedUser("--");
                 }
+
                 return sampleVerifyFile;
             });
-        } catch (Exception exception) {
-            throw exception;
+
+            //if (sampleVerifyFileList != null && !sampleVerifyFileList.isEmpty() && sampleVerifyFileList.size() > 0) {
+            //    SampleVerifyFile sampleVerifyFile = sampleVerifyFileList.stream().filter(s -> (s.getBarcode() == null || s.getBarcode().isEmpty() || s.getBarcode().equals("--"))).findFirst().orElse(null);
+            //    //validate the list contain object with empty or null labcode
+            //    if (sampleVerifyFile != null) {
+            //        message = MessageVarList.SAMPLE_VERIFY_FILE_RECORD_EMPTY_LABCODE;
+            //    }
+            //} else {
+            //    message = MessageVarList.COMMON_ERROR_RECORD_DOESNOT_EXISTS;
+            //}
+        } catch (Exception ex) {
+            throw ex;
         }
-        return sampleVerifyFileList;
+        return message;
     }
 
     @LogRepository
@@ -295,11 +460,13 @@ public class SampleVerifyFileRepository<yes> {
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
+
         } catch (Exception ex) {
             throw ex;
         }
         return message;
     }
+
 
     @LogRepository
     @Transactional

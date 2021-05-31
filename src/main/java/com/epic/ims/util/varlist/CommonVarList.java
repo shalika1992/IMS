@@ -164,5 +164,9 @@ public class CommonVarList {
     public String REPORT_TEST_METHOD;
     //-------------------------------report content codes-------------------------------------------------------------//
 
+    //-------------------------------report content codes-------------------------------------------------------------//
+    @Value("${plate.position.c3}")
+    public String PLATE_POSITION_C3;
+    //-------------------------------report content codes-------------------------------------------------------------//
 }
 

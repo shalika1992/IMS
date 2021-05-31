@@ -54,7 +54,7 @@ public class CommonRepository {
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
     private final String SQL_GET_RESULT_LIST = "select code,description from result";
-    private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?)";
+    private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?, ?)";
     private final String SQL_GET_STATUS_LIST_REPORT = "select code, description from status where code in (?, ?, ?)";
 
     @LogRepository
@@ -97,6 +97,21 @@ public class CommonRepository {
     @Transactional(readOnly = true)
     public String getCurrentDateAsString() throws Exception {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDateAsString = "";
+        try {
+            Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
+            Date formattedCurrentDate = formatter.parse(currentDate.get("currentdate").toString());
+            currentDateAsString = formatter.format(formattedCurrentDate);
+        } catch (Exception e) {
+            throw e;
+        }
+        return currentDateAsString;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String getCurrentDateAsYYYYMMDD() throws Exception {
+        DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
         String currentDateAsString = "";
         try {
             Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
@@ -296,7 +311,7 @@ public class CommonRepository {
     public List<Status> getStatusListForSampleVerify() throws Exception {
         List<Status> statusBeanList;
         try {
-            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED});
+            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED});
             statusBeanList = statusList.stream().map((record) -> {
                 Status statusBean = new Status();
                 statusBean.setStatusCode(record.get("code").toString());
