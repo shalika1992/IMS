@@ -59,13 +59,21 @@ function _generatePlates(platesArray) {
     // shift for next plate
     let shift = 0;
     let shift_val = 0;
+    // monitor if pooled or not
+    let pool_count = 0;
     // fill plates
-    for (let k = 0; k < round; k++) { // plate rounds
-
+    for (let k = 0; k < round; k++) {
+        // plate rounds
         // check box
         let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,' + (k + 1) + ')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
-        // plate no
-        html += "<div class='row master-plate'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
+
+        if (platesArray[pool_count][0]['ispool'] === '0') {
+            // plate no
+            html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
+        } else {
+            // plate no
+            html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Merged Plate<span>#" + (k + 1) + "</span></div>\n";
+        }
 
         // plate vertical letters
         html += "<div class='col-1'><div class='row'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
@@ -127,6 +135,7 @@ function _generatePlates(platesArray) {
         html += '</div>\n'
         // to next plate
         shift += 96;
+        pool_count += 94;
 
     }
     // set final html obj
