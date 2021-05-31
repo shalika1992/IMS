@@ -168,5 +168,13 @@ public class CommonVarList {
     @Value("${plate.position.c3}")
     public String PLATE_POSITION_C3;
     //-------------------------------report content codes-------------------------------------------------------------//
+
+    //-------------------------------report content codes-------------------------------------------------------------//
+    @Value("${masterfile.linux.filepath}")
+    public String MASTERFILE_LINUX_FILEPATH;
+
+    @Value("${masterfile.windows.filepath}")
+    public String MASTERFILE_WINDOWS_FILEPATH;
+    //-------------------------------report content codes-------------------------------------------------------------//
 }
 
