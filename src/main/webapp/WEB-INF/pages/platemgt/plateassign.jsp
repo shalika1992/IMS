@@ -17,7 +17,6 @@
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/resources/assets/css/plategenerate/plategenerate.css">
     <script type="text/javascript">
-
         let platesNum;
         let mergeArray;
         let selectedDate;
@@ -60,9 +59,7 @@
         }
 
         function generatePlates() {
-
             if ($('#kt_datepicker_1').val()) {
-
                 selectedDate = $('#kt_datepicker_1').val();
                 $.ajax({
                     type: 'POST',
@@ -70,6 +67,7 @@
                     data: {receivedDate: $('#kt_datepicker_1').val()},
                     success: function (res) {
                         platesNum = res;
+                        sessionStorage.setItem('plates', JSON.stringify(res));
                         if (Object.keys(res).length > 0) {
                             $("#generateDiv").show();
                             $("#stickyOp").show();
@@ -104,29 +102,18 @@
                     }
                 });
             }
-
         }
 
         function merge() {
-            if ($('#kt_datepicker_1').val()) {
-                selectedDate = $('#kt_datepicker_1').val();
-                $.ajax({
-                    type: 'POST',
-                    url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
-                    data: {receivedDate: $('#kt_datepicker_1').val()},
-                    success: function (res) {
-                        _storeMergePlate(platesNum);
-                    }
-                });
-            }
+            _storeMergePlate(JSON.parse(sessionStorage.getItem('plates')));
         }
 
         function _storeMergePlate(platesArray) {
+            let mergedIdList = [];
             // get modulus
             let module = Object.keys(platesArray).length % 93;
             // get plate count
             let round = Math.floor(Object.keys(platesArray).length / 93);
-
             // plate count final
             if (module != 0) {
                 round++;
@@ -136,6 +123,7 @@
             for (let k = 0; k < round; k++) {
                 var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
                 if (selectedPlate.checked) {
+                    mergedIdList.push((k + 1));
                     count++;
                 }
             }
@@ -160,11 +148,11 @@
                     }
                 });
             } else {
-                _processMergingPlate(platesArray) ;
+                _processMergingPlate(platesArray, mergedIdList);
             }
         }
 
-        function _processMergingPlate(platesArray) {
+        function _processMergingPlate(platesArray, mergedIdList) {
             let mergedArr = [];
             let finalizedMergedArr = [];
             $(this).addClass("active");
@@ -172,14 +160,12 @@
             let module = Object.keys(platesArray).length % 93;
             // get plate count
             let round = Math.floor(Object.keys(platesArray).length / 93);
-
             // plate count final
             if (module != 0) {
                 round++;
             }
             let shift = 0;
             let shift_val = 0;
-
             // plate rounds
             for (let k = 0; k < round; k++) {
                 let val;
@@ -213,10 +199,10 @@
             for (let i = 0; i < mergedArr.length; i++) {
                 finalizedMergedArr.push(mergedArr[i].flat(Infinity))
             }
-            this._updateMergeDatabase(finalizedMergedArr);
+            this._updateMergeDatabase(finalizedMergedArr, mergedIdList);
         }
 
-        function _updateMergeDatabase(mergeArray) {
+        function _updateMergeDatabase(mergeArray, mergedIdList) {
             $.ajax({
                 type: 'POST',
                 url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
@@ -224,15 +210,7 @@
                 data: JSON.stringify(Object.assign({}, mergeArray)),
                 dataType: 'json',
                 success: function (res) {
-                    swal.fire({
-                        text: "Successful",
-                        icon: "success",
-                        buttonsStyling: false,
-                        confirmButtonText: "Exit",
-                        customClass: {
-                            confirmButton: "btn font-weight-bold btn-light-primary"
-                        }
-                    })
+                    _generatePlates(res);
                 },
                 error: function (jqXHR) {
                     swal.fire({
@@ -256,9 +234,7 @@
                 swapArray[y.dataset.key] = y.dataset.value;
                 swap.push(y.dataset.value);
             });
-
             let swapModel = {"labCode1": swap[0], "labCode2": swap[1]};
-
             if (!$.isEmptyObject(swapArray)) {
                 if (Object.keys(swapArray).length == 2) {
                     swal.fire({
@@ -280,7 +256,6 @@
                             Swal.fire('Changes are not saved', '', 'info');
                         }
                     });
-
                 } else {
                     Swal.fire('Only 2 values can swap', '', 'error');
                 }
@@ -400,6 +375,7 @@
                                 </button>
                             </div>
                         </div>
+                        <div id="mergedplates"></div>
                         <div id="plates"></div>
                     </div>
                 </div>
@@ -431,7 +407,6 @@
     <script src="${pageContext.request.contextPath}/resources/assets/js/scripts.bundle.js"></script>
     <script src="${pageContext.request.contextPath}/resources/assets/js/plategenerate/plategenerate.js"></script>
     <script>
-
         var arrows;
         if (KTUtil.isRTL()) {
             arrows = {
@@ -444,7 +419,6 @@
                 rightArrow: '<i class="la la-angle-right"></i>'
             }
         }
-
         $('#kt_datepicker_1').datepicker({
             rtl: KTUtil.isRTL(),
             todayHighlight: true,
@@ -454,8 +428,6 @@
             endDate: new Date(),
             format: "yyyy-mm-dd"
         });
-
-
     </script>
     <!-- start include jsp files -->
     <!-- end include jsp files -->
