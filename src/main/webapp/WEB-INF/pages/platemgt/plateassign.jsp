@@ -107,7 +107,7 @@
 
         }
 
-        function testMerge() {
+        function merge() {
             if ($('#kt_datepicker_1').val()) {
                 selectedDate = $('#kt_datepicker_1').val();
                 $.ajax({
@@ -121,6 +121,133 @@
             }
         }
 
+        function _storeMergePlate(platesArray) {
+            // get modulus
+            let module = Object.keys(platesArray).length % 93;
+            // get plate count
+            let round = Math.floor(Object.keys(platesArray).length / 93);
+
+            // plate count final
+            if (module != 0) {
+                round++;
+            }
+            let count = 0;
+            // plate rounds
+            for (let k = 0; k < round; k++) {
+                var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
+                if (selectedPlate.checked) {
+                    count++;
+                }
+            }
+            if (count <= 1) {
+                swal.fire({
+                    text: "Need a minimum of 2 plates to pool",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "OK",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else if (count > 4) {
+                swal.fire({
+                    text: "Maximum number of plates which can be pooled together is 4",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "OK",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else {
+                _processMergingPlate(platesArray) ;
+            }
+        }
+
+        function _processMergingPlate(platesArray) {
+            let mergedArr = [];
+            let finalizedMergedArr = [];
+            $(this).addClass("active");
+            // get modulus
+            let module = Object.keys(platesArray).length % 93;
+            // get plate count
+            let round = Math.floor(Object.keys(platesArray).length / 93);
+
+            // plate count final
+            if (module != 0) {
+                round++;
+            }
+            let shift = 0;
+            let shift_val = 0;
+
+            // plate rounds
+            for (let k = 0; k < round; k++) {
+                let val;
+                let tmpArr = [];
+                var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
+                for (let j = 0; j < 8; j++) { // columns
+                    for (let i = 0; i < 12; i++) { // rows
+                        val = i + (12 * j); // change normal filling
+                        if ((val + 1) !== 84 && (val + 1) !== 96) {
+                            if (platesArray[val + shift + shift_val] !== undefined) {
+                                if (selectedPlate.checked) {
+                                    tmpArr.push(platesArray[val + shift + shift_val][0]['labcode']);
+                                }
+                            }
+                        } else {
+                            shift_val--;
+                        }
+                    }
+                }
+                shift += 96;
+                if (selectedPlate.checked) {
+                    if (mergedArr.length === 0) {
+                        mergedArr = tmpArr;
+                    } else {
+                        mergedArr = mergedArr.map((value, index) => {
+                            return [value, tmpArr[index]]
+                        });
+                    }
+                }
+            }
+            for (let i = 0; i < mergedArr.length; i++) {
+                finalizedMergedArr.push(mergedArr[i].flat(Infinity))
+            }
+            this._updateMergeDatabase(finalizedMergedArr);
+        }
+
+        function _updateMergeDatabase(mergeArray) {
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
+                contentType: "application/json",
+                data: JSON.stringify(Object.assign({}, mergeArray)),
+                dataType: 'json',
+                success: function (res) {
+                    swal.fire({
+                        text: "Successful",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    })
+                },
+                error: function (jqXHR) {
+                    swal.fire({
+                        text: "Error occurred while processing.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    });
+                }
+            });
+        }
+
         function swap() {
             const swap = [];
             let swapArray = {}
@@ -130,7 +257,7 @@
                 swap.push(y.dataset.value);
             });
 
-            let swapModel = {"labCode1": swap[0], "labCode2":swap[1]};
+            let swapModel = {"labCode1": swap[0], "labCode2": swap[1]};
 
             if (!$.isEmptyObject(swapArray)) {
                 if (Object.keys(swapArray).length == 2) {
@@ -148,8 +275,7 @@
                         if (result.isConfirmed) {
                             platesNum = _swapCells(platesNum, swapArray);
                             _generatePlates(platesNum);
-                            console.log(swapModel);
-                            _updateDatabase(platesNum, swapModel, 'SWAP');
+                            _updateSwapDatabase(platesNum, swapModel);
                         } else {
                             Swal.fire('Changes are not saved', '', 'info');
                         }
@@ -161,99 +287,39 @@
             } else {
                 Swal.fire('No values to swap', '', 'error');
             }
-
         }
 
-        function merge() {
-            let mergeArray = {}
-            let activeElements = $('.cell-elmt.active');
-            $.each(activeElements, function (x, y) {
-                mergeArray[y.dataset.key] = y.dataset.value;
-            });
-
-            if (!$.isEmptyObject(mergeArray)) {
-                if (Object.keys(mergeArray).length != 1) {
+        function _updateSwapDatabase(plateArray, updateArray) {
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/swapBlockPlate.json',
+                contentType: "application/json",
+                data: JSON.stringify(updateArray),
+                dataType: 'json',
+                success: function (res) {
                     swal.fire({
-                        text: "Are you sure to proceed the operation?",
-                        // icon: "success",
+                        text: "Successful",
+                        icon: "success",
                         buttonsStyling: false,
-                        confirmButtonText: "Proceed",
-                        showCancelButton: true,
+                        confirmButtonText: "Exit",
                         customClass: {
-                            confirmButton: "btn font-weight-bold btn-light-primary",
-                            cancelButton: "btn font-weight-bold btn-light-primary"
+                            confirmButton: "btn font-weight-bold btn-light-primary"
                         }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            platesNum = _mergeCells(platesNum, mergeArray);
-                            _generatePlates(platesNum);
-                            _updateDatabase(platesNum, mergeArray, 'MERGE');
-                        } else {
-                            Swal.fire('Changes are not saved', '', 'info');
+                    })
+                },
+                error: function (jqXHR) {
+                    swal.fire({
+                        text: "Error occurred while processing.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
                         }
                     });
-                } else {
-                    Swal.fire('Less values to merge', '', 'error')
                 }
-            } else {
-                Swal.fire('No values to merge', '', 'error');
-            }
-
+            });
         }
-
-        function _updateDatabase(plateArray, updateArray, operation) {
-            if (operation === 'SWAP') {
-                $.ajax({
-                    type: 'POST',
-                    url: '${pageContext.request.contextPath}/swapBlockPlate.json',
-                    contentType: "application/json",
-                    data: JSON.stringify(updateArray),
-                    dataType: 'json',
-                    success: function (res) {
-                        console.log("message", res);
-                        swal.fire({
-                            text: res,
-                            // icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Exit",
-                            customClass: {
-                                confirmButton: "btn font-weight-bold btn-light-primary"
-                            }
-                        });
-
-                    },
-                    error: function (jqXHR) {
-                        <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
-                    }
-                });
-            } else if (operation === 'MERGE') {
-                let dataM = {"plateArray": plateArray, "mergeArray": updateArray};
-
-                $.ajax({
-                    type: 'POST',
-                    url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
-                    contentType: "application/json",
-                    data: JSON.stringify(dataM),
-                    dataType: 'text',
-                    success: function (res) {
-                        console.log(res);
-                        swal.fire({
-                            text: res,
-                            // icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Exit",
-                            customClass: {
-                                confirmButton: "btn font-weight-bold btn-light-primary"
-                            }
-                        });
-                    },
-                    error: function (jqXHR) {
-                        window.location = "${pageContext.request.contextPath}/logout.htm";
-                    }
-                });
-            }
-        }
-
     </script>
 </head>
 <!--begin::Content-->
@@ -322,9 +388,9 @@
                         <h4>Following operations can be done</h4>
                         <div class="form-group row">
                             <div class="col-lg-3">
-                                <label>Pool selected cells</label>
+                                <label>Pool selected tables</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
-                                        onclick="testMerge()">Pool
+                                        onclick="merge()">Pool
                                 </button>
                             </div>
                             <div class="col-lg-3">
@@ -344,7 +410,7 @@
     <ul class="sticky-toolbar nav flex-column pl-2 pr-2 pt-3 pb-3 mt-4" id="stickyOp" style="display: none">
         <!--begin::Item-->
         <li class="nav-item mb-2" id="kt_demo_panel_toggle" data-toggle="tooltip" title="" data-placement="right"
-            data-original-title="Merge selected cells">
+            data-original-title="Merge selected tables">
             <a class="btn btn-sm btn-icon btn-bg-light btn-icon-success btn-hover-success" href="javascript:void(0);"
                onclick="merge()">
                 <i class="flaticon2-size"></i>
