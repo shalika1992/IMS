@@ -181,9 +181,22 @@ public class CommonVarList {
     //-------------------------------report content codes-------------------------------------------------------------//
 
     //-------------------------------report content codes-------------------------------------------------------------//
-
     @Value("${default.max.labcode}")
     public String DEFAULT_MAX_LABCODE;
     //-------------------------------report content codes-------------------------------------------------------------//
+
+    //-------------------------------plate pool codes-----------------------------------------------------------------//
+    @Value("${plate.poolcode.yes}")
+    public String PLATE_POOLCODE_YES;
+
+    @Value("${plate.poolcode.no}")
+    public String PLATE_POOLCODE_NO;
+
+    @Value("${plate.pooldescription.no}")
+    public String PLATE_POOLDESCRIPTION_YES;
+
+    @Value("${plate.pooldescription.yes}")
+    public String PLATE_POOLDESCRIPTION_NO;
+    //-------------------------------plate pool codes-----------------------------------------------------------------//
 }
 

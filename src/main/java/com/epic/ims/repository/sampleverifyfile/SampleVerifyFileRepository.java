@@ -436,15 +436,15 @@ public class SampleVerifyFileRepository {
                 return sampleVerifyFile;
             });
 
-            //if (sampleVerifyFileList != null && !sampleVerifyFileList.isEmpty() && sampleVerifyFileList.size() > 0) {
-            //    SampleVerifyFile sampleVerifyFile = sampleVerifyFileList.stream().filter(s -> (s.getBarcode() == null || s.getBarcode().isEmpty() || s.getBarcode().equals("--"))).findFirst().orElse(null);
-            //    //validate the list contain object with empty or null labcode
-            //    if (sampleVerifyFile != null) {
-            //        message = MessageVarList.SAMPLE_VERIFY_FILE_RECORD_EMPTY_LABCODE;
-            //    }
-            //} else {
-            //    message = MessageVarList.COMMON_ERROR_RECORD_DOESNOT_EXISTS;
-            //}
+            if (sampleVerifyFileList != null && !sampleVerifyFileList.isEmpty() && sampleVerifyFileList.size() > 0) {
+                SampleVerifyFile sampleVerifyFile = sampleVerifyFileList.stream().filter(s -> (s.getBarcode() == null || s.getBarcode().isEmpty() || s.getBarcode().equals("--"))).findFirst().orElse(null);
+                //validate the list contain object with empty or null labcode
+                if (sampleVerifyFile != null) {
+                    message = MessageVarList.SAMPLE_VERIFY_FILE_RECORD_EMPTY_LABCODE;
+                }
+            } else {
+                message = MessageVarList.COMMON_ERROR_RECORD_DOESNOT_EXISTS;
+            }
         } catch (Exception ex) {
             throw ex;
         }
@@ -551,7 +551,7 @@ public class SampleVerifyFileRepository {
         DefaultLabCode defaultLabCode = new DefaultLabCode();
         DecimalFormat df = new DecimalFormat("00000000");
         try {
-            String query = "select max(barcode) from master_data";
+            String query = "select max(barcode) from sample_data";
             String maxValue = jdbcTemplate.queryForObject(query, String.class);
             //check the value
             if (maxValue != null && !maxValue.isEmpty()) {
@@ -567,12 +567,30 @@ public class SampleVerifyFileRepository {
         return defaultLabCode;
     }
 
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public long getDataCountEmptyLabCode(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
+        long count = 0;
+        try {
+            StringBuilder dynamicClause = new StringBuilder(SQL_GET_COUNT);
+            //create the where clause
+            dynamicClause = this.setDynamicClauseForEmptyLabCode(sampleFileVerificationInputBean, dynamicClause);
+            //create the query
+            count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
+        } catch (Exception exception) {
+            logger.error(exception);
+            throw exception;
+        }
+        return count;
+    }
+
     @LogRepository
     @Transactional(readOnly = true)
     public List<SampleVerifyFile> getSampleVerifyFileLabReportSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
         List<SampleVerifyFile> sampleVerifyFileList = null;
         try {
-            StringBuilder dynamicClause = this.setDynamicClause(sampleFileVerificationInputBean, new StringBuilder());
+            StringBuilder dynamicClause = this.setDynamicClauseForEmptyLabCode(sampleFileVerificationInputBean, new StringBuilder());
             //create sorting order
             String sortingStr = " order by i.createdtime desc ";
 
@@ -755,5 +773,29 @@ public class SampleVerifyFileRepository {
         return dynamicClause;
     }
 
+
+    private StringBuilder setDynamicClauseForEmptyLabCode(SampleFileVerificationInputBean sampleFileVerificationInputBean, StringBuilder dynamicClause) {
+        dynamicClause.append("1=1 and i.barcode is null or i.barcode = ''");
+        try {
+            if (sampleFileVerificationInputBean.getReceivedDate() != null && !sampleFileVerificationInputBean.getReceivedDate().isEmpty()) {
+                dynamicClause.append(" and i.receiveddate = '").append(sampleFileVerificationInputBean.getReceivedDate()).append("'");
+            }
+
+            if (sampleFileVerificationInputBean.getInstitutionCode() != null && !sampleFileVerificationInputBean.getInstitutionCode().isEmpty()) {
+                dynamicClause.append(" and i.institutioncode = '").append(sampleFileVerificationInputBean.getInstitutionCode()).append("'");
+            }
+
+            if (sampleFileVerificationInputBean.getReferenceNo() != null && !sampleFileVerificationInputBean.getReferenceNo().isEmpty()) {
+                dynamicClause.append("and lower(i.referenceno) like lower('%").append(sampleFileVerificationInputBean.getReferenceNo()).append("%') ");
+            }
+
+            if (sampleFileVerificationInputBean.getStatus() != null && !sampleFileVerificationInputBean.getStatus().isEmpty()) {
+                dynamicClause.append(" and i.status = '").append(sampleFileVerificationInputBean.getStatus()).append("'");
+            }
+        } catch (Exception exception) {
+            throw exception;
+        }
+        return dynamicClause;
+    }
 
 }

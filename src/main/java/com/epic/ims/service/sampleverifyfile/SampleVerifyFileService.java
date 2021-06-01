@@ -152,7 +152,7 @@ public class SampleVerifyFileService {
                 FileUtils.deleteDirectory(file);
             }
             //get count
-            count = sampleVerifyFileRepository.getDataCount(sampleFileVerificationInputBean);
+            count = sampleVerifyFileRepository.getDataCountEmptyLabCode(sampleFileVerificationInputBean);
             if (count > 0) {
                 List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileLabReportSearchList(sampleFileVerificationInputBean);
                 for (SampleVerifyFile sampleVerifyFile : sampleVerifyFileList) {

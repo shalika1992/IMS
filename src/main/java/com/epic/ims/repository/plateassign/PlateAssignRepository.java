@@ -68,12 +68,20 @@ public class PlateAssignRepository {
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
             "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , " +
             "sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser " +
-            "from sample_data sd where sd.status in (?,?) ";
-    //"from sample_data sd where sd.status in (?,?) and sd.borcode not null and and sd.borcode <> ''";
+            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> ''";
+    //"from sample_data sd where sd.status in (?,?) ";
+
 
     private final String SQL_GET_EXCELBLOCK_VALUE = "select code from excelblock eb where eb.indexvalue = ?";
     private final String SQL_INSERT_MASTERTEMPRECORD = "insert into master_temp_data(sampleid,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,plateid,blockvalue,ward,labcode,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    private final String SQL_GET_DEFAULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,labcode,plateid,blockvalue,ispool from master_temp_data, (select @n := -1) m where status = ? group by labcode , plateid , blockvalue , ispool order by labcode";
+    private final String SQL_GET_DEFAULT_PLATE_LIST = "" +
+            "select m.n,m.id,m.referenceno,m.name,m.nic,m.labcode,m.plateid,m.blockvalue,m.ispool from (select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id, " +
+            "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, " +
+            "GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
+            "labcode,plateid,blockvalue,ispool from master_temp_data as mt, (select @n := -1) m " +
+            "where status = ? " +
+            "group by labcode , plateid , blockvalue , ispool) as m inner join excelblock e on m.blockvalue = e. code " +
+            "order by m.plateid , cast(e.indexvalue as unsigned) ";
 
     private final String SQL_SWAP_DEFAULT_PLATE_LIST = "" +
             "update master_temp_data a " +
@@ -95,7 +103,7 @@ public class PlateAssignRepository {
             "left outer join status s on s.code=m.status " +
             "left outer join excelblock e on e.code=m.blockvalue where plateid = ? order by cast(e.indexvalue as unsigned)";
 
-    private final String SQL_INSERT_MASTERRECORD = "insert into master_data(sampleid,referenceno,institutioncode ,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,serialno,specimenid,barcode,receiveddate,status,plateid,blockvalue,ward,ispool,createduser) values(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_MASTERRECORD = "insert into master_data(sampleid,referenceno,institutioncode ,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,serialno,specimenid,barcode,receiveddate,status,plateid,blockvalue,ward,ispool,createduser,createdtime) values(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_UPDATE_SAMPLEDATA_LIST = "update sample_data set status = :status where id in (:ids)";
 
     @LogRepository
@@ -375,7 +383,7 @@ public class PlateAssignRepository {
                         ps.setString(16, masterTemp.getPlateId());
                         ps.setString(17, masterTemp.getBlockValue());
                         ps.setString(18, masterTemp.getWard());
-                        ps.setString(19, "");
+                        ps.setString(19, masterTemp.getBarcode());
                         ps.setString(20, sessionBean.getUsername());
                     }
 
@@ -684,6 +692,25 @@ public class PlateAssignRepository {
     }
 
     @LogRepository
+    @Transactional(readOnly = true)
+    public String getMaxPlateId(String currentDate) {
+        String plateId = "";
+        try {
+            String query = "select max(code) from plate where receiveddate = ?";
+            String maxValue = jdbcTemplate.queryForObject(query, new Object[]{currentDate}, String.class);
+            //check the value
+            if (maxValue != null && !maxValue.isEmpty()) {
+                plateId = (Integer.parseInt(maxValue) + 1) + "";
+            } else {
+                plateId = "1";
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return plateId;
+    }
+
+    @LogRepository
     @Transactional
     public String createPlate(String plateId) {
         String message = "";
@@ -705,9 +732,10 @@ public class PlateAssignRepository {
 
     @LogRepository
     @Transactional
-    public String insertMasterBatch(List<MasterTemp> masterTempList) throws Exception {
+    public String insertMasterBatch(List<MasterTemp> masterTempList,String masterTablePlateId) throws Exception {
         String message = "";
         try {
+            String currentDate = commonRepository.getCurrentDateAsString();
             for (int j = 0; j < masterTempList.size(); j += commonVarList.BULKUPLOAD_BATCH_SIZE) {
                 final List<MasterTemp> batchList = masterTempList.subList(j, j + commonVarList.BULKUPLOAD_BATCH_SIZE > masterTempList.size() ? masterTempList.size() : j + commonVarList.BULKUPLOAD_BATCH_SIZE);
                 jdbcTemplate.batchUpdate(SQL_INSERT_MASTERRECORD, new BatchPreparedStatementSetter() {
@@ -732,11 +760,12 @@ public class PlateAssignRepository {
                         ps.setString(16, masterTemp.getBarcode());
                         ps.setString(17, masterTemp.getReceivedDate());
                         ps.setString(18, commonVarList.STATUS_PLATEASSIGNED);
-                        ps.setString(19, masterTemp.getPlateId());
+                        ps.setString(19, masterTablePlateId);
                         ps.setString(20, masterTemp.getBlockValue());
                         ps.setString(21, masterTemp.getWard());
                         ps.setString(22, masterTemp.getIsPool());
                         ps.setString(23, sessionBean.getUsername());
+                        ps.setString(24, currentDate);
                     }
 
                     @Override
