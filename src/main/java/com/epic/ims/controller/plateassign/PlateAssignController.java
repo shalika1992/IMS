@@ -24,8 +24,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -49,6 +52,8 @@ public class PlateAssignController {
 
     @Autowired
     PlateAssignService plateAssignService;
+
+    private static final int BUFFER_SIZE = 4096;
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
@@ -129,9 +134,44 @@ public class PlateAssignController {
     @RequestMapping(value = "/createPlate", method = RequestMethod.POST)
     public void createPlate(@ModelAttribute("plate") PlateInputBean plateInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         logger.info("[" + sessionBean.getSessionid() + "]  MASTER PLATE CREATION");
+        ServletContext context = httpServletRequest.getServletContext();
         OutputStream outputStream = null;
         try {
-            List<String> fileList = plateAssignService.getFilePathList();
+            String zipFilePath = plateAssignService.getFilePathList();
+
+            File downloadFile = new File(zipFilePath);
+            FileInputStream inputStream = new FileInputStream(downloadFile);
+
+            // get MIME type of the file
+            String mimeType = context.getMimeType(zipFilePath);
+            if (mimeType == null) {
+                // set to binary type if MIME mapping not found
+                mimeType = "application/octet-stream";
+            }
+            System.out.println("MIME type: " + mimeType);
+
+            // set content attributes for the response
+            httpServletResponse.setContentType(mimeType);
+            httpServletResponse.setContentLength((int) downloadFile.length());
+
+            // set headers for the response
+            String headerKey = "Content-Disposition";
+            String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+            httpServletResponse.setHeader(headerKey, headerValue);
+
+            // get output stream of the response
+            OutputStream outStream = httpServletResponse.getOutputStream();
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead = -1;
+
+            // write bytes read from the input stream into the output stream
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+
+            inputStream.close();
+            outStream.close();
         } catch (Exception ex) {
             logger.error("Exception  :  ", ex);
         } finally {
@@ -143,7 +183,6 @@ public class PlateAssignController {
             } catch (IOException ex) {
             }
         }
-
     }
 
     @ModelAttribute

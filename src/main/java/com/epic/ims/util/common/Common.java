@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -311,6 +308,68 @@ public class Common {
             throw ioe;
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-31 12:43:55 PM
+     * @Version V1.00
+     * @MethodName deleteFile
+     * @MethodParams [fileName]
+     * @MethodDescription - delete the file if exists in file path
+     */
+    public void deleteFile(String fileName) {
+        try {
+            File file = new File(fileName);
+            file.deleteOnExit();
+        } catch (Exception e) {
+            logger.error("Exception", e);
+        }
+    }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-05-31 12:44:18 PM
+     * @Version V1.00
+     * @MethodName zipFiles
+     * @MethodParams [files, zipFilePath]
+     * @MethodDescription - zip multiple files
+     */
+    public void zipFiles(List<String> files, String zipFilePath) {
+        FileOutputStream fos = null;
+        ZipOutputStream zipOut = null;
+        FileInputStream fis = null;
+        try {
+            fos = new FileOutputStream(zipFilePath);
+            zipOut = new ZipOutputStream(new BufferedOutputStream(fos));
+            for (String filePath : files) {
+                File input = new File(filePath);
+                fis = new FileInputStream(input);
+                ZipEntry ze = new ZipEntry(input.getName());
+                System.out.println("Zipping the file: " + input.getName());
+                zipOut.putNextEntry(ze);
+                byte[] tmp = new byte[4 * 1024];
+                int size = 0;
+                while ((size = fis.read(tmp)) != -1) {
+                    zipOut.write(tmp, 0, size);
+                }
+                zipOut.flush();
+                fis.close();
+            }
+            zipOut.close();
+        } catch (FileNotFoundException e) {
+            logger.error("FileNotFoundException", e);
+        } catch (IOException e) {
+            logger.error("IOException", e);
+        } catch (Exception e) {
+            logger.error("Exception", e);
+        } finally {
+            try {
+                if (fos != null) fos.close();
+            } catch (Exception ex) {
+
+            }
         }
     }
 }
