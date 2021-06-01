@@ -492,6 +492,7 @@ public class PlateAssignRepository {
         List<String> plateNumberList = new ArrayList<>();
         try {
             String sql = "select distinct(plateid) as plateid from master_temp_data";
+            // new Object[]{commonVarList.STATUS_PLATEASSIGNED},
             jdbcTemplate.query(sql, (ResultSet rs) -> {
                 while (rs.next()) {
                     plateNumberList.add(rs.getString("plateid"));
@@ -689,7 +690,7 @@ public class PlateAssignRepository {
         try {
             int value = 0;
             String currentDate = commonRepository.getCurrentDateAsString();
-            value = jdbcTemplate.update("insert into plate(code,receiveddata) values(?,?)", new Object[]{plateId, currentDate});
+            value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, currentDate});
 
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
