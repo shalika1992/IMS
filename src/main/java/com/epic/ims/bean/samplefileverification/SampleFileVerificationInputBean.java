@@ -30,6 +30,7 @@ public class SampleFileVerificationInputBean extends DataTablesRequest {
     private String residentDistrict;
     private String contactNumber;
     private String secondaryContactNumber;
+    private String initialLabCode;
     private Date createdTime;
     private String createdUser;
     private Date lastUpdatedTime;

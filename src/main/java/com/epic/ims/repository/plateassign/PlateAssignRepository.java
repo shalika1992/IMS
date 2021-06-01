@@ -492,7 +492,7 @@ public class PlateAssignRepository {
         List<String> plateNumberList = new ArrayList<>();
         try {
             String sql = "select distinct(plateid) as plateid from master_temp_data";
-            jdbcTemplate.query(sql, new Object[]{commonVarList.STATUS_PLATEASSIGNED}, (ResultSet rs) -> {
+            jdbcTemplate.query(sql, (ResultSet rs) -> {
                 while (rs.next()) {
                     plateNumberList.add(rs.getString("plateid"));
                 }

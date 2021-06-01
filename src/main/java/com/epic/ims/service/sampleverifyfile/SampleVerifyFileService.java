@@ -1,6 +1,7 @@
 package com.epic.ims.service.sampleverifyfile;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.samplefileverification.DefaultLabCode;
 import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.samplefileverification.SampleIdListBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -8,16 +9,26 @@ import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.sampleverifyfile.SampleVerifyFileRepository;
 import com.epic.ims.util.common.Common;
+import com.epic.ims.util.common.ExcelCommon;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
@@ -42,6 +53,12 @@ public class SampleVerifyFileService {
 
     @Autowired
     CommonVarList commonVarList;
+
+    @Autowired
+    ExcelCommon excelCommon;
+
+    private final int labReportColumnCount = 16;
+    private final int labReportHeaderRowCount = 4;
 
     @LogService
     public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
@@ -103,5 +120,166 @@ public class SampleVerifyFileService {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
         return message;
+    }
+
+    @LogService
+    public DefaultLabCode generateDefaultLabCode() throws Exception {
+        DefaultLabCode defaultLabCode = new DefaultLabCode();
+        try {
+            defaultLabCode = sampleVerifyFileRepository.generateDefaultLabCode();
+        } catch (Exception e) {
+            throw e;
+        }
+        return defaultLabCode;
+    }
+
+    @LogService
+    public Object generateLabCodeExcelReport(HttpServletRequest httpServletRequest, SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
+        DecimalFormat df = new DecimalFormat("00000000");
+        Object returnObject = null;
+        long count = 0;
+        try {
+            String initialLabCode = sampleFileVerificationInputBean.getInitialLabCode();
+            //check the temporary file path and create file path
+            String directory = httpServletRequest.getServletContext().getInitParameter("tmpreportpath");
+            File file = new File(directory);
+            if (file.exists()) {
+                FileUtils.deleteDirectory(file);
+            }
+            //get count
+            count = sampleVerifyFileRepository.getDataCount(sampleFileVerificationInputBean);
+            if (count > 0) {
+                List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileLabReportSearchList(sampleFileVerificationInputBean);
+                for (SampleVerifyFile sampleVerifyFile : sampleVerifyFileList) {
+                    sampleVerifyFile.setBarcode(initialLabCode);
+                    String value = initialLabCode.substring(1, initialLabCode.length());
+                    initialLabCode = initialLabCode.substring(0, 1) + df.format(Integer.parseInt(value) + 1);
+                }
+
+                String message = sampleVerifyFileRepository.updateSampleVerifyBatch(sampleVerifyFileList);
+                if (message.isEmpty()) {
+                    long maxRow = Long.parseLong(httpServletRequest.getServletContext().getInitParameter("numberofrowsperexcel"));
+                    SXSSFWorkbook workbook = this.createExcelTopSection();
+                    Sheet sheet = workbook.getSheetAt(0);
+
+                    int fileCount = 0;
+                    int currRow = labReportHeaderRowCount;
+                    currRow = this.createExcelTableHeaderSection(workbook, currRow);
+
+                    int selectRow = Integer.parseInt(httpServletRequest.getServletContext().getInitParameter("numberofselectrows"));
+                    long numberOfTimes = count / selectRow;
+                    if ((count % selectRow) > 0) {
+                        numberOfTimes += 1;
+                    }
+
+                    int from = 0;
+                    int listrownumber = 1;
+                    for (int i = 0; i < numberOfTimes; i++) {
+                        if (sampleVerifyFileList.size() > 0) {
+                            for (SampleVerifyFile sampleVerifyFile : sampleVerifyFileList) {
+
+                            }
+                        }
+                        from = from + selectRow;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return returnObject;
+    }
+
+    private SXSSFWorkbook createExcelTopSection() throws Exception {
+        SXSSFWorkbook workbook = null;
+        try {
+            workbook = new SXSSFWorkbook(-1);
+            Sheet sheet = workbook.createSheet("Lab_Report");
+
+            CellStyle fontBoldedUnderlinedCell = excelCommon.getFontBoldedUnderlinedCell(workbook);
+
+            Row row = sheet.createRow(0);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Sample Data Report");
+            cell.setCellStyle(fontBoldedUnderlinedCell);
+        } catch (Exception e) {
+            throw e;
+        }
+        return workbook;
+    }
+
+    private int createExcelTableHeaderSection(SXSSFWorkbook workbook, int currrow) throws Exception {
+        try {
+            CellStyle columnHeaderCell = ExcelCommon.getColumnHeadeCell(workbook);
+            Sheet sheet = workbook.getSheetAt(0);
+            Row row = sheet.createRow(currrow++);
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue("No");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(1);
+            cell.setCellValue("ID");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(2);
+            cell.setCellValue("Lab No");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(3);
+            cell.setCellValue("Serial No");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(4);
+            cell.setCellValue("Institution Code");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(5);
+            cell.setCellValue("Name");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(6);
+            cell.setCellValue("Age");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(7);
+            cell.setCellValue("Gender");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(8);
+            cell.setCellValue("Symptomatic");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(9);
+            cell.setCellValue("Contact Type");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(10);
+            cell.setCellValue("Nic");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(11);
+            cell.setCellValue("Address");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(12);
+            cell.setCellValue("District");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(13);
+            cell.setCellValue("Contact No");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(14);
+            cell.setCellValue("Received Date");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(15);
+            cell.setCellValue("Ward");
+            cell.setCellStyle(columnHeaderCell);
+        } catch (Exception e) {
+            throw e;
+        }
+        return currrow;
     }
 }
