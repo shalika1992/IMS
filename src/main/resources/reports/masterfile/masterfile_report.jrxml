@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="1175" pageHeight="595" orientation="Landscape" columnWidth="1135" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1509a054-c95c-4ef4-9b6b-27707e7b302e">
-	<property name="ireport.zoom" value="0.75"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="262"/>
 	<property name="ireport.y" value="0"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
@@ -38,7 +38,7 @@
 	<field name="contactNumber" class="java.lang.String"/>
 	<field name="receivedDate" class="java.lang.String"/>
 	<field name="status" class="java.lang.String"/>
-	<field name="createdTime" class="java.sql.Date"/>
+	<field name="createdTime" class="java.sql.Timestamp"/>
 	<field name="barcode" class="java.lang.String"/>
 	<field name="indexValue" class="java.lang.String"/>
 	<field name="isPool" class="java.lang.String"/>
