@@ -550,6 +550,25 @@
                 }
             });
         }
+
+        function generateLabCodes() {
+            var labcode = $('#labCode').val();
+            $('#modalGenerateLabCode').modal('hide');
+            if (labcode) {
+                $('#initialLabCode').val(labcode);
+                form = document.getElementById('sampleverifyform');
+                form.action = 'updatelabcode.htm';
+                form.submit();
+                setTimeout(function () {
+                    oTable.fnDraw();
+                }, 5000);
+            } else {
+                //popup the error messae
+                $('#responseHeader').text('Empty Initial Lab Code');
+                $('#responseMsg').text('Please enter valid lab code');
+                $('#modalResponse').modal('show');
+            }
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -628,6 +647,15 @@
                                             </c:forEach>
                                         </select>
                                         <span class="form-text text-muted">Please select status</span>
+                                    </div>
+
+                                    <div class="col-lg-3" hidden="true">
+                                        <label>Reference No:</label>
+                                        <input id="initialLabCode" name="initialLabCode" type="text"
+                                               maxlength="10"
+                                               class="form-control form-control-sm" placeholder="Initial Lab Code">
+
+                                        <span class="form-text text-muted">Please enter initial lab code</span>
                                     </div>
 
                                 </div>

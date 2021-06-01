@@ -19,7 +19,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -28,7 +30,10 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -58,7 +63,7 @@ public class SampleVerifyFileService {
     ExcelCommon excelCommon;
 
     private final int labReportColumnCount = 16;
-    private final int labReportHeaderRowCount = 4;
+    private final int labReportHeaderRowCount = 2;
 
     @LogService
     public long getCount(SampleFileVerificationInputBean sampleFileVerificationInputBean) throws Exception {
@@ -177,11 +182,32 @@ public class SampleVerifyFileService {
                     for (int i = 0; i < numberOfTimes; i++) {
                         if (sampleVerifyFileList.size() > 0) {
                             for (SampleVerifyFile sampleVerifyFile : sampleVerifyFileList) {
-
+                                if (currRow + 1 > maxRow) {
+                                    fileCount++;
+                                    this.writeTemporaryFile(workbook, fileCount, directory);
+                                    workbook = this.createExcelTopSection();
+                                    sheet = workbook.getSheetAt(0);
+                                    currRow = labReportHeaderRowCount;
+                                    this.createExcelTableHeaderSection(workbook, currRow);
+                                }
+                                currRow = this.createExcelTableBodySection(workbook, sampleVerifyFile, currRow, listrownumber);
+                                listrownumber++;
+                                if (currRow % 100 == 0) {
+                                    // retain 100 last rows and flush all others
+                                    ((SXSSFSheet) sheet).flushRows(100);
+                                }
                             }
                         }
                         from = from + selectRow;
                     }
+
+                    Date createdTime = commonRepository.getCurrentDate();
+                    this.createExcelBotomSection(workbook, currRow, count, createdTime);
+                    for (int i = 0; i < labReportColumnCount; i++) {
+                        //to auto size all column in the sheet
+                        sheet.autoSizeColumn(i);
+                    }
+                    returnObject = workbook;
                 }
             }
         } catch (Exception e) {
@@ -281,5 +307,138 @@ public class SampleVerifyFileService {
             throw e;
         }
         return currrow;
+    }
+
+    private void writeTemporaryFile(SXSSFWorkbook workbook, int fileCount, String directory) throws Exception {
+        File file;
+        FileOutputStream outputStream = null;
+        try {
+            file = new File(directory);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            if (fileCount > 0) {
+                file = new File(directory + File.separator + "LabReport_" + fileCount + ".xlsx");
+            } else {
+                file = new File(directory + File.separator + "LabReport.xlsx");
+            }
+            outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (outputStream != null) {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
+    }
+
+    private int createExcelTableBodySection(SXSSFWorkbook workbook, SampleVerifyFile sampleVerifyFile, int currrow, int rownumber) throws Exception {
+        try {
+            Sheet sheet = workbook.getSheetAt(0);
+            CellStyle rowColumnCell = ExcelCommon.getRowColumnCell(workbook);
+            Row row = sheet.createRow(currrow++);
+
+            CellStyle style = workbook.createCellStyle();
+            style.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+            style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue(rownumber);
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue(sampleVerifyFile.getId() + "");
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(2);
+            cell.setCellValue(sampleVerifyFile.getBarcode());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(3);
+            cell.setCellValue(sampleVerifyFile.getReferenceNo());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(4);
+            cell.setCellValue(sampleVerifyFile.getInstitutionCode());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(5);
+            cell.setCellValue(sampleVerifyFile.getName());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(6);
+            cell.setCellValue(sampleVerifyFile.getAge());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(7);
+            cell.setCellValue(sampleVerifyFile.getGender());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(8);
+            cell.setCellValue(sampleVerifyFile.getSymptomatic());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(9);
+            cell.setCellValue(sampleVerifyFile.getContactType());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(10);
+            cell.setCellValue(sampleVerifyFile.getNic());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(11);
+            cell.setCellValue(sampleVerifyFile.getAddress());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(12);
+            cell.setCellValue(sampleVerifyFile.getResidentDistrict());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(13);
+            cell.setCellValue(sampleVerifyFile.getContactNumber());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(14);
+            cell.setCellValue(sampleVerifyFile.getReceivedDate());
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(15);
+            cell.setCellValue(sampleVerifyFile.getWard());
+            cell.setCellStyle(rowColumnCell);
+        } catch (Exception e) {
+            throw e;
+        }
+        return currrow;
+    }
+
+    private void createExcelBotomSection(SXSSFWorkbook workbook, int currrow, long count, Date date) throws Exception {
+        try {
+            CellStyle fontBoldedCell = ExcelCommon.getFontBoldedCell(workbook);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            currrow++;
+            Row row = sheet.createRow(currrow++);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Summary");
+            cell.setCellStyle(fontBoldedCell);
+
+            row = sheet.createRow(currrow++);
+            cell = row.createCell(0);
+            cell.setCellValue("Report Created Time");
+            cell = row.createCell(1);
+
+            if (date != null && !date.toString().isEmpty()) {
+                cell.setCellValue(date.toString().substring(0, 19));
+            } else {
+                cell.setCellValue("--");
+            }
+            cell.setCellStyle(ExcelCommon.getAligneCell(workbook, null, XSSFCellStyle.ALIGN_RIGHT));
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

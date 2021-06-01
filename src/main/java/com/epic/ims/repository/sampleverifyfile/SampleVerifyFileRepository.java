@@ -98,7 +98,11 @@ public class SampleVerifyFileRepository {
                     col = "i.id";
                     break;
                 case 1:
+                    col = "i.barcode ";
+                    break;
+                case 2:
                     col = "i.referenceno ";
+                    break;
                 case 3:
                     col = "i.institutioncode ";
                     break;
@@ -133,22 +137,19 @@ public class SampleVerifyFileRepository {
                     col = "i.secondarycontactno ";
                     break;
                 case 14:
-                    col = "i.specimenid";
-                    break;
-                case 16:
-                    col = "i.barcode";
-                    break;
-                case 17:
                     col = "i.receiveddate";
                     break;
-                case 18:
+                case 15:
                     col = "s.description";
                     break;
-                case 19:
+                case 16:
                     col = "i.createduser";
                     break;
-                default:
+                case 17:
                     col = "i.createdtime";
+                    break;
+                default:
+                    col = "i.barcode";
             }
             sortingStr = " order by " + col + " " + sampleFileVerificationInputBean.sortDirections.get(0);
 

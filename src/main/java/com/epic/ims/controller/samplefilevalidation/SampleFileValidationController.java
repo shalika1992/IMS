@@ -206,7 +206,7 @@ public class SampleFileValidationController implements RequestBeanValidation<Obj
             if (object instanceof SXSSFWorkbook) {
                 SXSSFWorkbook workbook = (SXSSFWorkbook) object;
                 httpServletResponse.setContentType("application/vnd.ms-excel");
-                httpServletResponse.setHeader("Content-disposition", "attachment; filename=AuditTrace_Report.xlsx");
+                httpServletResponse.setHeader("Content-disposition", "attachment; filename=Lab_Report.xlsx");
                 httpServletResponse.setBufferSize(61440);
                 outputStream = httpServletResponse.getOutputStream();
                 workbook.write(outputStream);

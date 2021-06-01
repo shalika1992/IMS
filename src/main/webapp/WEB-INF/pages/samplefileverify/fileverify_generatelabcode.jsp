@@ -38,8 +38,3 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-<script>
-    function generateLabCodes() {
-        alert('--TODO--');
-    }
-</script>
