@@ -1,0 +1,66 @@
+.landing-page {
+    width: 100%;
+    height: 100vh;
+    background: url(../../../../images/landing-bg.png);
+    background-size: cover;
+    background-position: top center;
+}
+
+.landing-container {
+    max-width: 640px;
+    margin: auto;
+    margin-top: 32px;
+    text-align: center;
+    height: calc(100vh - 44px - 32px);
+}
+
+.logo-one {
+    width: 100%;
+    margin-bottom: 36px;
+}
+
+.main-title {
+    font-size: 42px;
+    color: #03A9F4;
+    font-weight: 600;
+    margin-bottom: 0;
+    letter-spacing: -1px;
+}
+
+.secondary-title {
+    font-size: 24px;
+    color: black;
+    margin-bottom: 24px;
+
+}
+
+.logo-two {
+    width: 160px;
+    margin-bottom: 16px;
+}
+
+.sub-content {
+    margin-bottom: 24px;
+}
+
+a.login-btn {
+    padding: 6px 90px;
+    background-color: white;
+    border: 1px solid #03A9F4;
+    color: #03A9F4;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+footer {
+    background-color: #03A9F4;
+    text-align: center;
+    height: 44px;
+}
+
+footer p {
+    font-size: 12px;
+    color: white;
+    padding-top: 12px;
+}
