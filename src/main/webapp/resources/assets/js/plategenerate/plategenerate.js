@@ -69,9 +69,11 @@ function _generatePlates(platesArray) {
 
         if (platesArray[pool_count][0]['ispool'] === '0') {
             // plate no
+            // not pooled
             html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
         } else {
             // plate no
+            // pooled
             html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Merged Plate<span>#" + (k + 1) + "</span></div>\n";
         }
 
@@ -109,7 +111,12 @@ function _generatePlates(platesArray) {
                             ul += '<li style="text-align: left !important;" class="list-group-item">' + e['labcode'] + '</li>';
                         });
                         ul += '</ul>';
-                        html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['labcode'] + "</div>\n";
+                        // check if pooled or not
+                        if (platesArray[pool_count][0]['ispool'] === '0') {
+                            html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['labcode'] + "</div>\n";
+                        } else {
+                            html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['labcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['labcode'] + "</div>\n";
+                        }
                     } else {
                         html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
                     }

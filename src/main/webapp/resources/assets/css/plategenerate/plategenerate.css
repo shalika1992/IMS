@@ -1,3 +1,8 @@
+li {
+    padding: 5px !important;
+    font-size: 8px !important;
+}
+
 .first-elmt {
     background: repeating-linear-gradient(
             45deg

@@ -374,6 +374,13 @@
                                         onclick="swap()">Swap
                                 </button>
                             </div>
+                            <div class="col-lg-3">
+                                <form:form method="post" modelAttribute="plate" action="createPlate.htm">
+                                    <label>Plate creation</label>
+                                    <button type="submit" class="btn btn-success btn-hover-light btn-block">Create
+                                    </button>
+                                </form:form>
+                            </div>
                         </div>
                         <div id="mergedplates"></div>
                         <div id="plates"></div>
