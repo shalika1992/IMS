@@ -124,7 +124,7 @@ public class PlateAssignService {
                         message = plateAssignRepository.createPlate(masterTablePlateId);
                         if (message.isEmpty()) {
                             //insert the master batch
-                            message = plateAssignRepository.insertMasterBatch(masterTempList,masterTablePlateId);
+                            message = plateAssignRepository.insertMasterBatch(masterTempList, masterTablePlateId);
                             if (message.isEmpty()) {
                                 //update the status in sample table
                                 List<String> sampleIdList = masterTempList.stream().map(m -> m.getSampleId()).collect(Collectors.toList());
@@ -161,6 +161,8 @@ public class PlateAssignService {
             List<MasterTemp> masterTemps = masterTempList.stream().collect(Collectors.toList());
             //update the master temp list new plate id
             masterTemps.stream().forEach(m -> m.setPlateId(masterTablePlateId));
+            masterTemps.stream().filter(m -> m.getIsPool().equals(commonVarList.PLATE_POOLCODE_YES)).forEach(m -> m.setIsPool(commonVarList.PLATE_POOLDESCRIPTION_YES));
+            masterTemps.stream().filter(m -> m.getIsPool().equals(commonVarList.PLATE_POOLCODE_NO)).forEach(m -> m.setIsPool(commonVarList.PLATE_POOLDESCRIPTION_NO));
             //put values to parameter map
             Map<String, Object> parameterMap = new HashMap<>();
             parameterMap.put("date", currentDate);

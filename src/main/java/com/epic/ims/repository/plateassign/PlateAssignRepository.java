@@ -68,26 +68,25 @@ public class PlateAssignRepository {
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
             "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , " +
             "sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser " +
-            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> ''";
+            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' order by  barcode";
     //"from sample_data sd where sd.status in (?,?) ";
 
 
     private final String SQL_GET_EXCELBLOCK_VALUE = "select code from excelblock eb where eb.indexvalue = ?";
     private final String SQL_INSERT_MASTERTEMPRECORD = "insert into master_temp_data(sampleid,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,plateid,blockvalue,ward,labcode,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_GET_DEFAULT_PLATE_LIST = "" +
-            "select m.n,m.id,m.referenceno,m.name,m.nic,m.labcode,m.plateid,m.blockvalue,m.ispool from (select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id, " +
-            "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, " +
-            "GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
-            "labcode,plateid,blockvalue,ispool from master_temp_data as mt, (select @n := -1) m " +
-            "where status = ? " +
-            "group by labcode , plateid , blockvalue , ispool) as m inner join excelblock e on m.blockvalue = e. code " +
-            "order by m.plateid , cast(e.indexvalue as unsigned) ";
+            "select m.id,m.referenceno,m.name,m.nic,m.labcode,m.plateid,m.blockvalue,m.ispool from " +
+            "(select GROUP_CONCAT(id SEPARATOR '|') as id, " +
+            "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
+            "labcode,plateid,blockvalue,ispool from master_temp_data as mt where status = ? " +
+            "group by labcode , plateid , blockvalue , ispool) as m " +
+            "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
 
     private final String SQL_SWAP_DEFAULT_PLATE_LIST = "" +
             "update master_temp_data a " +
             "inner join master_temp_data b on a.id <> b.id " +
             "set a.sampleid = b.sampleid,a.referenceno = b.referenceno,a.institutioncode = b.institutioncode,a.name = b.name,a.age = b.age,a.gender = b.gender, a.nic = b.nic,a.address = b.address," +
-            "a.district = b.district,a.contactno = b.contactno,a.receiveddate = b.receiveddate,a.status = b.status,a.plateid = b.plateid,a.blockvalue = b.blockvalue,a.labcode = b.labcode,a.createduser = b.createduser " +
+            "a.district = b.district,a.contactno = b.contactno,a.receiveddate = b.receiveddate,a.status = b.status,a.labcode = b.labcode,a.createduser = b.createduser " +
             "where a.labcode in (:aLabCodes) and b.labcode in (:bLabCodes)";
 
     private final String SQL_MERGE_DEFAULT_PLATE_LIST = "" +
@@ -133,10 +132,10 @@ public class PlateAssignRepository {
                     //check the sample file list size is enough for sub list
                     List<SampleFile> subList = null;
                     if (sampleFileList.size() >= (endingIndex - 1)) {
-                        subList = sampleFileList.subList(startingIndex, endingIndex);
+                        subList = new ArrayList<>(sampleFileList.subList(startingIndex, endingIndex));
                     } else {
                         endingIndex = sampleFileList.size() - 1;
-                        subList = sampleFileList.subList(startingIndex, endingIndex);
+                        subList = new ArrayList<>(sampleFileList.subList(startingIndex, endingIndex));
                     }
 
                     //handle the c3 value in master plate
@@ -407,8 +406,9 @@ public class PlateAssignRepository {
         Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
             jdbcTemplate.query(SQL_GET_DEFAULT_PLATE_LIST, new Object[]{commonVarList.STATUS_PLATEASSIGNED}, (ResultSet rs) -> {
+                int counter = 0;
                 while (rs.next()) {
-                    defaultPlateMap.put(rs.getInt("n"), Arrays.asList(
+                    defaultPlateMap.put(counter, Arrays.asList(
                             new DefaultBean(
                                     rs.getString("id").split("\\|"),
                                     rs.getString("referenceno").split("\\|"),
@@ -420,6 +420,7 @@ public class PlateAssignRepository {
                                     rs.getString("ispool")
                             )
                     ));
+                    counter++;
                 }
                 return defaultPlateMap;
             });
@@ -696,7 +697,7 @@ public class PlateAssignRepository {
     public String getMaxPlateId(String currentDate) {
         String plateId = "";
         try {
-            String query = "select max(code) from plate where receiveddate = ?";
+            String query = "select max(CONVERT(code,UNSIGNED INTEGER)) as code from plate where receiveddate = ?";
             String maxValue = jdbcTemplate.queryForObject(query, new Object[]{currentDate}, String.class);
             //check the value
             if (maxValue != null && !maxValue.isEmpty()) {
@@ -723,7 +724,7 @@ public class PlateAssignRepository {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
         } catch (DuplicateKeyException dke) {
-            message = MessageVarList.COMMON_ERROR_RECORD_ALREADY_EXISTS;
+            message = "";
         } catch (Exception e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;
         }
@@ -732,7 +733,7 @@ public class PlateAssignRepository {
 
     @LogRepository
     @Transactional
-    public String insertMasterBatch(List<MasterTemp> masterTempList,String masterTablePlateId) throws Exception {
+    public String insertMasterBatch(List<MasterTemp> masterTempList, String masterTablePlateId) throws Exception {
         String message = "";
         try {
             String currentDate = commonRepository.getCurrentDateAsString();
@@ -785,15 +786,17 @@ public class PlateAssignRepository {
     public String updateSampleDataList(List<String> sampleIdList) {
         String message = "";
         try {
-            MapSqlParameterSource parameterMap = new MapSqlParameterSource();
-            //create the integer set
-            parameterMap.addValue("status", commonVarList.STATUS_PLATEASSIGNED);
-            parameterMap.addValue("ids", sampleIdList);
+            if (sampleIdList != null && !sampleIdList.isEmpty() && sampleIdList.size() > 0) {
+                MapSqlParameterSource parameterMap = new MapSqlParameterSource();
+                //create the integer set
+                parameterMap.addValue("status", commonVarList.STATUS_PLATEASSIGNED);
+                parameterMap.addValue("ids", sampleIdList);
 
-            //execute the query
-            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_SAMPLEDATA_LIST, parameterMap);
-            if (value < 0) {
-                message = MessageVarList.COMMON_ERROR_PROCESS;
+                //execute the query
+                int value = namedParameterJdbcTemplate.update(SQL_UPDATE_SAMPLEDATA_LIST, parameterMap);
+                if (value < 0) {
+                    message = MessageVarList.COMMON_ERROR_PROCESS;
+                }
             }
         } catch (Exception e) {
             throw e;
