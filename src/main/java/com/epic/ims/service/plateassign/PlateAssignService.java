@@ -72,19 +72,6 @@ public class PlateAssignService {
     }
 
     @LogService
-    public Map<Integer, List<ResultBean>> getMasterPlate(int plateid) throws Exception {
-        Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
-        try {
-            masterPlateMap = plateAssignRepository.getMasterResultPlateList(plateid);
-        } catch (EmptyResultDataAccessException ere) {
-            throw ere;
-        } catch (Exception e) {
-            throw e;
-        }
-        return masterPlateMap;
-    }
-
-    @LogService
     public Map<Integer, List<DefaultBean>> swapBlockPlate(SwapBean swapBean) {
         Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
         try {

@@ -1,6 +1,7 @@
 package com.epic.ims.repository.resultupdate;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -21,9 +22,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -53,6 +53,7 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_LIST_DETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_NOTDETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_PENDING = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
+    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? group by barcode , plateid , blockvalue , ispool order by barcode";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -72,6 +73,39 @@ public class ResultUpdateRepository {
         return count;
     }
 
+    @LogRepository
+    @Transactional(readOnly = true)
+    public Map<Integer, List<ResultBean>> getMasterResultPlateList(int plateid) {
+        Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
+        try {
+            jdbcTemplate.query(SQL_GET_MASTER_RESULT_PLATE_LIST, new Object[]{plateid}, (ResultSet rs) -> {
+                while (rs.next()) {
+                    masterPlateMap.put(rs.getInt("n"), Arrays.asList(
+                            new ResultBean(
+                                    rs.getString("id").split("\\|"),
+                                    rs.getString("referenceno").split("\\|"),
+                                    rs.getString("name").split("\\|"),
+                                    rs.getString("nic").split("\\|"),
+                                    rs.getString("barcode"),
+                                    rs.getString("plateid"),
+                                    rs.getString("blockvalue"),
+                                    rs.getString("ispool"),
+                                    rs.getString("iscomplete"),
+                                    rs.getString("result")
+                            )
+                    ));
+                }
+                return masterPlateMap;
+            });
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+            return masterPlateMap;
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        return masterPlateMap;
+    }
 
     @LogRepository
     @Transactional(readOnly = true)

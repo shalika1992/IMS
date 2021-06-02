@@ -1,6 +1,7 @@
 package com.epic.ims.service.resultupdate;
 
 import com.epic.ims.annotation.logservice.LogService;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -20,7 +21,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Scope("prototype")
@@ -82,6 +85,19 @@ public class ResultUpdateService {
             throw e;
         }
         return plate;
+    }
+
+    @LogService
+    public Map<Integer, List<ResultBean>> getMasterPlate(int plateid) throws Exception {
+        Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
+        try {
+            masterPlateMap = resultUpdateRepository.getMasterResultPlateList(plateid);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return masterPlateMap;
     }
 
     @LogService

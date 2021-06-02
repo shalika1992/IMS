@@ -2,6 +2,7 @@ package com.epic.ims.controller.resultupdate;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -28,9 +29,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Controller
 @Scope("request")
@@ -129,6 +128,20 @@ public class ResultUpdateController {
             logger.error("Exception  :  ", e);
         }
         return plate;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/generateMasterPlate", method = RequestMethod.POST)
+    public @ResponseBody
+    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
+        try {
+            resultPlateMap = resultUpdateService.getMasterPlate(plateid);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return resultPlateMap;
     }
 
     @LogController

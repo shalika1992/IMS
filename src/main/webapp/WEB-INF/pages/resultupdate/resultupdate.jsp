@@ -180,17 +180,7 @@
             for (let k = 0; k < round; k++) {
                 // plate rounds
                 // check box
-                let select = '<span style="float: right"><label class="checkbox checkbox-success text-dark"><input onchange="_checkBoxSelect(this.id,' + (k + 1) + ')" type="checkbox" name="selectAll" id="checkbox-' + (k + 1) + '"/><span style="margin-right: 5px;"></span>Select All</label></span>';
-
-                if (platesArray[pool_count][0]['ispool'] === '0') {
-                    // plate no
-                    // not pooled
-                    html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + select + "</span></div>\n";
-                } else {
-                    // plate no
-                    // pooled
-                    html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Merged Plate<span>#" + (k + 1) + "</span></div>\n";
-                }
+                html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + "</span></div>\n";
 
                 // plate vertical letters
                 html += "<div class='col-1'><div class='row'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
@@ -226,7 +216,7 @@
                                 });
                                 ul += '</ul>';
                                 // check if pooled or not
-                                if (platesArray[pool_count][0]['ispool'] === '0') {
+                                if (platesArray[pool_count][0]['iscomplete'] === '0') {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
                                 } else {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";

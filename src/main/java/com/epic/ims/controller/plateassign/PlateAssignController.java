@@ -85,20 +85,6 @@ public class PlateAssignController {
     }
 
     @LogController
-    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
-    @RequestMapping(value = "/generateMasterPlate", method = RequestMethod.POST)
-    public @ResponseBody
-    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, ModelMap modelMap, Locale locale) {
-        Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
-        try {
-            resultPlateMap = plateAssignService.getMasterPlate(plateid);
-        } catch (Exception e) {
-            logger.error("Exception  :  ", e);
-        }
-        return resultPlateMap;
-    }
-
-    @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/swapBlockPlate", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
