@@ -56,6 +56,8 @@
             $("#receivedDate").datepicker('setDate', getReceivedDate());
             //reset plate list
             getCorrespondingPlateList();
+            // reset table
+            $('#resultplate').empty();
         }
 
         function setReceivedDate() {
