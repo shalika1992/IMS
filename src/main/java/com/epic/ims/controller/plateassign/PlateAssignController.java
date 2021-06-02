@@ -2,10 +2,8 @@ package com.epic.ims.controller.plateassign;
 
 import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
-import com.epic.ims.bean.plate.DefaultBean;
-import com.epic.ims.bean.plate.PlateInputBean;
-import com.epic.ims.bean.plate.PoolBean;
-import com.epic.ims.bean.plate.SwapBean;
+import com.epic.ims.bean.common.Result;
+import com.epic.ims.bean.plate.*;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.plateassign.PlateAssignService;

@@ -103,7 +103,6 @@ function _generatePlates(platesArray) {
                             '<ul style="text-align: left !important;" class="list-group">';
                         $.each(platesArray[val + shift + shift_val], (j, e) => {
                             for (let i = 0; i < e['id'].length; i++) {
-                                ul += '<li style="text-align: left !important;" class="list-group-item">' + e['id'][i] + '</li>';
                                 ul += '<li style="text-align: left !important;" class="list-group-item">' + e['referenceNo'][i] + '</li>';
                                 ul += '<li style="text-align: left !important;" class="list-group-item">' + e['name'][i] + '</li>';
                                 ul += '<li style="text-align: left !important;" class="list-group-item">' + e['nic'][i] + '</li>';

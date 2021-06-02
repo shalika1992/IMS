@@ -3,6 +3,7 @@ package com.epic.ims.service.plateassign;
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PoolBean;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.mastertemp.MasterTemp;

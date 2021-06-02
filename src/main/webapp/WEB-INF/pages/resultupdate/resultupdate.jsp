@@ -48,40 +48,6 @@
             $('#receivedDate').datepicker().on('changeDate', function (ev) {
                 getCorrespondingPlateList();
             });
-
-            var rowletter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-            var platedata = [];
-            var length = 96;
-            for (var i = 0; i < length; i++) {
-                platedata.push(i);
-            }
-
-            let html = "";
-            html += "<div class='row'><div class='card-body result' style='display: inline;width: 60px;height:60px'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
-            for (let y = 1; y < 13; y++) {
-                html += "<div class='card-body result' style='display: inline;width: 60px;height:60px;'><div class='col-12 horizontal-elmt'>" + y + " </div>"
-                html += "</div>\n";
-            }
-            html += "</div>\n";
-
-            for (let z = 0; z < platedata.length; z++) {
-                let count = z;
-                if ((count % 12 === 0)) {
-                    let rownumber = count / 12;
-                    var letter = rowletter[rownumber];
-                    html += "<div class='row'><div class='card-body result' style='display: inline;width: 60px;height:60px'><div class='col-12 vertical-elmt'>" + letter + "</div></div>\n";
-                    for (let y = 1; y < 13; y++) {
-                        let value = platedata[z + (y - 1)];
-                        html += "<div class='card-body result' style='display: inline;width: 60px;height:60px;background-color: #0a6aa1;'>"
-                        html += "<p class='card-title'></p>"
-                        html += "<p class='card-text'>" + value + "</p>"
-                        html += "</div>\n";
-                    }
-                    html += "</div>\n";
-                }
-            }
-            $('#resultplate').empty();
-            $('#resultplate').append(html);
         });
 
 
@@ -90,6 +56,8 @@
             $("#receivedDate").datepicker('setDate', getReceivedDate());
             //reset plate list
             getCorrespondingPlateList();
+            // reset table
+            $('#resultplate').empty();
         }
 
         function setReceivedDate() {
@@ -159,6 +127,138 @@
                 }
             });
         }
+
+        function search() {
+            if ($('#plateId').val()) {
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/generateMasterPlate.json',
+                    data: {plateid: $('#plateId').val()},
+                    success: function (res) {
+                        _generatePlates(res);
+                    },
+                    error: function (jqXHR) {
+                        window.location = "${pageContext.request.contextPath}/logout.htm";
+                    }
+                });
+            } else {
+                swal.fire({
+                    text: "Please select a plate",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Proceed",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            }
+        }
+
+        /*
+          Generate Plates Function
+          @param - platesArray {}
+        */
+        function _generatePlates(platesArray) {
+            // get modulus
+            let module = Object.keys(platesArray).length % 93;
+            // get plate count
+            let round = Math.floor(Object.keys(platesArray).length / 93);
+
+            // plate count final
+            if (module != 0) {
+                round++;
+            }
+
+            // html obj
+            let html = "";
+            // shift for next plate
+            let shift = 0;
+            let shift_val = 0;
+            // monitor if pooled or not
+            let pool_count = 0;
+            // fill plates
+            for (let k = 0; k < round; k++) {
+                // plate rounds
+                // check box
+                html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + "</span></div>\n";
+
+                // plate vertical letters
+                html += "<div class='col-1'><div class='row'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
+                for (let x = 1; x < 9; x++) {
+                    html += "<div class='row'><div class='col-12 vertical-elmt'>" + (x + 9).toString(36).toUpperCase() + "</div></div>\n";
+                }
+                html += "</div>\n";
+
+                // plate horizontal numbers
+                html += "<div class='col-11'>\n";
+                html += "<div class='row'>\n";
+                for (let y = 1; y < 13; y++) {
+                    html += "<div class='col-1 horizontal-elmt'>" + y + "</div>\n";
+                }
+                // fill cells
+                let val;
+                for (let j = 0; j < 8; j++) { // columns
+                    for (let i = 0; i < 12; i++) { // rows
+                        val = i + (12 * j); // change normal filling
+                        // [&& (val + 1) !== 27] => C3
+                        if ((val + 1) !== 84 && (val + 1) !== 96) {
+                            if (platesArray[val + shift + shift_val] !== undefined) { // after finish filling
+                                // tooltip creation
+                                let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
+                                    '<ul style="text-align: left !important;" class="list-group">';
+                                $.each(platesArray[val + shift + shift_val], (j, e) => {
+                                    for (let i = 0; i < e['id'].length; i++) {
+                                        ul += '<li style="text-align: left !important;" class="list-group-item">' + e['referenceNo'][i] + '</li>';
+                                        ul += '<li style="text-align: left !important;" class="list-group-item">' + e['name'][i] + '</li>';
+                                        ul += '<li style="text-align: left !important;" class="list-group-item">' + e['nic'][i] + '</li>';
+                                    }
+                                    ul += '<li style="text-align: left !important;" class="list-group-item">' + e['barcode'] + '</li>';
+                                });
+                                ul += '</ul>';
+                                // check if pooled or not
+                                if (platesArray[pool_count][0]['iscomplete'] === '0') {
+                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
+                                } else {
+                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
+                                }
+                            } else {
+                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                            }
+                        } else {
+                            shift_val--;
+                            // tooltip creation
+                            if ((val + 1) === 84) {
+                                let span = '<span class="label label-success label-inline ">Negative control</span>';
+                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                            } else if ((val + 1) === 96) {
+                                let span = '<span class="label label-success label-inline ">Positive control</span>';
+                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                            } else {
+                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                            }
+                        }
+                    }
+                }
+
+                // close tags
+                html += "</div>\n";
+                html += "</div>\n";
+                html += '</div>\n'
+                // to next plate
+                shift += 96;
+                pool_count += 94;
+
+            }
+            // set final html obj
+            $('#resultplate').empty();
+            $('#resultplate').append(html);
+
+            // tooltip init
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -212,7 +312,7 @@
                                         <select id="plateId" name="plateId" class="form-control">
                                             <option selected value="">Select Plate</option>
                                             <c:forEach items="${resultupdate.plateList}" var="plate">
-                                                <option value="${plate.id}">${plate.code}</option>
+                                                <option value="${plate.code}">${plate.code}</option>
                                             </c:forEach>
                                         </select>
                                     </div>
@@ -238,9 +338,12 @@
             </div>
 
 
-            <div class="card card-custom gutter-b" id="resultplate">
-
-
+            <div class="card card-custom gutter-b">
+                <div class="card-body">
+                    <div class="py-8">
+                        <div id="resultplate"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
