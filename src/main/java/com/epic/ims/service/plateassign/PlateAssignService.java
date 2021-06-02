@@ -3,6 +3,7 @@ package com.epic.ims.service.plateassign;
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PoolBean;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.mastertemp.MasterTemp;
@@ -68,6 +69,19 @@ public class PlateAssignService {
             throw e;
         }
         return defaultPlateMap;
+    }
+
+    @LogService
+    public Map<Integer, List<ResultBean>> getMasterPlate(int plateid) throws Exception {
+        Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
+        try {
+            masterPlateMap = plateAssignRepository.getMasterResultPlateList(plateid);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return masterPlateMap;
     }
 
     @LogService

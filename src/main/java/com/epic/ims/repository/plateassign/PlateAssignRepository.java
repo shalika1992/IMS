@@ -3,6 +3,7 @@ package com.epic.ims.repository.plateassign;
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PoolBean;
+import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapper.mastertemp.MasterTempDataMapper;
@@ -74,6 +75,8 @@ public class PlateAssignRepository {
     private final String SQL_GET_EXCELBLOCK_VALUE = "select code from excelblock eb where eb.indexvalue = ?";
     private final String SQL_INSERT_MASTERTEMPRECORD = "insert into master_temp_data(sampleid,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,plateid,blockvalue,ward,labcode,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_GET_DEFAULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,labcode,plateid,blockvalue,ispool from master_temp_data, (select @n := -1) m where status = ? group by labcode , plateid , blockvalue , ispool order by labcode";
+
+    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? group by barcode , plateid , blockvalue , ispool order by barcode";
 
     private final String SQL_SWAP_DEFAULT_PLATE_LIST = "" +
             "update master_temp_data a " +
@@ -423,6 +426,40 @@ public class PlateAssignRepository {
             throw e;
         }
         return defaultPlateMap;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public Map<Integer, List<ResultBean>> getMasterResultPlateList(int plateid) {
+        Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
+        try {
+            jdbcTemplate.query(SQL_GET_MASTER_RESULT_PLATE_LIST, new Object[]{plateid}, (ResultSet rs) -> {
+                while (rs.next()) {
+                    masterPlateMap.put(rs.getInt("n"), Arrays.asList(
+                            new ResultBean(
+                                    rs.getString("id").split("\\|"),
+                                    rs.getString("referenceno").split("\\|"),
+                                    rs.getString("name").split("\\|"),
+                                    rs.getString("nic").split("\\|"),
+                                    rs.getString("barcode"),
+                                    rs.getString("plateid"),
+                                    rs.getString("blockvalue"),
+                                    rs.getString("ispool"),
+                                    rs.getString("iscomplete"),
+                                    rs.getString("result")
+                            )
+                    ));
+                }
+                return masterPlateMap;
+            });
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+            return masterPlateMap;
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        return masterPlateMap;
     }
 
 
