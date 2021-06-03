@@ -10,6 +10,7 @@ import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.plate.Plate;
 import com.epic.ims.mapping.result.Result;
+import com.epic.ims.mapping.result.ResultType;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.resultupdate.ResultUpdateService;
 import com.epic.ims.util.common.DataTablesResponse;
@@ -81,6 +82,21 @@ public class ResultUpdateController {
             logger.error("Exception  :  ", e);
         }
         return plateList;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/getResultList", method = RequestMethod.GET)
+    public @ResponseBody
+    List<ResultType> getResultTypeList(Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] GET RESULT LIST");
+        List<ResultType> resultTypeList = new ArrayList<>();
+        try {
+            resultTypeList = commonRepository.getResultTypeList();
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return resultTypeList;
     }
 
     @LogController
