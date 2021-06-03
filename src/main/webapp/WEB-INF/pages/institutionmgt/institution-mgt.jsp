@@ -334,47 +334,39 @@
                         <!--begin::Form-->
                         <form:form class="form" id="institutionform" name="institutionform" action=""
                                    theme="simple" method="post" modelAttribute="institution">
-                            <%--                        <form class="form">--%>
                             <div class="card-body">
-                                <div class="form-group row">
-
+                                <div class="form-group row mb-0">
                                     <div class="col-lg-3">
-                                        <label>Institution Code:</label>
+                                        <label class="label-right">Institution Code:</label>
                                         <input id="institutionCode" name="institutionCode" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                maxlength="16" class="form-control "
-                                               placeholder="Institution Code">
-                                        <span class="form-text text-muted">Please enter institution Code</span>
-                                    </div>
+                                               placeholder="Institution Code"></div>
 
                                     <div class="col-lg-3">
-                                        <label>Institution Name:</label>
+                                        <label class="label-right">Institution Name:</label>
                                         <input id="institutionName" name="institutionName" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                maxlength="256" class="form-control "
                                                placeholder="Institution Name">
-                                        <span class="form-text text-muted">Please enter institution name</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Contact Number:</label>
+                                        <label class="label-right">Contact Number:</label>
                                         <input id="contactNumber" name="contactNumber" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                                maxlength="10"
-                                               class="form-control form-control-sm" placeholder="Contact Number">
-
-                                        <span class="form-text text-muted">Please enter contact number</span>
+                                               class="form-control" placeholder="Contact Number">
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Status:</label>
+                                        <label class="label-right">Status:</label>
                                         <select id="status" name="status" class="form-control">
                                             <option selected value="">Select Status</option>
                                             <c:forEach items="${institution.statusList}" var="status">
                                                 <option value="${status.statusCode}">${status.description}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select status</span>
                                     </div>
 
                                 </div>

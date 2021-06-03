@@ -36,34 +36,31 @@
 
                         <div class="form-group row">
                             <div class="col-lg-4">
-                                <label>Institution Code<span class="text-danger">*</span></label>
+                                <label class="label-right">Institution Code<span class="text-danger">*</span></label>
                                 <form:input path="institutionCode" name="userName" type="text"
                                             class="form-control form-control-sm"
                                             id="aInstitutionCode" maxlength="16" placeholder="Institution Code"
                                             onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9]/g,''))"/>
-                                <span class="form-text text-muted">Please enter institution code</span>
                             </div>
                             <div class="col-lg-4">
-                                <label>Institution Name<span class="text-danger">*</span></label>
+                                <label class="label-right">Institution Name<span class="text-danger">*</span></label>
                                 <form:input path="institutionName" name="institutionName" type="text"
                                             onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g,''))"
                                             class="form-control form-control-sm" maxlength="256"
                                             id="aInstitutionName" placeholder="Institution Name"/>
-                                <span class="form-text text-muted">Please enter institution name</span>
                             </div>
                             <div class="col-lg-4">
-                                <label>Address<span class="text-danger">*</span></label>
+                                <label class="label-right">Address<span class="text-danger">*</span></label>
                                 <form:input path="address" name="address" type="text"
                                             onkeyup="" class="form-control form-control-sm" maxlength="512"
                                             id="aAddress" placeholder="Address"/>
-                                <span class="form-text text-muted">Please enter Address</span>
                             </div>
                         </div>
 
                         <div class="form-group row">
 
                             <div class="col-lg-4">
-                                <label>Status<span class="text-danger">*</span></label>
+                                <label class="label-right">Status<span class="text-danger">*</span></label>
                                 <form:select path="status" name="status" class="form-control form-control-sm"
                                              id="aStatus"
                                              readonly="true">
@@ -71,16 +68,14 @@
                                         <form:option value="${status.statusCode}">${status.description}</form:option>
                                     </c:forEach>
                                 </form:select>
-                                <span class="form-text text-muted">Please enter Status</span>
                             </div>
 
                             <div class="col-lg-4">
-                                <label>Contact Number<span class="text-danger">*</span></label>
+                                <label class="label-right">Contact Number<span class="text-danger">*</span></label>
                                 <form:input path="contactNumber" name="contactNumber" type="text"
                                             onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                             class="form-control form-control-sm" maxlength="10"
                                             id="aContactNumber" placeholder="Contact Number"/>
-                                <span class="form-text text-muted">Please enter Contact Number</span>
                             </div>
 
                             <div class="col-lg-4">

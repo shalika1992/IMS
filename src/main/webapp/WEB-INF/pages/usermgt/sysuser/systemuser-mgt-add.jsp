@@ -37,33 +37,30 @@
 
                         <div class="form-group row">
                             <div class="col-lg-4">
-                                <label>Username<span class="text-danger">*</span></label>
+                                <label class="label-right">Username<span class="text-danger">*</span></label>
                                 <form:input path="userName" name="userName" type="text"
                                             class="form-control form-control-sm"
                                             id="aUserName" maxlength="16" placeholder="Username"
                                             onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9]/g,''))"/>
-                                <span class="form-text text-muted">Please enter username</span>
                             </div>
                             <div class="col-lg-4">
-                                <label>Full Name<span class="text-danger">*</span></label>
+                                <label class="label-right">Full Name<span class="text-danger">*</span></label>
                                 <form:input path="fullName" name="fullName" type="text"
                                             onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g,''))"
                                             class="form-control form-control-sm" maxlength="512"
                                             id="aFullName" placeholder="Full Name"/>
-                                <span class="form-text text-muted">Please enter fullname</span>
                             </div>
                             <div class="col-lg-4">
-                                <label>Email<span class="text-danger">*</span></label>
+                                <label class="label-right">Email<span class="text-danger">*</span></label>
                                 <form:input path="email" name="email" type="text"
                                             onkeyup="" class="form-control form-control-sm" maxlength="128"
                                             id="aEmail" placeholder="Email"/>
-                                <span class="form-text text-muted">Please enter Email</span>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <div class="col-lg-4">
-                                <label>User Role<span class="text-danger">*</span></label>
+                                <label class="label-right">User Role<span class="text-danger">*</span></label>
                                 <form:select path="userRoleCode" name="userRoleCode"
                                              class="form-control form-control-sm"
                                              id="aUserRoleCode" readonly="true">
@@ -71,11 +68,10 @@
                                         <option value="${userRole.userroleCode}">${userRole.description}</option>
                                     </c:forEach>
                                 </form:select>
-                                <span class="form-text text-muted">Please enter User Role Code</span>
                             </div>
 
                             <div class="col-lg-4">
-                                <label>Status<span class="text-danger">*</span></label>
+                                <label class="label-right">Status<span class="text-danger">*</span></label>
                                 <form:select path="status" name="status" class="form-control form-control-sm"
                                              id="aStatus"
                                              readonly="true">
@@ -83,34 +79,30 @@
                                         <form:option value="${status.statusCode}">${status.description}</form:option>
                                     </c:forEach>
                                 </form:select>
-                                <span class="form-text text-muted">Please enter Status</span>
                             </div>
 
                             <div class="col-lg-4">
-                                <label>Mobile Number<span class="text-danger">*</span></label>
+                                <label class="label-right">Mobile Number<span class="text-danger">*</span></label>
                                 <form:input path="mobileNumber" name="mobileNumber" type="text"
                                             onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                             class="form-control form-control-sm" maxlength="10"
                                             id="aMobileNumber" placeholder="Mobile Number"/>
-                                <span class="form-text text-muted">Please enter Mobile Number</span>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <div class="col-lg-4">
-                                <label>Password<span class="text-danger">*</span></label>
+                                <label class="label-right">Password<span class="text-danger">*</span></label>
                                 <form:input path="password" name="password" type="password"
                                             class="form-control form-control-sm" maxlength="128"
                                             id="aPassword" placeholder="Password"/>
-                                <span class="form-text text-muted">Please enter Password</span>
                             </div>
 
                             <div class="col-lg-4">
-                                <label>Confirm Password<span class="text-danger">*</span></label>
+                                <label class="label-right">Confirm Password<span class="text-danger">*</span></label>
                                 <form:input path="confirmPassword" name="confirmPassword" type="password"
                                             class="form-control form-control-sm" maxlength="128"
                                             id="aConfirmPassword" placeholder="Confirm Password"/>
-                                <span class="form-text text-muted">Please enter Confirm Password</span>
                             </div>
                         </div>
 

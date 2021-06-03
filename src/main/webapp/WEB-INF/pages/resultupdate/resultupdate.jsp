@@ -19,7 +19,7 @@
             cursor: pointer;
             vertical-align: middle;
             max-width: 100px;
-            padding: 5px;
+            padding: 0;
             text-align: center;
         }
 
@@ -57,9 +57,9 @@
             }
 
             let html = "";
-            html += "<div class='row'><div class='card-body result' style='display: inline;width: 60px;height:60px'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
+            html += "<div class='row'><div class='card-body result' style='display: inline;width: 56px;height:56px'><div class='col-12 first-elmt'>&nbsp;</div></div>\n";
             for (let y = 1; y < 13; y++) {
-                html += "<div class='card-body result' style='display: inline;width: 60px;height:60px;'><div class='col-12 horizontal-elmt'>" + y + " </div>"
+                html += "<div class='card-body result' style='display: inline;width: 56px;height:56px;'><div class='col-12 horizontal-elmt'>" + y + " </div>"
                 html += "</div>\n";
             }
             html += "</div>\n";
@@ -69,10 +69,10 @@
                 if ((count % 12 === 0)) {
                     let rownumber = count / 12;
                     var letter = rowletter[rownumber];
-                    html += "<div class='row'><div class='card-body result' style='display: inline;width: 60px;height:60px'><div class='col-12 vertical-elmt'>" + letter + "</div></div>\n";
+                    html += "<div class='row'><div class='card-body result' style='display: inline;width: 56px;height:56px'><div class='col-12 vertical-elmt'>" + letter + "</div></div>\n";
                     for (let y = 1; y < 13; y++) {
                         let value = platedata[z + (y - 1)];
-                        html += "<div class='card-body result' style='display: inline;width: 60px;height:60px;background-color: #0a6aa1;'>"
+                        html += "<div class='card-body result' style='display: inline;width: 56px;height:56px;background-color: #ffffff;'>"
                         html += "<p class='card-title'></p>"
                         html += "<p class='card-text'>" + value + "</p>"
                         html += "</div>\n";
@@ -196,19 +196,18 @@
                                    action="addResultUpdate" theme="simple" method="post"
                                    modelAttribute="resultupdate">
                             <div class="card-body">
-                                <div class="form-group row">
-                                    <div class="col-lg-4">
-                                        <label>Received Date:</label>
+                                <div class="form-group row mb-0">
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="receivedDate"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
-                                        <span class="form-text text-muted">Please select received date</span>
                                     </div>
 
-                                    <div class="col-lg-4">
-                                        <label>Plate :</label>
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Plate :</label>
                                         <select id="plateId" name="plateId" class="form-control">
                                             <option selected value="">Select Plate</option>
                                             <c:forEach items="${resultupdate.plateList}" var="plate">
@@ -237,10 +236,14 @@
                 </div>
             </div>
 
-
-            <div class="card card-custom gutter-b" id="resultplate">
-
-
+            <div class="card card-custom gutter-b">
+                <div class="card-header">
+                    <h3 class="card-title">Plate Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="card card-custom gutter-b" id="resultplate">
+                    </div>
+                </div>
             </div>
         </div>
     </div>

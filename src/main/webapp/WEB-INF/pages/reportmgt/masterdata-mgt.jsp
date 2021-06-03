@@ -302,51 +302,46 @@
                         <form:form class="form" id="masterDataForm" name="masterDataForm" action=""
                                    theme="simple" method="post" modelAttribute="masterData">
                             <div class="card-body">
-                                <div class="form-group row">
+                                <div class="form-group row mb-0">
 
                                     <div class="col-lg-3" hidden="true">
-                                        <label>ID</label>
+                                        <label class="label-right">ID</label>
                                         <input path="id" name="id" id="id" type="text" maxlength="8"
                                                class="form-control" placeholder="ID"/>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Received Date:</label>
+                                        <label class="label-right">Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="receivedDate"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
-                                        <span class="form-text text-muted">Please enter received date</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Reference Number:</label>
+                                        <label class="label-right">Reference Number:</label>
                                         <input id="referenceNumber" name="referenceNumber" type="text"
                                                maxlength="64"
                                                class="form-control" placeholder="Reference Number"/>
-                                        <span class="form-text text-muted">Please enter reference number</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Name:</label>
+                                        <label class="label-right">Name:</label>
                                         <input id="name" name="name" type="text"
                                                maxlength="256"
-                                               class="form-control form-control-sm" placeholder="Name"/>
-
-                                        <span class="form-text text-muted">Please enter Name</span>
+                                               class="form-control form-control" placeholder="Name"/>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>NIC:</label>
+                                        <label  class="label-right" >NIC:</label>
                                         <input id="nic" name="nic" type="text"
                                                maxlength="16"
-                                               class="form-control form-control-sm" placeholder="NIC"/>
-                                        <span class="form-text text-muted">Please enter NIC</span>
+                                               class="form-control form-control" placeholder="NIC"/>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Institution:</label>
+                                        <label class="label-right">Institution:</label>
                                         <select id="institutionCode" name="institutionCode" class="form-control">
                                             <option selected value="">Select Institution</option>
                                             <c:forEach items="${masterData.commonInstitutionList}" var="institution">
@@ -354,31 +349,27 @@
                                                     - ${institution.institutionName} </option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please enter institution code</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Status:</label>
+                                        <label class="label-right">Status:</label>
                                         <select id="status" name="status" class="form-control">
                                             <option selected value="">Select Status</option>
                                             <c:forEach items="${masterData.statusList}" var="status">
                                                 <option value="${status.statusCode}">${status.description}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select status</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Result:</label>
+                                        <label class="label-right">Result:</label>
                                         <select id="result" name="result" class="form-control">
                                             <option selected value="">Select Result</option>
                                             <c:forEach items="${masterData.resultList}" var="result">
                                                 <option value="${result.code}">${result.description}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select result</span>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="card-footer">
@@ -393,10 +384,8 @@
                                         </button>
                                     </div>
 
-                                    <div class="col-lg-4"></div>
-
-                                    <div class="col-lg-2">
-                                        <button id="viewPDF" type="button" class="btn btn-primary mr-2"
+                                    <div class="col-lg-6">
+                                        <button id="viewPDF" type="button" class="btn btn-primary pull-r btn-sm"
                                                 onclick="downloadPDFReport()">
                                             View Report
                                         </button>

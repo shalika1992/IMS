@@ -27,10 +27,10 @@
             <div id="kt_header_menu" class="header-menu header-menu-mobile header-menu-layout-default">
                 <ul class="menu-nav">
                     <li class="menu-item menu-item-submenu menu-item-rel menu-item-active" data-menu-toggle="click" aria-haspopup="true">
-                        <div class="menu-link menu-toggle">
+                        <!-- <div class="menu-link menu-toggle">
                             <span class="menu-text text-combank">IMS</span>
                             <i class="menu-arrow"></i>
-                        </div>
+                        </div> -->
                 </ul>
             </div>
             <!--end::Header Menu-->
@@ -42,7 +42,7 @@
             <div class="topbar-item">
                 <div class="btn btn-icon btn-icon-mobile w-auto btn-clean d-flex align-items-center btn-lg px-2" id="kt_quick_user_toggle">
                     <span class="text-muted font-weight-bold font-size-base d-none d-md-inline mr-1">Welcome,</span>
-                    <span class="text-dark-50 font-weight-bolder font-size-base d-none d-md-inline mr-3">${user.fullName}</span>
+                    <span class="primary-text-color font-weight-bolder font-size-base d-none d-md-inline mr-3">${user.fullName}</span>
                     <span class="symbol symbol-lg-35 symbol-25 symbol-light-success">
 										<span class="symbol-label font-size-h5 font-weight-bold">S</span>
                                     </span>

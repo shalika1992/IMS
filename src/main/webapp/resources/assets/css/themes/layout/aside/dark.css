@@ -1,5 +1,114 @@
 .aside {
-  background-color: #1e1e2d; }
+  background-color: #ffffff; 
+  box-shadow: 4px 0px 16px rgb(0 0 0 / 8%);
+  border-top: 5px solid #03A9F4;
+}
+
+body {
+  background: url(../../../../../images/home-bg.png) !important; 
+  background-size: cover;
+  background-position: center;
+}
+
+.menu-submenu {
+  margin-top: -8px !important;
+  margin-bottom: 8px !important;
+  margin-right: 8px;
+}
+
+.menu-submenu li.second-menu-item {
+  margin: 0px 20px;
+  padding: 12px;
+  margin-left: 56px;
+  background: #eee;
+}
+
+.subheader {
+  background-color: rgb(243 242 244 / 80%) !important;
+}
+
+.symbol.symbol-light-success .symbol-label {
+  background-color: #03A9F4;
+  color: #ffffff;
+  border-radius: 50%;
+
+}
+
+.home-card-body {
+  background-color: #f5f5f5;
+  box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.16);
+}
+
+.home-card-title {
+  padding: 16px 36px;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #0072BA;
+  font-size: 16px;
+}
+
+.home-card-link-list {
+  list-style: none;
+  margin-top: 24px;
+  margin-bottom: 24px;  
+}
+
+.home-card-link-list a {
+  padding: 4px 0;
+  display: block;
+  color: #6C6C6C;
+}
+
+.home-card-link-list a:hover {
+  color: #000000;
+}
+
+.primary-text-color {
+  color: #03A9F4;
+}
+
+.aside footer {
+  padding: 0px 12px;
+  position: absolute;
+  bottom: 0;
+}
+
+.aside footer p {
+  font-size: 9px;
+  margin-bottom: 8px;
+  color: #6C6C6C;
+}
+
+.aside footer p a {
+  color: #03A9F4;
+}
+
+.label-right {
+  padding-left: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.pull-r {
+  float: right;
+}
+
+.form-control {
+  margin-bottom: 16px;
+}
+
+.second-menu-item a {
+  color: #0072BA;
+}
+
+.menu-subnav li.second-menu-item:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.dataTables_length .form-control {
+  margin-bottom: 0;
+}
+
   .aside .aside-menu.ps > .ps__rail-x {
     background-color: transparent; }
     .aside .aside-menu.ps > .ps__rail-x:hover, .aside .aside-menu.ps > .ps__rail-x:focus {
@@ -28,7 +137,7 @@
         background: #637099; }
 
 .aside-menu {
-  background-color: #1e1e2d ; }
+  background-color: #ffffff ; }
   .aside-menu .menu-nav > .menu-item > .menu-heading .menu-text,
   .aside-menu .menu-nav > .menu-item > .menu-link .menu-text {
     color: #a2a3b7 ; }
@@ -52,16 +161,18 @@
     background-color: #5c5e81 ; }
   .aside-menu .menu-nav > .menu-item > .menu-heading .menu-arrow,
   .aside-menu .menu-nav > .menu-item > .menu-link .menu-arrow {
-    color: #5c5e81 ; }
+    color: #03a9f4;
+    font-size: 12px;
+   }
   .aside-menu .menu-nav > .menu-item.menu-item-open {
     -webkit-transition: background-color 0.3s;
     transition: background-color 0.3s; }
     .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading,
     .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link {
-      background-color: #1b1b28 ; }
+      background-color: #dddddd ; }
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading .menu-text,
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link .menu-text {
-        color: #ffffff ; }
+        color: #000000 ; }
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading .menu-icon,
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link .menu-icon {
         color: #3699FF ; }
@@ -82,16 +193,13 @@
         background-color: #3699FF ; }
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading .menu-arrow,
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link .menu-arrow {
-        color: #ffffff ; }
+        color: #000000 ; }
   .aside-menu .menu-nav > .menu-item.menu-item-here {
     -webkit-transition: background-color 0.3s;
     transition: background-color 0.3s; }
-    .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-heading,
-    .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-link {
-      background-color: #1b1b28 ; }
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-heading .menu-text,
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-link .menu-text {
-        color: #ffffff ; }
+        color: #000000 ; }
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-heading .menu-icon,
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-link .menu-icon {
         color: #3699FF ; }
@@ -112,7 +220,7 @@
         background-color: #3699FF ; }
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-heading .menu-arrow,
       .aside-menu .menu-nav > .menu-item.menu-item-here > .menu-link .menu-arrow {
-        color: #ffffff ; }
+        color: #000000 ; }
   .aside-menu .menu-nav > .menu-item.menu-item-active {
     -webkit-transition: background-color 0.3s;
     transition: background-color 0.3s; }
@@ -148,10 +256,10 @@
     transition: background-color 0.3s; }
     .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-heading,
     .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-link {
-      background-color: #1b1b28 ; }
+      background-color: #eeeeee ; }
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-heading .menu-text,
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-link .menu-text {
-        color: #ffffff ; }
+        color: #000000 ; }
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-heading .menu-icon,
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-link .menu-icon {
         color: #3699FF ; }
@@ -172,7 +280,7 @@
         background-color: #3699FF ; }
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-heading .menu-arrow,
       .aside-menu .menu-nav > .menu-item:not(.menu-item-parent):not(.menu-item-open):not(.menu-item-here):not(.menu-item-active):hover > .menu-link .menu-arrow {
-        color: #ffffff ; }
+        color: #000000 ; }
   .aside-menu .menu-nav > .menu-item > .menu-arrow {
     color: #1e1e2d; }
   .aside-menu .menu-nav > .menu-section .menu-text {

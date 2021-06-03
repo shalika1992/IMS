@@ -25,7 +25,7 @@
     <link href="${pageContext.request.contextPath}/resources/assets/css/themes/layout/header/menu/light.css" rel="stylesheet" type="text/css"/>
     <link href="${pageContext.request.contextPath}/resources/assets/css/themes/layout/brand/dark.css" rel="stylesheet" type="text/css"/>
     <link href="${pageContext.request.contextPath}/resources/assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css"/>
-    <!--end::Layout Themes-->
+    <!--end::Layout Themes-->   
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/assets/media/logos/favicon.ico"/>
 
     <title>Colombo East Base Hospital</title>
@@ -37,13 +37,51 @@
         <h1 class="main-title">PCR Automation System</h1>
         <h3 class="secondary-title">Another National Level CSR from</h3>
         <img class="logo-two" src="${pageContext.request.contextPath}/resources/images/epic-logo.png" alt="Epic Lanka (Pvt) Ltd. Logo">
-        <p>This system allows medical staff to digitalize the PCR test results and analyze it and take timely important decisions to save many Life's.  More importantly it supports wide range of analytical information and PCR test results report printing.
+        <p>A solution to support medical staff to digitally record PCR test results to generate wide range of automated analytics and reports.  These precise and updated insights and reports will help to make well informed decision to save many lives.
         </p>
-        <h5 class="sub-content">Let's Save Our People!</h5>
-        <a class="login-btn" href="${pageContext.request.contextPath}/test.htm">Login</a>
+        <h5 class="sub-content">Let's Save Lives!</h5>
+        <div class="login-btn-container">
+            <a class="login-btn" href="${pageContext.request.contextPath}/test.htm">Login</a>
+        </div>
     </div>
 
-    <footer><p>&copy; 2021 Colombo East Base Hospital. All rights recerved. Solution by Epic Lanka (Pvt) Ltd</p></footer>
+    <div>
+        <footer>
+            <div class="footer-container">
+                <div class="footer-item">
+                    <h4>For Emergency</h4>
+                    <ul>
+                        <li><p>Suwasariya Hotline:   1999</p></li>
+                        <li><p>Epidemiology Unit:   +94011 269 5112</p></li>
+                        <li><p>Quarantine Unit:   +94011 211 2705</p></li>
+                        <li><p>Disaster Management Unit:   +94011 307 1073</p></li>
+                    </ul>
+                </div>
+                <div class="footer-item">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><p>TEL:   011 257 8226 / 011 257 8290</p></li>
+                        <li><p>FAX:   011 241 9304</p></li>
+                        <li><p>EMAIL:   rmuraleesswaran@yahoo.com</p></li>
+                    </ul>
+                </div>
+                <div class="footer-item">
+                    <h4>Our Address</h4>
+                    <p>Colombo East Base Hospital
+                        Mulleriyawa New Town, Mulleriyawa,
+                        Sri Lanka</p>
+                    <div class="social-links">
+                        <a href="www.facebook.com"><img src="${pageContext.request.contextPath}/resources/images/social/facebook.svg" alt="Facebook"></a>
+                        <a href="www.Linkedin.com"><img src="${pageContext.request.contextPath}/resources/images/social/linkedin.svg" alt="LinkedIn"></a>
+                        <a href="www.google.com"><img src="${pageContext.request.contextPath}/resources/images/social/google.svg" alt="Google"></a>
+                        <a href="www.youtube.com"><img src="${pageContext.request.contextPath}/resources/images/social/youtube.svg" alt="YouTube"></a>
+                    </div>
+                </div>
+    
+            </div>
+            <p class="copy-right">Copyright 2021 Colombo East Base Hospital. All rights recerved. Solution by <a href="https://www.epictechnology.lk" target="_blank" rel="noopener noreferrer">Epic Lanka (Pvt) Ltd</a>.</p>
+        </footer>
+    </div>
 </div>
 </body>
 </html>

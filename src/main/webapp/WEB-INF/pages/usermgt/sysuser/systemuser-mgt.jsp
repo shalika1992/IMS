@@ -316,11 +316,10 @@
                         <!--begin::Form-->
                         <form:form class="form" id="systemuserform" name="systemuserform" action=""
                                    theme="simple" method="post" modelAttribute="systemuser">
-                            <%--                        <form class="form">--%>
                             <div class="card-body">
-                                <div class="form-group row">
+                                <div class="form-group row mb-0">
                                     <div class="col-lg-3">
-                                        <label>Username:</label>
+                                        <label class="label-right">Username:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
 																	<span class="input-group-text">
@@ -332,33 +331,28 @@
                                                    maxlength="16" class="form-control"
                                                    placeholder="Username">
                                         </div>
-                                        <span class="form-text text-muted">Please enter username</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>Full Name:</label>
+                                        <label class="label-right">Full Name:</label>
                                         <input id="fullName" name="fullName" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                maxlength="512" class="form-control "
                                                placeholder="Full Name">
-                                        <span class="form-text text-muted">Please enter full name</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>Email:</label>
+                                        <label class="label-right">Email:</label>
                                         <input id="email" name="email" type="text" onkeyup="" maxlength="128"
                                                class="form-control" placeholder="Email">
-                                        <span class="form-text text-muted">Please enter email</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>Mobile Number:</label>
+                                        <label class="label-right">Mobile Number:</label>
                                         <input id="mobileNumber" name="mobileNumber" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^\d]/ig, ''))"
                                                maxlength="10"
-                                               class="form-control form-control-sm" placeholder="Mobile Number">
-
-                                        <span class="form-text text-muted">Please enter mobile number</span>
+                                               class="form-control form-control" placeholder="Mobile Number">
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>User Role:</label>
+                                        <label class="label-right">User Role:</label>
                                         <select id="userRoleCode" name="userRoleCode"
                                                 class="form-control">
                                             <option selected value="">Select User Role Code</option>
@@ -366,17 +360,15 @@
                                                 <option value="${userRole.userroleCode}">${userRole.description}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select user role code</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        <label>Status:</label>
+                                        <label class="label-right">Status:</label>
                                         <select id="status" name="status" class="form-control">
                                             <option selected value="">Select Status</option>
                                             <c:forEach items="${systemuser.statusList}" var="status">
                                                 <option value="${status.statusCode}">${status.description}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select status</span>
                                     </div>
                                 </div>
                             </div>

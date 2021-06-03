@@ -357,19 +357,18 @@
                                    action="addSampleFileRecord" theme="simple" method="post"
                                    modelAttribute="samplefile">
                             <div class="card-body">
-                                <div class="form-group row">
-                                    <div class="col-lg-4">
-                                        <label>Received Date:</label>
+                                <div class="form-group row mb-0">
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="searchReceivedDate"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
-                                        <span class="form-text text-muted">Please select received date</span>
                                     </div>
 
-                                    <div class="col-lg-4">
-                                        <label>Reference No:</label>
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Reference No:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -377,14 +376,13 @@
                                                 </span>
                                             </div>
                                             <input id="referenceNo" name="referenceNo" type="text"
-                                                   maxlength="64" class="form-control form-control-sm"
+                                                   maxlength="64" class="form-control "
                                                    placeholder="Reference No" autocomplete="off">
                                         </div>
-                                        <span class="form-text text-muted">Please enter reference no</span>
                                     </div>
 
-                                    <div class="col-lg-4">
-                                        <label>Institution Code:</label>
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Institution Code:</label>
                                         <select id="institutionCode" name="institutionCode" class="form-control">
                                             <option selected value="">Select Institution Code</option>
                                             <c:forEach items="${samplefile.institutionList}" var="institution">
@@ -393,23 +391,21 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-lg-4">
-                                        <label>Name :</label>
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Name :</label>
                                         <input id="name" name="name" type="text"
-                                               maxlength="128" class="form-control form-control-sm"
+                                               maxlength="128" class="form-control "
                                                placeholder="Name" autocomplete="off">
-                                        <span class="form-text text-muted">Please enter name</span>
                                     </div>
 
-                                    <div class="col-lg-4">
-                                        <label>NIC:</label>
+                                    <div class="col-lg-3">
+                                        <label class="label-right">NIC:</label>
                                         <div class="input-group">
                                             <input path="nic" name="nic" id="nic" type="text"
                                                    onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                    maxlength="16"
-                                                   class="form-control form-control-sm" placeholder="NIC">
+                                                   class="form-control " placeholder="NIC">
                                         </div>
-                                        <span class="form-text text-muted">Please enter nic</span>
                                     </div>
 
                                 </div>
