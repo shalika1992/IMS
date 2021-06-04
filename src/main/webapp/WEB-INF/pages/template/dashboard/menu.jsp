@@ -29,7 +29,7 @@
     <div class="brand flex-column-auto" id="kt_brand">
         <!--begin::Logo-->
         <a href="${pageContext.request.contextPath}/home.htm" class="brand-logo">
-            <!--<img alt="Logo" src="${pageContext.request.contextPath}/resources/assets/media/logos/combanklogo4.png"/>-->
+            <img alt="Logo" src="${pageContext.request.contextPath}/resources/images/ecbh_logo.png" width="212px"/>
         </a>
         <!--end::Logo-->
         <!--begin::Toggle-->
@@ -85,11 +85,6 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
-
-                <li class="menu-section">
-                    <h4 class="menu-text">PAGES</h4>
-                    <i class="menu-icon ki ki-bold-more-hor icon-md"></i>
-                </li>
                 <c:if test="${not changePwdMode}" var="condition">
                     <c:forEach items="${sectionList}" var="section">
                         <li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
@@ -128,7 +123,7 @@
                                     </li>
                                     <c:set var="sectionCode" value="${section.sectionCode}"/>
                                     <c:forEach items="${pageMap[sectionCode]}" var="page">
-                                        <li class="menu-item" aria-haspopup="true">
+                                        <li class="second-menu-item" aria-haspopup="true">
                                             <a href="${pageContext.request.contextPath}/${page.url}" class="menu-link"
                                                id="${page.pageCode}">
                                                 <i class="menu-bullet menu-bullet-dot">
@@ -146,6 +141,11 @@
                 </c:if>
             </ul>
             <!--end::Menu Nav-->
+
+            <footer>
+                <p>Copyright 2021 Colombo East Base Hospitel. <br> 
+                    All rights recerved. Solution by <a href="https://www.epictechnology.lk">Epic Lanka (Pvt) Ltd.</a></p>
+            </footer>
         </div>
         <!--end::Menu Container-->
     </div>

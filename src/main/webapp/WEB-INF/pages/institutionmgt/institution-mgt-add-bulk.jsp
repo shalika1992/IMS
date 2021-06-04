@@ -40,8 +40,9 @@
                                 <label>Excel File<span class="text-danger">*</span></label>
                                 <form:input path="institutionBulk" name="institutionBulk" type="file"
                                             class="form-control form-control-sm"
+                                            style="padding: 0.4rem 1rem;"
                                             id="abInstitutionBulk" maxlength="16" placeholder="Upload excel file" accept=".xls,.xlsx"/>
-                                <span class="form-text text-muted">Please upload the excel file</span>
+                                <span class="form-text text-muted">Upload excel file type .xls or .xlsx</span>
                             </div>
                         </div>
 

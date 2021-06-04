@@ -33,7 +33,7 @@
                                 class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <input type="file" path="sampleFile" name="sampleFile" id="sampleFile"
-                                   class="form-control form-control-sm">
+                                   class="form-control" style="padding: 0.4rem 0.75rem;">
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700"/>
     <!--end::Fonts-->
     <!--begin::Page Custom Styles(used by this page)-->
-    <link href="${pageContext.request.contextPath}/resources/assets/css/pages/login/classic/login-1.css" rel="stylesheet" type="text/css"/>
+    <%--<link href="${pageContext.request.contextPath}/resources/assets/css/pages/login/classic/login-1.css" rel="stylesheet" type="text/css"/>--%>
+    <link href="${pageContext.request.contextPath}/resources/assets/css/pages/login/classic/login.css" rel="stylesheet" type="text/css"/>
     <!--end::Page Custom Styles-->
     <!--begin::Global Theme Styles(used by all pages)-->
     <link href="${pageContext.request.contextPath}/resources/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css"/>
@@ -32,6 +33,9 @@
     <link href="${pageContext.request.contextPath}/resources/assets/css/themes/layout/aside/dark.css" rel="stylesheet" type="text/css"/>
     <!--end::Layout Themes-->
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/assets/media/logos/favicon.ico"/>
+
+    <title>Colombo East Base Hospital</title>
+
 </head>
 
 <tiles:insertAttribute name="body"/>

@@ -45,13 +45,13 @@
                         <div class="col-xl-4">
                             <div class="card card-custom card-stretch gutter-b">
                                 <div class="card-body d-flex p-0">
-                                    <div class="flex-grow-1 p-8 card-rounded flex-grow-1 bgi-no-repeat ${section.sectionCode}"
+                                    <div class="home-card-body flex-grow-1 card-rounded flex-grow-1 bgi-no-repeat ${section.sectionCode}"
                                          style="background-position: calc(100% + 0.5rem) bottom; background-size: auto 70%; ">
-                                        <h4 >${section.description}</h4>
+                                        <h4 class="home-card-title" >${section.description}</h4>
                                         <c:if test="${not changePwdMode}" var="condition">
                                             <c:set var="sectionCode" value="${section.sectionCode}"/>
                                             <c:forEach items="${pageMap[sectionCode]}" var="page">
-                                                <ul>
+                                                <ul class="home-card-link-list">
                                                     <li>
                                                         <a href="${pageContext.request.contextPath}/${page.url}"
                                                            id="${page.pageCode}">${page.description}</a>

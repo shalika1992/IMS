@@ -346,20 +346,18 @@
                         <form:form class="form" id="rejectedsampleform" name="rejectedsampleform" action=""
                                    theme="simple" method="post" modelAttribute="rejectedsample">
                             <div class="card-body">
-                                <div class="form-group row">
+                                <div class="form-group row mb-0">
                                     <div class="col-lg-3">
-                                        <label>Received Date:</label>
+                                        <label class="label-right">Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="receivedDate"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text" onkeydown="return false"/>
                                         </div>
-
-                                        <span class="form-text text-muted">Please enter received date</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Reference No:</label>
+                                        <label class="label-right">Reference No:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -370,34 +368,30 @@
                                                    maxlength="16" class="form-control"
                                                    placeholder="Reference No">
                                         </div>
-                                        <span class="form-text text-muted">Please enter reference number</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Institution Code:</label>
+                                        <label class="label-right">Institution Code:</label>
                                         <select id="institutionCode" name="institutionCode" class="form-control">
                                             <option selected value="">Select Institution</option>
                                             <c:forEach items="${rejectedsample.institutionList}" var="institution">
                                                 <option value="${institution.institutionCode}">${institution.institutionCode}</option>
                                             </c:forEach>
                                         </select>
-                                        <span class="form-text text-muted">Please select institution</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>Name:</label>
+                                        <label class="label-right">Name:</label>
                                         <input id="name" name="name" type="text"
                                                onkeyup="$(this).val($(this).val().replace(/[^a-zA-Z0-9 ]/g, ''))"
                                                maxlength="512" class="form-control "
                                                placeholder="Name">
-                                        <span class="form-text text-muted">Please enter name</span>
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label>NIC:</label>
+                                        <label class="label-right">NIC:</label>
                                         <input id="nic" name="nic" type="text" onkeyup="" maxlength="10"
                                                class="form-control" placeholder="NIC">
-                                        <span class="form-text text-muted">Please enter nic</span>
                                     </div>
 
                                 </div>
@@ -414,10 +408,8 @@
                                         </button>
                                     </div>
 
-                                    <div class="col-lg-4"></div>
-
-                                    <div class="col-lg-2">
-                                        <button id="viewPDF" type="button" class="btn btn-primary mr-2"
+                                    <div class="col-lg-6">
+                                        <button id="viewPDF" type="button" class="btn btn-primary btn-sm pull-r"
                                                 onclick="downloadPDFReport()">
                                             View Report
                                         </button>

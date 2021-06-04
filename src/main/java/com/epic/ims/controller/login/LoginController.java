@@ -62,6 +62,13 @@ public class LoginController implements RequestBeanValidation<Object> {
     CommonVarList commonVarList;
 
     @LogController
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ModelAndView getTest(ModelMap modelMap, Locale locale) {
+        return new ModelAndView("test/test", "loginform", new LoginBean());
+    }
+
+
+    @LogController
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView getLogin(ModelMap modelMap, Locale locale) {
         logger.info("[" + sessionBean.getSessionid() + "]  LOGIN PAGE VIEW");

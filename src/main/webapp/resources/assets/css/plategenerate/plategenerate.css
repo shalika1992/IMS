@@ -11,16 +11,16 @@ li {
             #eaeaea 10px,
             #eaeaea 20px );
     box-shadow: inset 0 0 0px 3px white;
-    padding: 15px 0;
+    padding: 17px 0;
     text-align: center;
     border: 1px solid #cacaca;
 }
 
 .horizontal-elmt {
-    box-shadow: inset 0 0 0px 3px white;
-    background: #f9f9f9;
+    /* box-shadow: inset 0 0 0px 3px white; */
+    background: #eeeeee;
     color: #7e8299;
-    padding: 15px 0;
+    padding: 17px 0;
     text-align: center;
     font-weight: bold;
     border-bottom: 1px solid #cacaca;
@@ -29,9 +29,9 @@ li {
 }
 
 .vertical-elmt {
-    box-shadow: inset 0 0 0px 3px white;
-    background: #f9f9f9;
-    padding: 15px 0;
+    /* box-shadow: inset 0 0 0px 3px white; */
+    background: #eeeeee;
+    padding: 17px 0;
     color: #7e8299;
     font-weight: bold;
     text-align: center;

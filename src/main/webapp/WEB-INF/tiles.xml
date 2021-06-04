@@ -35,6 +35,11 @@
         <put-attribute name="footer" value="/WEB-INF/pages/template/userregistration/footer.jsp"/>
     </definition>
 
+    <!-- test page-->
+    <definition name="test/test" extends="login-template">
+        <put-attribute name="body" value="/WEB-INF/pages/test/test.jsp"/>
+    </definition>
+
     <!-- login page-->
     <definition name="login/login" extends="login-template">
         <put-attribute name="body" value="/WEB-INF/pages/login/login.jsp"/>

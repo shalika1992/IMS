@@ -333,12 +333,12 @@
                                 <div class="form-group row">
 
                                     <div class="col-lg-5">
-                                        <label>Plate Generate Date :</label>
+                                        <label class="label-right">Plate Generate Date :</label>
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="kt_datepicker_1"
                                                    readonly="readonly" placeholder="Select date"/>
                                             <div class="input-group-append">
-                                                <button class="btn btn-success" type="button"
+                                                <button class="btn btn-primary" type="button"
                                                         onclick="generatePlates()">
                                                     Generate
                                                 </button>
@@ -347,7 +347,6 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <span class="form-text text-muted">Please Select Date</span>
                                     </div>
                                 </div>
                             </div>
