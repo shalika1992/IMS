@@ -4,6 +4,7 @@ import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
+import com.epic.ims.bean.resultupdate.ResultPlateBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
@@ -158,6 +159,25 @@ public class ResultUpdateController {
             logger.error("Exception  :  ", e);
         }
         return resultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/updatePlateResult", method = RequestMethod.POST)
+    public @ResponseBody
+    ResultPlateBean updateResultPlate(@RequestBody ResultPlateBean resultPlateBean, ModelMap modelMap, Locale locale) {
+        ResultPlateBean resultPlate = new ResultPlateBean();
+        try {
+            String message = resultUpdateService.updatePlateResult(resultPlateBean);
+            if (message.isEmpty()) {
+
+            } else {
+
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return resultPlate;
     }
 
     @LogController

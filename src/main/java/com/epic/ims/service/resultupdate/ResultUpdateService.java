@@ -3,6 +3,7 @@ package com.epic.ims.service.resultupdate;
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
+import com.epic.ims.bean.resultupdate.ResultPlateBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.plate.Plate;
@@ -98,6 +99,19 @@ public class ResultUpdateService {
             throw e;
         }
         return masterPlateMap;
+    }
+
+    @LogService
+    public String updatePlateResult(ResultPlateBean resultPlateBean) throws Exception {
+        String message = "";
+        try {
+            message = resultUpdateRepository.updateMasterResult(resultPlateBean);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
     }
 
     @LogService
