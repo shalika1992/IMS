@@ -48,6 +48,11 @@
             $('#receivedDate').datepicker().on('changeDate', function (ev) {
                 getCorrespondingPlateList();
             });
+
+            $('#exampleModal').on('shown.bs.modal', function () {
+                $('#myInput').trigger('focus')
+            })
+
         });
 
 
@@ -117,10 +122,34 @@
                     var options = '<option selected value=""><strong>Select Plate</strong></option>';
                     if (data && data.length > 0) {
                         $(data).each(function (index, value) {
-                            options += '<option value="' + value.id + '">' + value.code + '</option>';
+                            options += '<option value="' + value.code + '">' + value.code + '</option>';
                         });
                     }
                     $('#plateId').html(options);
+                },
+                error: function (data) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
+        function getResultTypeList() {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/getResultList.json",
+                data: {},
+                dataType: "json",
+                type: 'GET',
+                contentType: "application/json",
+                success: function (data) {
+                    $('#resultId')[0].options.length = 0;
+                    //append the new list
+                    var options = '<option selected value=""><strong>Select Result</strong></option>';
+                    if (data && data.length > 0) {
+                        $(data).each(function (index, value) {
+                            options += '<option value="' + value.code + '">' + value.description + '</option>';
+                        });
+                    }
+                    $('#resultId').html(options);
                 },
                 error: function (data) {
                     window.location = "${pageContext.request.contextPath}/logout.htm";
@@ -177,7 +206,7 @@
             // monitor if pooled or not
             let pool_count = 0;
             // fill plates
-            for (let k = 0; k < round; k++) {
+            for (let k = 0; k < 1; k++) {
                 // plate rounds
                 // check box
                 html += "<div class='row master-plate' id='master-plate-" + (k + 1) + "'><div class='col-12 plate-title'>Master Plate<span>#" + (k + 1) + "</span></div>\n";
@@ -259,6 +288,38 @@
             })
 
         }
+
+        function removeItemOnce(arr, value) {
+            var index = arr.indexOf(value);
+            if (index > -1) {
+                arr.splice(index, 1);
+            }
+            return arr;
+        }
+
+        $(document).on("click", ".cell-click", function () {
+            //result list
+            getResultTypeList();
+            let checkIfAlreadySelected = $('.cell-elmt.active');
+            $.each(checkIfAlreadySelected, function (x, y) {
+                if ($(this).hasClass('active')) {
+                    $(this).removeClass("active");
+                } else {
+                    $(this).addClass("active");
+                }
+            });
+            if ($(this).hasClass('active')) {
+                $(this).removeClass("active");
+                $('#resultModal').modal('hide');
+            } else {
+                $(this).addClass("active");
+                $('#resultModal').modal('show');
+            }
+            let activeElements = $('.cell-elmt.active');
+            $.each(activeElements, function (x, y) {
+                document.getElementById('barcode').value = y.dataset.value;
+            });
+        });
     </script>
 </head>
 <!--begin::Content-->
@@ -342,6 +403,59 @@
                 <div class="card-body">
                     <div class="py-8">
                         <div id="resultplate"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Result Update</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-lg-2">
+                                        <label>Barcode:</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                            <input path="receivedDate" name="barcode" id="barcode"
+                                                   class="form-control" readonly="true"
+                                                   autocomplete="off" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-lg-2">
+                                        <label>Result:</label>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <select id="resultId" name="resultId" class="form-control">
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <button type="button" class="btn btn-primary mr-2">
+                                            Update
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

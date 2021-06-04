@@ -8,6 +8,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.result.ResultType;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.util.varlist.CommonVarList;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +51,7 @@ public class CommonRepository {
     private final String SQL_GET_INSTITUTION_LIST = "select institutioncode as code, name from institution where status=? order by name asc";
     private final String SQL_GETALL_INSTITUTION_LIST = "select * from institution";
     private final String SQL_GET_PLATE_LIST = "select id , code , receiveddate , createddate from plate where receiveddate = ? order by id asc";
+    private final String SQL_GET_RESULT_TYPE_LIST = "select code , description from result order by code asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
@@ -304,6 +306,27 @@ public class CommonRepository {
             throw e;
         }
         return plateList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<ResultType> getResultTypeList() {
+        List<ResultType> resultTypeList;
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_RESULT_TYPE_LIST
+                    , new Object[]{});
+            resultTypeList = list.stream().map((record) -> {
+                ResultType resultType = new ResultType();
+                resultType.setCode(record.get("code").toString());
+                resultType.setDescription(record.get("description").toString());
+                return resultType;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            resultTypeList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return resultTypeList;
     }
 
     @LogRepository
