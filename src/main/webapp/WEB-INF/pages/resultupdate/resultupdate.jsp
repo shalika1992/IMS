@@ -157,12 +157,22 @@
             });
         }
 
+        function checkResultType(event) {
+            if (event.value === 'DTCD') {
+                document.getElementById("ct_txt").style.display = "block";
+            } else {
+                $('#ct1').val("");
+                $('#ct2').val("");
+                document.getElementById("ct_txt").style.display = "none";
+            }
+        }
+
         function search() {
             if ($('#plateId').val()) {
                 $.ajax({
                     type: 'POST',
                     url: '${pageContext.request.contextPath}/generateMasterPlate.json',
-                    data: {plateid: $('#plateId').val()},
+                    data: {plateid: $('#plateId').val(), receivedDate: $('#receivedDate').val()},
                     success: function (res) {
                         _generatePlates(res);
                     },
@@ -181,6 +191,74 @@
                     }
                 });
             }
+        }
+
+        function updateValidation() {
+            if ($('#resultId').val()) {
+                if ($('#resultId').val() !== 'DTCD') {
+                    update();
+                } else {
+                    if ($('#ct1').val()) {
+                        if ($('#ct2').val()) {
+                            update();
+                        } else {
+                            swal.fire({
+                                text: "Please enter a value for ct2",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Proceed",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            });
+                        }
+                    } else {
+                        swal.fire({
+                            text: "Please enter a value for ct1",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Proceed",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+                    }
+                }
+            } else {
+                swal.fire({
+                    text: "Please select a result",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Proceed",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            }
+        }
+
+        // update
+        function update() {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/updatePlateResult.json",
+                data: JSON.stringify({
+                    barcode: $('#barcode').val(),
+                    resultId: $('#resultId').val(),
+                    ct1: $('#ct1').val(),
+                    ct2: $('#ct2').val(),
+                    plateid: $('#plateId').val(),
+                    receivedDate: $('#receivedDate').val()
+                }),
+                dataType: "json",
+                type: 'POST',
+                contentType: "application/json",
+                success: function (data) {
+
+                },
+                error: function (data) {
+                    <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
+                }
+            });
         }
 
         /*
@@ -245,7 +323,7 @@
                                 });
                                 ul += '</ul>';
                                 // check if pooled or not
-                                if (platesArray[pool_count][0]['iscomplete'] === '0') {
+                                if (platesArray[val + shift + shift_val][0]['iscomplete'] === '0') {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
                                 } else {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
@@ -286,20 +364,14 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             })
-
-        }
-
-        function removeItemOnce(arr, value) {
-            var index = arr.indexOf(value);
-            if (index > -1) {
-                arr.splice(index, 1);
-            }
-            return arr;
         }
 
         $(document).on("click", ".cell-click", function () {
             //result list
             getResultTypeList();
+            // hide ct fields
+            document.getElementById("ct_txt").style.display = "none";
+            // monitor selected plates
             let checkIfAlreadySelected = $('.cell-elmt.active');
             $.each(checkIfAlreadySelected, function (x, y) {
                 if ($(this).hasClass('active')) {
@@ -421,32 +493,58 @@
                         <div class="modal-body">
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-3">
                                         <label>Barcode:</label>
                                     </div>
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-8">
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
-                                            <input path="receivedDate" name="barcode" id="barcode"
+                                            <input path="barcode" name="barcode" id="barcode"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-3">
                                         <label>Result:</label>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <select id="resultId" name="resultId" class="form-control">
-
+                                    <div class="col-lg-8">
+                                        <select id="resultId" onchange="checkResultType(this)" name="resultId"
+                                                class="form-control">
                                         </select>
+                                    </div>
+                                </div>
+                                <div id="ct_txt">
+                                    <div class="form-group row">
+                                        <div class="col-lg-3">
+                                            <label>CT1:</label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                                <input path="ct1" name="ct1" id="ct1"
+                                                       class="form-control"
+                                                       autocomplete="off" type="text"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-lg-3">
+                                            <label>CT2:</label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                                <input path="ct2" name="ct2" id="ct2"
+                                                       class="form-control"
+                                                       autocomplete="off" type="text"/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <button type="button" class="btn btn-primary mr-2">
+                                        <button type="button" class="btn btn-primary mr-2" onclick="updateValidation()">
                                             Update
                                         </button>
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">

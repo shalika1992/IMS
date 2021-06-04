@@ -4,6 +4,7 @@ import com.epic.ims.annotation.accesscontrol.AccessControl;
 import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
+import com.epic.ims.bean.resultupdate.ResultPlateBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
@@ -150,10 +151,27 @@ public class ResultUpdateController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
     @RequestMapping(value = "/generateMasterPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, ModelMap modelMap, Locale locale) {
+    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, @RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
         Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
         try {
-            resultPlateMap = resultUpdateService.getMasterPlate(plateid);
+            resultPlateMap = resultUpdateService.getMasterPlate(plateid, receivedDate);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return resultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/updatePlateResult", method = RequestMethod.POST)
+    public @ResponseBody
+    Map<Integer, List<ResultBean>> updateResultPlate(@RequestBody ResultPlateBean resultPlateBean, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
+        try {
+            String message = resultUpdateService.updatePlateResult(resultPlateBean);
+            if (message.isEmpty()) {
+                resultPlateMap = resultUpdateService.getMasterPlate(Integer.parseInt(resultPlateBean.getPlateid()), resultPlateBean.getReceivedDate());
+            }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }

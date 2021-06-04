@@ -154,6 +154,12 @@ public class CommonVarList {
 
     @Value("${result.code.pending}")
     public String RESULT_CODE_PENDING;
+
+    @Value("${result.code.repeated}")
+    public String RESULT_CODE_REPEATED;
+
+    @Value("${result.code.inconclusive}")
+    public String RESULT_CODE_INCONCLUSIVE;
     //-------------------------------result codes---------------------------------------------------------------------//
 
     //-------------------------------report content codes-------------------------------------------------------------//
