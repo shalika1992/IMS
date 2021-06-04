@@ -666,7 +666,7 @@
                                         </button>
                                     </div>
                                     <div class="col-lg-3"></div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-3 text-right">
                                         <button type="button" class="btn btn-primary mr-2 btn-sm"
                                                 onclick="generateLabCodePopUp()">
                                             Generate Lab Codes
