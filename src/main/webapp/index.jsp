@@ -35,7 +35,7 @@
     <div class="landing-container">
         <img class="logo-one" src="${pageContext.request.contextPath}/resources/images/ecbh_logo.png" alt="Colombo East Base Hospital Logo">
         <h1 class="main-title">PCR Automation System</h1>
-        <h3 class="secondary-title">Another National Level CSR from</h3>
+        <h3 class="secondary-title">Another CSR Project By</h3>
         <img class="logo-two" src="${pageContext.request.contextPath}/resources/images/epic-logo.png" alt="Epic Lanka (Pvt) Ltd. Logo">
         <p>A solution to support medical staff to digitally record PCR test results to generate wide range of automated analytics and reports.  These precise and updated insights and reports will help to make well informed decision to save many lives.
         </p>

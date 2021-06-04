@@ -35,7 +35,7 @@ body {
 }
 
 .home-card-body {
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.16);
 }
 
@@ -45,6 +45,7 @@ body {
   background: #ffffff;
   color: #0072BA;
   font-size: 16px;
+  border-bottom: 1px solid #d0e8f3;
 }
 
 .home-card-link-list {
@@ -140,7 +141,7 @@ body {
   background-color: #ffffff ; }
   .aside-menu .menu-nav > .menu-item > .menu-heading .menu-text,
   .aside-menu .menu-nav > .menu-item > .menu-link .menu-text {
-    color: #a2a3b7 ; }
+    color: #000000 ; }
   .aside-menu .menu-nav > .menu-item > .menu-heading .menu-icon,
   .aside-menu .menu-nav > .menu-item > .menu-link .menu-icon {
     color: #494b74 ; }
@@ -169,7 +170,7 @@ body {
     transition: background-color 0.3s; }
     .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading,
     .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link {
-      background-color: #dddddd ; }
+      background-color: #f5f5f5 ; }
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-heading .menu-text,
       .aside-menu .menu-nav > .menu-item.menu-item-open > .menu-link .menu-text {
         color: #000000 ; }
