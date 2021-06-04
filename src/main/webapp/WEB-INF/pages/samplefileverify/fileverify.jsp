@@ -135,33 +135,39 @@
                         visible: false
                     },
                     {
-                        title: "Reference Number",
+                        title: "Lab Code",
                         targets: 2,
+                        mDataProp: "barcode",
+                        defaultContent: "--"
+                    },
+                    {
+                        title: "Reference Number",
+                        targets: 3,
                         mDataProp: "referenceNo",
                         defaultContent: "--"
                     },
 
                     {
                         title: "Institution Code",
-                        targets: 3,
+                        targets: 4,
                         mDataProp: "institutionCode",
                         defaultContent: "--"
                     },
                     {
                         title: "Name",
-                        targets: 4,
+                        targets: 5,
                         mDataProp: "name",
                         defaultContent: "--"
                     },
                     {
                         title: "Age",
-                        targets: 5,
+                        targets: 6,
                         mDataProp: "age",
                         defaultContent: "--"
                     },
                     {
                         title: "Gender",
-                        targets: 6,
+                        targets: 7,
                         mDataProp: "gender",
                         defaultContent: "--",
                         render: function (data) {
@@ -174,55 +180,55 @@
                     },
                     {
                         title: "Symptomatic",
-                        targets: 7,
+                        targets: 8,
                         mDataProp: "symptomatic",
                         defaultContent: "--"
                     },
                     {
                         title: "Contact Type",
-                        targets: 8,
+                        targets: 9,
                         mDataProp: "contactType",
                         defaultContent: "--"
                     },
                     {
                         title: "NIC",
-                        targets: 9,
+                        targets: 10,
                         mDataProp: "nic",
                         defaultContent: "--"
                     },
                     {
                         title: "Address",
-                        targets: 10,
+                        targets: 11,
                         mDataProp: "address",
                         defaultContent: "--"
                     },
                     {
                         title: "District",
-                        targets: 11,
+                        targets: 12,
                         mDataProp: "residentDistrict",
                         defaultContent: "--"
                     },
                     {
                         title: "Contact Number",
-                        targets: 12,
+                        targets: 13,
                         mDataProp: "contactNumber",
                         defaultContent: "--"
                     },
                     {
                         title: "Secondary Contact Number",
-                        targets: 13,
+                        targets: 14,
                         mDataProp: "secondaryContactNumber",
                         defaultContent: "--"
                     },
                     {
                         title: "Received Date",
-                        targets: 14,
+                        targets: 15,
                         mDataProp: "receivedDate",
                         defaultContent: "--"
                     },
                     {
                         title: "Status",
-                        targets: 15,
+                        targets: 16,
                         mDataProp: "status",
                         defaultContent: "--",
                         render: function (data, type, full, meta) {
@@ -264,14 +270,14 @@
                     },
                     {
                         title: "Created User",
-                        targets: 16,
+                        targets: 17,
                         mDataProp: "createdUser",
                         defaultContent: "--"
                     },
                     {
                         label: 'Created Time',
                         name: 'createdTime',
-                        targets: 17,
+                        targets: 18,
                         mDataProp: "createdTime",
                         render: function (data) {
                             return moment(data).format("YYYY-MM-DD HH:mm:ss A")
@@ -529,6 +535,40 @@
                 }
             });
         }
+
+        function generateLabCodePopUp() {
+            $.ajax({
+                type: 'GET',
+                url: "${pageContext.request.contextPath}/generateinitiallabcode.json",
+                contentType: "application/json",
+                success: function (e) {
+                    $('#labCode').val(e.initialLabCode)
+                    $('#modalGenerateLabCode').modal('show');
+                },
+                error: function (e) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
+        function generateLabCodes() {
+            var labcode = $('#labCode').val();
+            $('#modalGenerateLabCode').modal('hide');
+            if (labcode) {
+                $('#initialLabCode').val(labcode);
+                form = document.getElementById('sampleverifyform');
+                form.action = 'updatelabcode.htm';
+                form.submit();
+                setTimeout(function () {
+                    oTable.fnDraw();
+                }, 5000);
+            } else {
+                //popup the error messae
+                $('#responseHeader').text('Empty Initial Lab Code');
+                $('#responseMsg').text('Please enter valid lab code');
+                $('#modalResponse').modal('show');
+            }
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -565,7 +605,6 @@
                         <!--begin::Form-->
                         <form:form class="form" id="sampleverifyform" name="sampleverifyform" action=""
                                    theme="simple" method="post" modelAttribute="sampleverify">
-                            <%--                        <form class="form">--%>
                             <div class="card-body">
                                 <div class="form-group row">
 
@@ -610,6 +649,15 @@
                                         <span class="form-text text-muted">Please select status</span>
                                     </div>
 
+                                    <div class="col-lg-3" hidden="true">
+                                        <label>Reference No:</label>
+                                        <input id="initialLabCode" name="initialLabCode" type="text"
+                                               maxlength="10"
+                                               class="form-control form-control-sm" placeholder="Initial Lab Code">
+
+                                        <span class="form-text text-muted">Please enter initial lab code</span>
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="card-footer">
@@ -623,10 +671,18 @@
                                             Reset
                                         </button>
                                     </div>
+                                    <div class="col-lg-3"></div>
+                                    <div class="col-lg-3">
+                                        <button type="button" class="btn btn-primary mr-2 btn-sm"
+                                                onclick="generateLabCodePopUp()">
+                                            Generate Lab Codes
+                                        </button>
+                                    </div>
                                 </div>
-
                                 <!--end::Form-->
                             </div>
+
+
                         </form:form>
                         <!--end::Card-->
                     </div>
@@ -711,6 +767,7 @@
                             <tr>
                                 <th><input id="select_all" name="select_all" value="1" type="checkbox"></th>
                                 <th>Id</th>
+                                <th>Lab Code</th>
                                 <th>Reference Number</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
@@ -745,5 +802,6 @@
 <jsp:include page="fileverify_invalid.jsp"/>
 <jsp:include page="fileverify_notfound.jsp"/>
 <jsp:include page="fileverify_response.jsp"/>
+<jsp:include page="fileverify_generatelabcode.jsp"/>
 <!-- end include jsp files -->
 </html>

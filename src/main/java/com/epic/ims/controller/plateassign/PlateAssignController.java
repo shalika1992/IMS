@@ -102,7 +102,7 @@ public class PlateAssignController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody Map<String,String[]> mergedPool, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+    Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody Map<String, String[]> mergedPool, HttpServletRequest request, HttpServletResponse response, Locale locale) {
         Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
             PoolBean poolBean = convertMergedPoolToBean(mergedPool);
@@ -113,12 +113,12 @@ public class PlateAssignController {
         return defaultPlateMap;
     }
 
-    PoolBean convertMergedPoolToBean(Map<String,String[]> mergedPool) {
+    PoolBean convertMergedPoolToBean(Map<String, String[]> mergedPool) {
         PoolBean poolBean = new PoolBean();
         List<ArrayList<String>> poolList = new ArrayList<>();
         Iterator it = mergedPool.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+            Map.Entry pair = (Map.Entry) it.next();
             String[] pools = (String[]) pair.getValue();
             ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pools));
             poolList.add(arrayList);
@@ -136,40 +136,42 @@ public class PlateAssignController {
         OutputStream outputStream = null;
         try {
             String zipFilePath = plateAssignService.getFilePathList();
+            if (zipFilePath != null && !zipFilePath.isEmpty()) {
+                File downloadFile = new File(zipFilePath);
+                FileInputStream inputStream = new FileInputStream(downloadFile);
 
-            File downloadFile = new File(zipFilePath);
-            FileInputStream inputStream = new FileInputStream(downloadFile);
+                // get MIME type of the file
+                String mimeType = context.getMimeType(zipFilePath);
+                if (mimeType == null) {
+                    // set to binary type if MIME mapping not found
+                    mimeType = "application/octet-stream";
+                }
+                System.out.println("MIME type: " + mimeType);
 
-            // get MIME type of the file
-            String mimeType = context.getMimeType(zipFilePath);
-            if (mimeType == null) {
-                // set to binary type if MIME mapping not found
-                mimeType = "application/octet-stream";
+                // set content attributes for the response
+                httpServletResponse.setContentType(mimeType);
+                httpServletResponse.setContentLength((int) downloadFile.length());
+
+                // set headers for the response
+                String headerKey = "Content-Disposition";
+                String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+                httpServletResponse.setHeader(headerKey, headerValue);
+
+                // get output stream of the response
+                OutputStream outStream = httpServletResponse.getOutputStream();
+
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int bytesRead = -1;
+
+                // write bytes read from the input stream into the output stream
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
+
+                inputStream.close();
+                outStream.close();
             }
-            System.out.println("MIME type: " + mimeType);
 
-            // set content attributes for the response
-            httpServletResponse.setContentType(mimeType);
-            httpServletResponse.setContentLength((int) downloadFile.length());
-
-            // set headers for the response
-            String headerKey = "Content-Disposition";
-            String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
-            httpServletResponse.setHeader(headerKey, headerValue);
-
-            // get output stream of the response
-            OutputStream outStream = httpServletResponse.getOutputStream();
-
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead = -1;
-
-            // write bytes read from the input stream into the output stream
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, bytesRead);
-            }
-
-            inputStream.close();
-            outStream.close();
         } catch (Exception ex) {
             logger.error("Exception  :  ", ex);
         } finally {

@@ -119,10 +119,13 @@ public class PlateAssignService {
                     //validate the master temp list
                     if (masterTempList != null && !masterTempList.isEmpty() && masterTempList.size() > 0) {
                         //insert to plate table
-                        message = plateAssignRepository.createPlate(plateId);
+                        //this is the correct plate id for plate creation
+                        String masterTablePlateId = plateAssignRepository.getMaxPlateId(currentDate);
+                        //create the plate
+                        message = plateAssignRepository.createPlate(masterTablePlateId);
                         if (message.isEmpty()) {
                             //insert the master batch
-                            message = plateAssignRepository.insertMasterBatch(masterTempList);
+                            message = plateAssignRepository.insertMasterBatch(masterTempList, masterTablePlateId);
                             if (message.isEmpty()) {
                                 //update the status in sample table
                                 List<String> sampleIdList = masterTempList.stream().map(m -> m.getSampleId()).collect(Collectors.toList());
@@ -130,7 +133,7 @@ public class PlateAssignService {
                                 message = plateAssignRepository.updateSampleDataList(sampleIdList);
                                 if (message.isEmpty()) {
                                     //create the master file in machine location
-                                    String filePath = this.createMasterFile(masterTempList, currentDate, plateId);
+                                    String filePath = this.createMasterFile(masterTempList, currentDate, masterTablePlateId);
                                     filePathList.add(filePath);
                                 } else {
                                     break;
@@ -152,16 +155,22 @@ public class PlateAssignService {
         return zipFilePath;
     }
 
-    private String createMasterFile(List<MasterTemp> masterTempList, String currentDate, String plateId) throws Exception {
+    private String createMasterFile(List<MasterTemp> masterTempList, String currentDate, String masterTablePlateId) throws Exception {
         String filePath = "";
         try {
-            Map<String, Object> parameterMap = new HashMap<>();
+            //get the copy of master temp list
+            List<MasterTemp> masterTemps = masterTempList.stream().collect(Collectors.toList());
+            //update the master temp list new plate id
+            masterTemps.stream().forEach(m -> m.setPlateId(masterTablePlateId));
+            masterTemps.stream().filter(m -> m.getIsPool().equals(commonVarList.PLATE_POOLCODE_YES)).forEach(m -> m.setIsPool(commonVarList.PLATE_POOLDESCRIPTION_YES));
+            masterTemps.stream().filter(m -> m.getIsPool().equals(commonVarList.PLATE_POOLCODE_NO)).forEach(m -> m.setIsPool(commonVarList.PLATE_POOLDESCRIPTION_NO));
             //put values to parameter map
+            Map<String, Object> parameterMap = new HashMap<>();
             parameterMap.put("date", currentDate);
-            parameterMap.put("plateno", plateId);
+            parameterMap.put("plateno", masterTablePlateId);
             //initialize file path
             String folderPath = this.getFolderPath(currentDate);
-            filePath = folderPath + File.separator + MASTERFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + plateId);
+            filePath = folderPath + File.separator + MASTERFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + masterTablePlateId);
             String masterFileJasperPath = this.getClass().getResource("/reports/masterfile/masterfile_report.jasper").getPath();
             String printFileName = JasperFillManager.fillReportToFile(masterFileJasperPath, parameterMap, new JRBeanCollectionDataSource(masterTempList));
             //create the pdf location

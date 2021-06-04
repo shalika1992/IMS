@@ -140,6 +140,9 @@ public class CommonVarList {
     //-------------------------------sample file upload batch size----------------------------------------------------//
     @Value("${bulkupload.batch.size}")
     public int BULKUPLOAD_BATCH_SIZE;
+
+    @Value("${bulkupdate.batch.size}")
+    public int BULKUPDATE_BATCH_SIZE;
     //-------------------------------sample file upload batch size----------------------------------------------------//
 
     //-------------------------------result codes---------------------------------------------------------------------//
@@ -182,5 +185,24 @@ public class CommonVarList {
     @Value("${masterfile.windows.filepath}")
     public String MASTERFILE_WINDOWS_FILEPATH;
     //-------------------------------report content codes-------------------------------------------------------------//
+
+    //-------------------------------report content codes-------------------------------------------------------------//
+    @Value("${default.max.labcode}")
+    public String DEFAULT_MAX_LABCODE;
+    //-------------------------------report content codes-------------------------------------------------------------//
+
+    //-------------------------------plate pool codes-----------------------------------------------------------------//
+    @Value("${plate.poolcode.yes}")
+    public String PLATE_POOLCODE_YES;
+
+    @Value("${plate.poolcode.no}")
+    public String PLATE_POOLCODE_NO;
+
+    @Value("${plate.pooldescription.no}")
+    public String PLATE_POOLDESCRIPTION_YES;
+
+    @Value("${plate.pooldescription.yes}")
+    public String PLATE_POOLDESCRIPTION_NO;
+    //-------------------------------plate pool codes-----------------------------------------------------------------//
 }
 
