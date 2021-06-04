@@ -62,18 +62,25 @@ public class AuthInterceptor implements HandlerInterceptor {
                         //check the session map
                         if (sessionMap != null) {
                             String userName = sessionBean.getUsername();
-                            //check the change password mode
-                            if (sessionBean.isChangePwdMode()) {
-                                if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/passwordchange.htm")) {
-                                    //redirect to login page
-                                    requestDispatcher = request.getRequestDispatcher("logout.htm?error=5");
-                                    requestDispatcher.forward(request, response);
-                                    status = false;
+                            if (sessionMap.get(userName).equals(httpSession.getId())) {
+                                //check the change password mode
+                                if (sessionBean.isChangePwdMode()) {
+                                    if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/passwordchange.htm")) {
+                                        //redirect to login page
+                                        requestDispatcher = request.getRequestDispatcher("logout.htm?error=5");
+                                        requestDispatcher.forward(request, response);
+                                        status = false;
+                                    } else {
+                                        status = true;
+                                    }
                                 } else {
                                     status = true;
                                 }
                             } else {
-                                status = true;
+                                //redirect to login page
+                                requestDispatcher = request.getRequestDispatcher("logout.htm?error=4");
+                                requestDispatcher.forward(request, response);
+                                status = false;
                             }
                         } else {
                             //redirect to login page
