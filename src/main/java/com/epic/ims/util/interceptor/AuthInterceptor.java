@@ -52,7 +52,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             response.setHeader("X-Content-Type-Options", "nosniff");
 
             if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/checkuser.htm") && !request.getRequestURI().substring(request.getContextPath().length()).equals("/logout.htm")) {
-                logger.info("session id :" + httpSession.getId());
+                //logger.info("session id :" + httpSession.getId());
                 //check the session bean
                 if (sessionBean != null) {
                     User user = sessionBean.getUser();
@@ -62,25 +62,18 @@ public class AuthInterceptor implements HandlerInterceptor {
                         //check the session map
                         if (sessionMap != null) {
                             String userName = sessionBean.getUsername();
-                            if (sessionMap.get(userName).equals(httpSession.getId())) {
-                                //check the change password mode
-                                if (sessionBean.isChangePwdMode()) {
-                                    if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/passwordchange.htm")) {
-                                        //redirect to login page
-                                        requestDispatcher = request.getRequestDispatcher("logout.htm?error=5");
-                                        requestDispatcher.forward(request, response);
-                                        status = false;
-                                    } else {
-                                        status = true;
-                                    }
+                            //check the change password mode
+                            if (sessionBean.isChangePwdMode()) {
+                                if (!request.getRequestURI().substring(request.getContextPath().length()).equals("/passwordchange.htm")) {
+                                    //redirect to login page
+                                    requestDispatcher = request.getRequestDispatcher("logout.htm?error=5");
+                                    requestDispatcher.forward(request, response);
+                                    status = false;
                                 } else {
                                     status = true;
                                 }
                             } else {
-                                //redirect to login page
-                                requestDispatcher = request.getRequestDispatcher("logout.htm?error=4");
-                                requestDispatcher.forward(request, response);
-                                status = false;
+                                status = true;
                             }
                         } else {
                             //redirect to login page
