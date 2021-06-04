@@ -89,10 +89,10 @@ public class ResultUpdateService {
     }
 
     @LogService
-    public Map<Integer, List<ResultBean>> getMasterPlate(int plateid) throws Exception {
+    public Map<Integer, List<ResultBean>> getMasterPlate(int plateid, String receivedDate) throws Exception {
         Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
         try {
-            masterPlateMap = resultUpdateRepository.getMasterResultPlateList(plateid);
+            masterPlateMap = resultUpdateRepository.getMasterResultPlateList(plateid, receivedDate);
         } catch (EmptyResultDataAccessException ere) {
             throw ere;
         } catch (Exception e) {

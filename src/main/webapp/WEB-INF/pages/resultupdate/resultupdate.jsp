@@ -172,7 +172,7 @@
                 $.ajax({
                     type: 'POST',
                     url: '${pageContext.request.contextPath}/generateMasterPlate.json',
-                    data: {plateid: $('#plateId').val()},
+                    data: {plateid: $('#plateId').val(), receivedDate: $('#receivedDate').val()},
                     success: function (res) {
                         _generatePlates(res);
                     },
@@ -245,7 +245,9 @@
                     barcode: $('#barcode').val(),
                     resultId: $('#resultId').val(),
                     ct1: $('#ct1').val(),
-                    ct2: $('#ct2').val()
+                    ct2: $('#ct2').val(),
+                    plateid: $('#plateId').val(),
+                    receivedDate: $('#receivedDate').val()
                 }),
                 dataType: "json",
                 type: 'POST',
@@ -321,7 +323,7 @@
                                 });
                                 ul += '</ul>';
                                 // check if pooled or not
-                                if (platesArray[pool_count][0]['iscomplete'] === '0') {
+                                if (platesArray[val + shift + shift_val][0]['iscomplete'] === '0') {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
                                 } else {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";

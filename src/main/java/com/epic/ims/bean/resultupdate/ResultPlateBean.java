@@ -13,4 +13,6 @@ public class ResultPlateBean {
     String resultId;
     String ct1;
     String ct2;
+    String plateid;
+    String receivedDate;
 }

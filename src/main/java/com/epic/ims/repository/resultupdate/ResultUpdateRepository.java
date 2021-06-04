@@ -54,8 +54,9 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_LIST_DETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_NOTDETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_PENDING = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
-    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? group by barcode , plateid , blockvalue , ispool order by barcode";
+    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? and createdtime = ? group by barcode , plateid , blockvalue , ispool order by barcode";
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
+    private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -77,10 +78,10 @@ public class ResultUpdateRepository {
 
     @LogRepository
     @Transactional(readOnly = true)
-    public Map<Integer, List<ResultBean>> getMasterResultPlateList(int plateid) {
+    public Map<Integer, List<ResultBean>> getMasterResultPlateList(int plateid, String receivedDate) {
         Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
         try {
-            jdbcTemplate.query(SQL_GET_MASTER_RESULT_PLATE_LIST, new Object[]{plateid}, (ResultSet rs) -> {
+            jdbcTemplate.query(SQL_GET_MASTER_RESULT_PLATE_LIST, new Object[]{plateid, receivedDate}, (ResultSet rs) -> {
                 while (rs.next()) {
                     masterPlateMap.put(rs.getInt("n"), Arrays.asList(
                             new ResultBean(
@@ -119,6 +120,8 @@ public class ResultUpdateRepository {
             if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_DETECTED);
+                idSetParameterMap.addValue("ct1", resultPlateBean.getCt1());
+                idSetParameterMap.addValue("ct2", resultPlateBean.getCt2());
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_NOTDETECTED)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_NOTDETECTED);
@@ -131,11 +134,14 @@ public class ResultUpdateRepository {
             }
             idSetParameterMap.addValue("isverified", 1);
             idSetParameterMap.addValue("iscomplete", 1);
-            idSetParameterMap.addValue("ct1", resultPlateBean.getCt1());
-            idSetParameterMap.addValue("ct2", resultPlateBean.getCt2());
             idSetParameterMap.addValue("barcode", resultPlateBean.getBarcode());
             //execute the query
-            int value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT, idSetParameterMap);
+            int value;
+            if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
+                value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT, idSetParameterMap);
+            } else {
+                value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITHOUT_CT, idSetParameterMap);
+            }
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }

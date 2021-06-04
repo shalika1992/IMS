@@ -151,10 +151,10 @@ public class ResultUpdateController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
     @RequestMapping(value = "/generateMasterPlate", method = RequestMethod.POST)
     public @ResponseBody
-    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, ModelMap modelMap, Locale locale) {
+    Map<Integer, List<ResultBean>> getMasterResultPlate(@RequestParam("plateid") int plateid, @RequestParam("receivedDate") String receivedDate, ModelMap modelMap, Locale locale) {
         Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
         try {
-            resultPlateMap = resultUpdateService.getMasterPlate(plateid);
+            resultPlateMap = resultUpdateService.getMasterPlate(plateid, receivedDate);
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }
@@ -165,19 +165,17 @@ public class ResultUpdateController {
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
     @RequestMapping(value = "/updatePlateResult", method = RequestMethod.POST)
     public @ResponseBody
-    ResultPlateBean updateResultPlate(@RequestBody ResultPlateBean resultPlateBean, ModelMap modelMap, Locale locale) {
-        ResultPlateBean resultPlate = new ResultPlateBean();
+    Map<Integer, List<ResultBean>> updateResultPlate(@RequestBody ResultPlateBean resultPlateBean, ModelMap modelMap, Locale locale) {
+        Map<Integer, List<ResultBean>> resultPlateMap = new HashMap<>();
         try {
             String message = resultUpdateService.updatePlateResult(resultPlateBean);
             if (message.isEmpty()) {
-
-            } else {
-
+                resultPlateMap = resultUpdateService.getMasterPlate(Integer.parseInt(resultPlateBean.getPlateid()), resultPlateBean.getReceivedDate());
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }
-        return resultPlate;
+        return resultPlateMap;
     }
 
     @LogController
