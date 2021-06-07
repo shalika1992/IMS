@@ -263,6 +263,74 @@
             }
         }
 
+        function deletePlate() {
+            let mergedIdList = [];
+            // get modulus
+            let module = Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length % 93;
+            // get plate count
+            let round = Math.floor(Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length / 93);
+            // plate count final
+            if (module != 0) {
+                round++;
+            }
+            let count = 0;
+            // plate rounds
+            for (let k = 0; k < round; k++) {
+                var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
+                if (selectedPlate.checked) {
+                    mergedIdList.push((k + 1));
+                    count++;
+                }
+            }
+            if (mergedIdList.length < 1) {
+                swal.fire({
+                    text: "Select a plate to delete.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Exit",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else if (mergedIdList.length > 1) {
+                swal.fire({
+                    text: "Cannot delete more than one plate.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Exit",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/deletePlate.json',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        plateId: Number(mergedIdList[0])
+                    }),
+                    dataType: 'json',
+                    success: function (res) {
+                        Swal.fire('Successfully deleted', '', 'success');
+                        sessionStorage.setItem('plates', JSON.stringify(res));
+                        _generatePlates(res)
+                    },
+                    error: function (jqXHR) {
+                        swal.fire({
+                            text: "Error occurred while processing.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Exit",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
         function _updateSwapDatabase(plateArray, updateArray) {
             $.ajax({
                 type: 'POST',
@@ -295,11 +363,13 @@
             });
         }
 
-        function reset() {
+        function plateCreation() {
+            form = document.getElementById('platecretionform');
+            form.action = 'createPlate.htm';
+            form.submit();
             setTimeout(function () {
-                Swal.fire('Created successfully', '', 'success');
                 $("#generateDiv").hide();
-            }, 5000);
+            }, 10000);
         }
     </script>
 </head>
@@ -380,12 +450,18 @@
                                 </button>
                             </div>
                             <div class="col-lg-3">
-                                <form:form method="post" modelAttribute="plate" action="createPlate.htm">
+                                <form:form method="post" modelAttribute="plate" id="platecretionform">
                                     <label>Plate creation</label>
-                                    <button type="submit" onclick="reset()"
+                                    <button type="button" onclick="plateCreation()"
                                             class="btn btn-success btn-hover-light btn-block">Create
                                     </button>
                                 </form:form>
+                            </div>
+                            <div class="col-lg-3">
+                                <label>Delete plate</label>
+                                <button type="button" class="btn btn-success btn-hover-light btn-block"
+                                        onclick="deletePlate()">Delete
+                                </button>
                             </div>
                         </div>
                         <div id="mergedplates"></div>
