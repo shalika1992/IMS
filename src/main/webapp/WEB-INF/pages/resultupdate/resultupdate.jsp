@@ -254,10 +254,12 @@
                 type: 'POST',
                 contentType: "application/json",
                 success: function (data) {
+                    $('#resultModal').modal('hide');
                     $('#responseMsg').text('Result Updated Successfully');
+                    _generatePlates(data)
                 },
                 error: function (data) {
-                    <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
+                    $('#responseMsg').text('Error occurred while updating result');
                 }
             });
         }
@@ -281,7 +283,6 @@
             let html = "";
             // shift for next plate
             let shift = 0;
-            let shift_val = 0;
             // monitor if pooled or not
             let pool_count = 0;
             // fill plates
@@ -305,16 +306,15 @@
                 }
                 // fill cells
                 let val;
-                for (let j = 0; j < 8; j++) { // columns
-                    for (let i = 0; i < 12; i++) { // rows
-                        val = i + (12 * j); // change normal filling
-                        // [&& (val + 1) !== 27] => C3
-                        if ((val + 1) !== 84 && (val + 1) !== 96) {
-                            if (platesArray[val + shift + shift_val] !== undefined) { // after finish filling
+                for (let i = 0; i < 8; i++) { // rows
+                    for (let j = 0; j < 12; j++) { // columns
+                        val = i + (8 * j); // change normal filling
+                        if (val < 94)  {
+                            if (platesArray[val + shift] !== undefined) { // after finish filling
                                 // tooltip creation
                                 let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +
                                     '<ul style="text-align: left !important;" class="list-group">';
-                                $.each(platesArray[val + shift + shift_val], (j, e) => {
+                                $.each(platesArray[val + shift], (j, e) => {
                                     for (let i = 0; i < e['id'].length; i++) {
                                         ul += '<li style="text-align: left !important;" class="list-group-item">' + e['referenceNo'][i] + '</li>';
                                         ul += '<li style="text-align: left !important;" class="list-group-item">' + e['name'][i] + '</li>';
@@ -324,25 +324,24 @@
                                 });
                                 ul += '</ul>';
                                 // check if pooled or not
-                                if (platesArray[val + shift + shift_val][0]['iscomplete'] === '0') {
-                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
+                                if (platesArray[val + shift][0]['iscomplete'] === '0') {
+                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
                                 } else {
-                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "' data-value='" + platesArray[val + shift + shift_val][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift + shift_val][0]['barcode'] + "</div>\n";
+                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
                                 }
                             } else {
-                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
                             }
                         } else {
-                            shift_val--;
                             // tooltip creation
-                            if ((val + 1) === 84) {
+                            if ((val + 1) === 95) {
                                 let span = '<span class="label label-success label-inline ">Negative control</span>';
-                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'  title='" + span + "'>N/A</div>\n";
                             } else if ((val + 1) === 96) {
                                 let span = '<span class="label label-success label-inline ">Positive control</span>';
-                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'  title='" + span + "'>N/A</div>\n";
+                                html += "<div class='col-1 cell-elmt cell-disable' data-html='true' data-toggle='tooltip' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'  title='" + span + "'>N/A</div>\n";
                             } else {
-                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift + shift_val) + "'>N/A</div>\n";
+                                html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
                             }
                         }
                     }
@@ -353,7 +352,7 @@
                 html += "</div>\n";
                 html += '</div>\n'
                 // to next plate
-                shift += 96;
+                shift += 94;
                 pool_count += 94;
 
             }

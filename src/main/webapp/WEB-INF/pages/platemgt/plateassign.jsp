@@ -160,32 +160,30 @@
             let module = Object.keys(platesArray).length % 93;
             // get plate count
             let round = Math.floor(Object.keys(platesArray).length / 93);
+
             // plate count final
             if (module != 0) {
                 round++;
             }
             let shift = 0;
-            let shift_val = 0;
             // plate rounds
             for (let k = 0; k < round; k++) {
                 let val;
                 let tmpArr = [];
                 var selectedPlate = document.getElementById("checkbox-" + (k + 1) + "");
-                for (let j = 0; j < 8; j++) { // columns
-                    for (let i = 0; i < 12; i++) { // rows
-                        val = i + (12 * j); // change normal filling
-                        if ((val + 1) !== 84 && (val + 1) !== 96) {
-                            if (platesArray[val + shift + shift_val] !== undefined) {
+                for (let i = 0; i < 8; i++) { // rows
+                    for (let j = 0; j < 12; j++) { // columns
+                        val = i + (8 * j); // change normal filling
+                        if (val < 94)  {
+                            if (platesArray[val + shift] !== undefined) {
                                 if (selectedPlate.checked) {
-                                    tmpArr.push(platesArray[val + shift + shift_val][0]['labcode']);
+                                    tmpArr.push(platesArray[val + shift][0]['labcode']);
                                 }
                             }
-                        } else {
-                            shift_val--;
                         }
                     }
                 }
-                shift += 96;
+                shift += 94;
                 if (selectedPlate.checked) {
                     if (mergedArr.length === 0) {
                         mergedArr = tmpArr;
@@ -250,6 +248,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             platesNum = _swapCells(platesNum, swapArray);
+                            sessionStorage.setItem('plates', JSON.stringify(platesNum));
                             _generatePlates(platesNum);
                             _updateSwapDatabase(platesNum, swapModel);
                         } else {
