@@ -22,7 +22,6 @@
         let selectedDate;
         let initArray;
         let haveData;
-
         function resetSearch() {
             if (selectedDate && Object.keys(platesNum).length > 0) {
                 swal.fire({
@@ -57,7 +56,6 @@
                 $("#stickyOp").hide();
             }
         }
-
         function generatePlates() {
             if ($('#kt_datepicker_1').val()) {
                 selectedDate = $('#kt_datepicker_1').val();
@@ -103,11 +101,9 @@
                 });
             }
         }
-
         function merge() {
             _storeMergePlate(JSON.parse(sessionStorage.getItem('plates')));
         }
-
         function _storeMergePlate(platesArray) {
             let mergedIdList = [];
             // get modulus
@@ -151,7 +147,6 @@
                 _processMergingPlate(platesArray, mergedIdList);
             }
         }
-
         function _processMergingPlate(platesArray, mergedIdList) {
             let mergedArr = [];
             let finalizedMergedArr = [];
@@ -160,7 +155,6 @@
             let module = Object.keys(platesArray).length % 93;
             // get plate count
             let round = Math.floor(Object.keys(platesArray).length / 93);
-
             // plate count final
             if (module != 0) {
                 round++;
@@ -199,7 +193,6 @@
             }
             this._updateMergeDatabase(finalizedMergedArr, mergedIdList);
         }
-
         function _updateMergeDatabase(mergeArray, mergedIdList) {
             $.ajax({
                 type: 'POST',
@@ -223,7 +216,6 @@
                 }
             });
         }
-
         function swap() {
             const swap = [];
             let swapArray = {}
@@ -247,14 +239,14 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            platesNum = _swapCells(platesNum, swapArray);
-                            sessionStorage.setItem('plates', JSON.stringify(platesNum));
-                            _generatePlates(platesNum);
-                            _updateSwapDatabase(platesNum, swapModel);
-                        } else {
-                            Swal.fire('Changes are not saved', '', 'info');
-                        }
-                    });
+                        platesNum = _swapCells(platesNum, swapArray);
+                        sessionStorage.setItem('plates', JSON.stringify(platesNum));
+                        _generatePlates(platesNum);
+                        _updateSwapDatabase(platesNum, swapModel);
+                    } else {
+                        Swal.fire('Changes are not saved', '', 'info');
+                    }
+                });
                 } else {
                     Swal.fire('Only 2 values can swap', '', 'error');
                 }
@@ -262,7 +254,6 @@
                 Swal.fire('No values to swap', '', 'error');
             }
         }
-
         function _updateSwapDatabase(plateArray, updateArray) {
             $.ajax({
                 type: 'POST',
@@ -295,11 +286,14 @@
             });
         }
 
-        function reset() {
+        function plateCreation() {
+            alert();
+            form = document.getElementById('platecretionform');
+            form.action = 'createPlate.htm';
+            form.submit();
             setTimeout(function () {
-                Swal.fire('Created successfully', '', 'success');
                 $("#generateDiv").hide();
-            }, 5000);
+            }, 10000);
         }
     </script>
 </head>
@@ -380,9 +374,9 @@
                                 </button>
                             </div>
                             <div class="col-lg-3">
-                                <form:form method="post" modelAttribute="plate" action="createPlate.htm">
+                                <form:form method="post" modelAttribute="plate" id="platecretionform" action="">
                                     <label>Plate creation</label>
-                                    <button type="submit" onclick="reset()"
+                                    <button type="button" onclick="plateCreation()"
                                             class="btn btn-success btn-hover-light btn-block">Create
                                     </button>
                                 </form:form>
