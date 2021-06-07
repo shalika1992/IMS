@@ -145,6 +145,80 @@ public class SampleFileService {
     }
 
     @LogService
+    public String validateSpecialCharactersFields(List<SampleData> sampleDataList, Locale locale) {
+        String message = "";
+        try {
+            for (int i = 0; i < sampleDataList.size(); i++) {
+                SampleData s = sampleDataList.get(i);
+                if (s != null) {
+
+                    String mohArea = s.getMohArea();
+                    if (mohArea != null && !mohArea.isEmpty()) {
+                        if (common.checkSpecialCharacter(mohArea)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+
+                    String name = s.getName();
+                    if (name != null && !name.isEmpty()) {
+                        if (common.checkSpecialCharacter(name)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    String age = s.getAge();
+                    if (age != null && !age.isEmpty()) {
+                        if (common.checkSpecialCharacter(age)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    String gender = s.getGender();
+                    if (gender != null && !gender.isEmpty()) {
+                        if (common.checkSpecialCharacter(gender)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    String nic = s.getNic();
+                    if (nic != null && !nic.isEmpty()) {
+                        if (common.checkSpecialCharacter(nic)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    String contactNumber = s.getContactNumber();
+                    if (contactNumber != null && !contactNumber.isEmpty()) {
+                        if (common.checkSpecialCharacter(contactNumber)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    String secondaryContactNumber = s.getSecondaryContactNumber();
+                    if (secondaryContactNumber != null && !secondaryContactNumber.isEmpty()) {
+                        if (common.checkSpecialCharacter(secondaryContactNumber)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+                } else {
+                    message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogService
     public String checkDuplicate(List<SampleData> sampleDataFileList, String receivedDate, Locale locale) {
         String message = "";
         try {
@@ -504,4 +578,6 @@ public class SampleFileService {
         }
         return duplicateList;
     }
+
+
 }

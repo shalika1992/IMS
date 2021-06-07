@@ -485,7 +485,7 @@
                 url: "${pageContext.request.contextPath}/notfoundsample.json",
                 contentType: "application/json",
                 data: JSON.stringify(dataS),
-                success: function (e) {
+                success: function (data) {
                     //hide the modal
                     $('#modalNotFound').modal('hide');
                     if (data.errorMessage) {
@@ -516,7 +516,7 @@
                 url: "${pageContext.request.contextPath}/invalidsample.json",
                 contentType: "application/json",
                 data: JSON.stringify(dataS),
-                success: function (e) {
+                success: function (data) {
                     //hide the modal
                     $('#modalInvalid').modal('hide');
                     if (data.errorMessage) {
@@ -561,7 +561,7 @@
                 form.submit();
                 setTimeout(function () {
                     oTable.fnDraw();
-                }, 5000);
+                }, 10000);
             } else {
                 //popup the error messae
                 $('#responseHeader').text('Empty Initial Lab Code');

@@ -10,10 +10,10 @@ import lombok.*;
 public class SampleData {
     private String referenceNo; //---------------> mandatory
     private String date;
-    private String mohArea;//--------------------> mandatory
-    private String name;//-----------------------> mandatory
-    private String age;
-    private String gender;
+    private String mohArea;//--------------------> mandatory -----------> special characters
+    private String name;//-----------------------> mandatory -----------> special characters
+    private String age;//------------------------> special characters
+    private String gender;//---------------------> special characters
     private String symptomatic;
     private String contactType;
     private String nic;//------------------------> mandatory
