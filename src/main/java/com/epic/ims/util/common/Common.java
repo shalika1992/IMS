@@ -372,4 +372,31 @@ public class Common {
             }
         }
     }
+
+    /**
+     * @Author shalika_w
+     * @CreatedTime 2021-06-07 10:30:24 AM
+     * @Version V1.00
+     * @MethodName checkSpecialCharacter
+     * @MethodParams [s]
+     * @MethodDescription - check special characters in the string
+     */
+    public boolean checkSpecialCharacter(String s) {
+        boolean isContainSpecialCharacter = false;
+        try {
+            String specialCharactersString = "!@#$%&*()'+,-/:;<=>?[]^_`{|}";
+            for (int i = 0; i < s.length(); i++) {
+                char ch = s.charAt(i);
+                if (specialCharactersString.contains(Character.toString(ch))) {
+                    isContainSpecialCharacter = true;
+                    break;
+                } else if (i == s.length() - 1) {
+                    isContainSpecialCharacter = false;
+                }
+            }
+        } catch (Exception e) {
+            isContainSpecialCharacter = false;
+        }
+        return isContainSpecialCharacter;
+    }
 }

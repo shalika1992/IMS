@@ -106,6 +106,7 @@ public class MessageVarList {
     public static final String SAMPLERECORD_ADDED_SUCCESSFULLY = "samplerecord.added.success";
     public static final String SAMPLERECORD_UPDATE_SUCCESSFULLY = "samplefilerecord.updated.success";
     public static final String SAMPLEFILE_INVALID_FILE = "samplefile.invalid.file";
+    public static final String SAMPLEFILE_INVALID_FILETYPE = "samplefile.invalid.filetype";
     public static final String SAMPLEFILE_CONTAIN_MAXRECORDS = "samplefile.contain.maxrecords";
     public static final String SAMPLEFILE_UPLOAD_SUCCESSFULLY = "samplefile.upload.success";
     public static final String SAMPLERECORD_NORECORD_FOUND = "samplerecord.norecord.found";
@@ -113,6 +114,7 @@ public class MessageVarList {
     public static final String SAMPLERECORD_VERIFY_SUCCESSFULLY = "samplerecord.verify.success";
     public static final String SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL = "samplerecord.mandatoryfield.validationfail";
     public static final String SAMPLERECORD_DUPLICATE_RECORDFOUND = "samplerecord.duplicate.recordfound";
+    public static final String SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL = "samplerecord.specialcharacter.validationfail";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 
     //-------------------------- result update mgt--------------------------------------------------------------------//

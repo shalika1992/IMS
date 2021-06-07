@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-
+<c:set var="msg" value="${msg}"/>
 <div class="login">
     <div class="login-container">
         <div class="login-left-content">
@@ -16,6 +16,11 @@
                 <img src="${pageContext.request.contextPath}/resources/images/ecbh_logo.png" alt="Colombo East Base Hospital Logo">
                 <h2 class="login-title">Login</h2>
                 <p class="login-description">Enter your username and password</p>
+                <c:if test="${not empty msg}">
+                    <div class="icon" >
+                        <div class="tile-title message-error"><c:out value="${msg}"/></div>
+                    </div>
+                </c:if>
                 <!--begin::Form-->
                 <form:form novalidate="novalidate" method="post" class="form" modelAttribute="loginform" action="checkuser.htm" id="kt_login_signin_form">
                     <div class="form-group">

@@ -19,6 +19,7 @@ import com.epic.ims.util.varlist.PageVarList;
 import com.epic.ims.util.varlist.SectionVarList;
 import com.epic.ims.validation.RequestBeanValidation;
 import com.epic.ims.validation.samplefileupload.SampleFileUploadValidator;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,8 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
 
     @Autowired
     CommonRepository commonRepository;
+
+    private static final String[] extensionList = {"xls", "xlsx"};
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_MGT, pageCode = PageVarList.SAMPLE_FILE_UPLOAD)
@@ -146,37 +149,44 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
         logger.info("[" + sessionBean.getSessionid() + "] UPDATE SAMPLE FILE RECORD");
         ResponseBean responseBean;
         try {
-            if (excelHelper.hasExcelFormat(multipartFile)) {
-                List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(), receivedDate);
-                if (sampleDataList != null) {
-                    //validate the sample data mandatory fields
-                    String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
-                    //validate the special characters
-
-                    if (message.isEmpty()) {
-                        //validate the duplicate records
-                        message = sampleFileService.checkDuplicate(sampleDataList, receivedDate, locale);
+            String fileName = multipartFile.getOriginalFilename();
+            if (FilenameUtils.isExtension(fileName, extensionList)) {
+                if (excelHelper.hasExcelFormat(multipartFile)) {
+                    List<SampleData> sampleDataList = excelHelper.excelToSampleData(multipartFile.getInputStream(), receivedDate);
+                    if (sampleDataList != null) {
+                        //validate the sample data mandatory fields
+                        String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
                         if (message.isEmpty()) {
-                            //upload sample file
-                            message = sampleFileService.uploadSampleFile(sampleDataList, receivedDate, locale);
+                            //validate the special characters
+                            message = sampleFileService.validateSpecialCharactersFields(sampleDataList, locale);
                             if (message.isEmpty()) {
-                                responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLEFILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                                //validate the duplicate records
+                                message = sampleFileService.checkDuplicate(sampleDataList, receivedDate, locale);
+                                if (message.isEmpty()) {
+                                    //upload sample file
+                                    message = sampleFileService.uploadSampleFile(sampleDataList, receivedDate, locale);
+                                    if (message.isEmpty()) {
+                                        responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLEFILE_UPLOAD_SUCCESSFULLY, null, locale), null);
+                                    } else {
+                                        responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                                    }
+                                } else {
+                                    responseBean = new ResponseBean(false, null, message);
+                                }
                             } else {
-                                responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                                responseBean = new ResponseBean(false, null, message);
                             }
                         } else {
                             responseBean = new ResponseBean(false, null, message);
                         }
                     } else {
-                        responseBean = new ResponseBean(false, null, message);
+                        responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLEFILE_INVALID_FILE, null, locale));
                     }
-
-
                 } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLEFILE_INVALID_FILE, null, locale));
+                    responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
                 }
             } else {
-                responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+                responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLEFILE_INVALID_FILETYPE, null, locale));
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);

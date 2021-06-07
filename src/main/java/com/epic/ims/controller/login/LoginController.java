@@ -98,14 +98,14 @@ public class LoginController implements RequestBeanValidation<Object> {
             if (bindingResult.hasErrors()) {
                 String errorMsg = bindingResult.getFieldErrors().stream().findFirst().get().getDefaultMessage();
                 //set the error message to model map
-                modelMap.put("msg", errorMsg);
                 modelAndView = new ModelAndView("login/login", modelMap);
+                modelAndView.addObject("msg", messageSource.getMessage(errorMsg, null, locale));
             } else {
                 String message = loginService.getUser(loginBean, httpServletRequest);
                 //check the return message from service
                 if (!message.isEmpty()) {
-                    modelMap.put("msg", messageSource.getMessage(message, null, locale));
                     modelAndView = new ModelAndView("login/login", modelMap);
+                    modelAndView.addObject("msg", messageSource.getMessage(message, null, locale));
                 } else {
                     if (loginBean.getUsername().equals(commonVarList.SYSTEMUSERNAME)) {
                         //handle the user session
@@ -123,32 +123,32 @@ public class LoginController implements RequestBeanValidation<Object> {
                             sessionBean.setSectionList(new ArrayList<>());
                             sessionBean.setPageMap(new HashMap<>());
                             //redirect to change password page
-                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_NEWUSER, null, locale));
                             modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+                            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_NEWUSER, null, locale));
 
                         } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_RESET)) {
                             //set section list and page list and to session bean
                             sessionBean.setSectionList(new ArrayList<>());
                             sessionBean.setPageMap(new HashMap<>());
                             //redirect to change password page
-                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_RESETUSER, null, locale));
                             modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+                            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_RESETUSER, null, locale));
 
                         } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_CHANGED)) {
                             //set section list and page list and to session bean
                             sessionBean.setSectionList(new ArrayList<>());
                             sessionBean.setPageMap(new HashMap<>());
                             //redirect to change password page
-                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_CHANGEPWD, null, locale));
                             modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+                            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_CHANGEPWD, null, locale));
 
                         } else if (user.getStatus().equalsIgnoreCase(commonVarList.STATUS_EXPIRED)) {
                             //set section list and page list and to session bean
                             sessionBean.setSectionList(new ArrayList<>());
                             sessionBean.setPageMap(new HashMap<>());
                             //redirect to change password page
-                            modelMap.put("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_EXPPWD, null, locale));
                             modelAndView = new ModelAndView("profile/changepassword", "passwordchangeform", getPasswordPolicyBean());
+                            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.PASSWORDRESET_EXPPWD, null, locale));
 
                         } else {
                             int daysToExpire = loginService.getPwdExpNotification();
@@ -169,13 +169,15 @@ public class LoginController implements RequestBeanValidation<Object> {
         } catch (EmptyResultDataAccessException ex) {
             logger.error("Exception  :  ", ex);
             //set the error message to model map
-            modelMap.put("msg", messageSource.getMessage(MessageVarList.LOGIN_INVALID, null, locale));
             modelAndView = new ModelAndView("login/login", modelMap);
+            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.LOGIN_INVALID, null, locale));
+
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
             //set the error message to model map
-            modelMap.put("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
             modelAndView = new ModelAndView("login/login", modelMap);
+            modelAndView.addObject("msg", messageSource.getMessage(MessageVarList.COMMON_ERROR_PROCESS, null, locale));
+
         }
         return modelAndView;
     }

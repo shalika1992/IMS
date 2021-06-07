@@ -101,7 +101,7 @@
                 stateSave: false,
                 columnDefs: [
                     {
-                        title: "Reference No",
+                        title: "Serial No",
                         targets: 0,
                         mDataProp: "referenceNo",
                         defaultContent: "--"
@@ -357,7 +357,7 @@
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label class="label-right">Reference No:</label>
+                                        <label class="label-right">Serial No:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -366,7 +366,7 @@
                                             </div>
                                             <input id="referenceNo" name="referenceNo" type="text"
                                                    maxlength="16" class="form-control"
-                                                   placeholder="Reference No">
+                                                   placeholder="Serial No">
                                         </div>
                                     </div>
 
@@ -442,7 +442,7 @@
                         <table class="table table-separate table-head-custom table-checkable" id="table">
                             <thead>
                             <tr>
-                                <th>Reference No</th>
+                                <th>Serial No</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
                                 <th>Age</th>

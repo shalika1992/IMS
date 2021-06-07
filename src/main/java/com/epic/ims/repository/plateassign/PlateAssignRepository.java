@@ -2,6 +2,7 @@ package com.epic.ims.repository.plateassign;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.plate.DefaultBean;
+import com.epic.ims.bean.plate.PlateDeleteBean;
 import com.epic.ims.bean.plate.PoolBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
@@ -30,7 +31,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
@@ -59,11 +59,12 @@ public class PlateAssignRepository {
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final int PLATE_SIZE = 93;
-    private final int PLATE_C3_POSITION = 26;
+    private final int PLATE_C3_POSITION = 18;
     private final int PLATE_G12_POSITION = 83;
     private final int PLATE_H12_POSITION = 95;
 
     private final String SQL_DELETE_MASTER_TEMP_TABLE = "delete from master_temp_data";
+    private final String SQL_DELETE_MASTER_TEMP_TABLE_PLATEID = "delete from master_temp_data where plateid = ?";
     private final String SQL_GET_MAX_PLATE_CODE = "select max(code) as maxplateid from plate where receiveddate = ?";
 
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
@@ -146,19 +147,6 @@ public class PlateAssignRepository {
                         subList.add(PLATE_C3_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeC3));
                     }
 
-                    //handle the g12 value in master plate
-                    //add 1 to position when checking the length
-                    String barcodeG12 = commonRepository.getCurrentDateAsYYYYMMDD() + maxPlateId + commonVarList.PLATE_POSITION_G12;
-                    if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
-                        subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeG12));
-                    }
-
-                    //handle the h12 value in master plate
-                    //add 1 to position when checking the length
-                    //if (subList != null && subList.size() > (PLATE_H12_POSITION - 1)) {
-                    //    subList.add(PLATE_H12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
-                    //}
-
                     for (int j = 0; j < subList.size(); j++) {
                         SampleFile sFile = subList.get(j);
                         Map<String, Object> map = jdbcTemplate.queryForMap(SQL_GET_EXCELBLOCK_VALUE, new Object[]{j + ""});
@@ -168,9 +156,6 @@ public class PlateAssignRepository {
                             sFile.setBlockValue(blockCode);
                         }
                     }
-
-                    //remove g12 barcode from sublist
-                    subList = subList.stream().filter(e -> !e.getBarcode().equals(barcodeG12)).collect(Collectors.toList());
 
                     //get the master temp data list using sample file list
                     List<MasterTemp> masterTempList = masterTempDataMapper.sampleListMasterTempList(subList);
@@ -713,6 +698,25 @@ public class PlateAssignRepository {
             throw ex;
         }
         return plateId;
+    }
+
+    @LogRepository
+    @Transactional
+    public String deletePlate(PlateDeleteBean plateDeleteBean) {
+        String message = "";
+        try {
+            int value = 0;
+            value = jdbcTemplate.update(SQL_DELETE_MASTER_TEMP_TABLE_PLATEID, new Object[]{plateDeleteBean.getPlateId()});
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        return message;
     }
 
     @LogRepository
