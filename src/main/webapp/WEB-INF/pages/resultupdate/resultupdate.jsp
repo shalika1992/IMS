@@ -194,6 +194,7 @@
         }
 
         function updateValidation() {
+            $('#responseMsg').text('');
             if ($('#resultId').val()) {
                 if ($('#resultId').val() !== 'DTCD') {
                     update();
@@ -253,7 +254,7 @@
                 type: 'POST',
                 contentType: "application/json",
                 success: function (data) {
-
+                    $('#responseMsg').text('Result Updated Successfully');
                 },
                 error: function (data) {
                     <%--window.location = "${pageContext.request.contextPath}/logout.htm";--%>
@@ -392,6 +393,10 @@
                 document.getElementById('barcode').value = y.dataset.value;
             });
         });
+
+        function cancel(){
+            $('#responseMsg').text('');
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -491,10 +496,13 @@
                             </button>
                         </div>
                         <div class="modal-body">
+                            <div>
+                                <p id="responseMsg"></p>
+                            </div>
                             <div class="card-body">
                                 <div class="form-group row">
                                     <div class="col-lg-3">
-                                        <label>Barcode:</label>
+                                        <label>Lab Code:</label>
                                     </div>
                                     <div class="col-lg-8">
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
@@ -547,7 +555,8 @@
                                         <button type="button" class="btn btn-primary mr-2" onclick="updateValidation()">
                                             Update
                                         </button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal" onclick="cancel()">
                                             Cancel
                                         </button>
                                     </div>

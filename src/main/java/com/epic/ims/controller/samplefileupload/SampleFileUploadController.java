@@ -151,6 +151,8 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
                 if (sampleDataList != null) {
                     //validate the sample data mandatory fields
                     String message = sampleFileService.validateMandatoryFields(sampleDataList, locale);
+                    //validate the special characters
+
                     if (message.isEmpty()) {
                         //validate the duplicate records
                         message = sampleFileService.checkDuplicate(sampleDataList, receivedDate, locale);
@@ -168,6 +170,8 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
                     } else {
                         responseBean = new ResponseBean(false, null, message);
                     }
+
+
                 } else {
                     responseBean = new ResponseBean(false, null, messageSource.getMessage(MessageVarList.SAMPLEFILE_INVALID_FILE, null, locale));
                 }

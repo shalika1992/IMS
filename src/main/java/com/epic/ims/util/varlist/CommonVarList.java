@@ -176,6 +176,9 @@ public class CommonVarList {
     //-------------------------------report content codes-------------------------------------------------------------//
     @Value("${plate.position.c3}")
     public String PLATE_POSITION_C3;
+
+    @Value("${plate.position.g12}")
+    public String PLATE_POSITION_G12;
     //-------------------------------report content codes-------------------------------------------------------------//
 
     //-------------------------------report content codes-------------------------------------------------------------//

@@ -3,7 +3,6 @@ package com.epic.ims.repository.plateassign;
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PoolBean;
-import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapper.mastertemp.MasterTempDataMapper;
@@ -31,6 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
@@ -141,16 +141,17 @@ public class PlateAssignRepository {
 
                     //handle the c3 value in master plate
                     //add 1 to position when checking the length
+                    String barcodeC3 = commonRepository.getCurrentDateAsYYYYMMDD() + maxPlateId + commonVarList.PLATE_POSITION_C3;
                     if (subList != null && subList.size() > (PLATE_C3_POSITION + 1)) {
-                        String barcode = commonRepository.getCurrentDateAsYYYYMMDD() + maxPlateId + commonVarList.PLATE_POSITION_C3;
-                        subList.add(PLATE_C3_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcode));
+                        subList.add(PLATE_C3_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeC3));
                     }
 
                     //handle the g12 value in master plate
                     //add 1 to position when checking the length
-                    //if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
-                    //    subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
-                    //}
+                    String barcodeG12 = commonRepository.getCurrentDateAsYYYYMMDD() + maxPlateId + commonVarList.PLATE_POSITION_G12;
+                    if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
+                        subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeG12));
+                    }
 
                     //handle the h12 value in master plate
                     //add 1 to position when checking the length
@@ -167,6 +168,9 @@ public class PlateAssignRepository {
                             sFile.setBlockValue(blockCode);
                         }
                     }
+
+                    //remove g12 barcode from sublist
+                    subList = subList.stream().filter(e -> !e.getBarcode().equals(barcodeG12)).collect(Collectors.toList());
 
                     //get the master temp data list using sample file list
                     List<MasterTemp> masterTempList = masterTempDataMapper.sampleListMasterTempList(subList);

@@ -54,7 +54,15 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_LIST_DETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_NOTDETECTED = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
     private final String SQL_UPDATE_LIST_PENDING = "update master_data set status =:status , isverified=:isverified , iscomplete=:iscomplete , result=:result where id in (:ids)";
-    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? and createdtime = ? group by barcode , plateid , blockvalue , ispool order by barcode";
+    //private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "select @n := @n + 1 n,GROUP_CONCAT(id SEPARATOR '|') as id,GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno,GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic,barcode,plateid,blockvalue,ispool,iscomplete,result from master_data, (select @n := -1) m where plateid = ? and createdtime = ? group by barcode , plateid , blockvalue , ispool order by barcode";
+    private final String SQL_GET_MASTER_RESULT_PLATE_LIST = "" +
+            "select m.id,m.referenceno,m.name,m.nic,m.barcode,m.plateid,m.blockvalue,m.ispool,m.iscomplete,m.result from " +
+            "(select GROUP_CONCAT(id SEPARATOR '|') as id, " +
+            "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
+            "barcode,plateid,blockvalue,ispool ,iscomplete,result  from master_data as mt where plateid = ? and createdtime = ? " +
+            "group by barcode , plateid , blockvalue , ispool , iscomplete,result ) as m " +
+            "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
+
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
 
@@ -82,8 +90,9 @@ public class ResultUpdateRepository {
         Map<Integer, List<ResultBean>> masterPlateMap = new HashMap<>();
         try {
             jdbcTemplate.query(SQL_GET_MASTER_RESULT_PLATE_LIST, new Object[]{plateid, receivedDate}, (ResultSet rs) -> {
+                int counter = 0;
                 while (rs.next()) {
-                    masterPlateMap.put(rs.getInt("n"), Arrays.asList(
+                    masterPlateMap.put(counter, Arrays.asList(
                             new ResultBean(
                                     rs.getString("id").split("\\|"),
                                     rs.getString("referenceno").split("\\|"),
@@ -97,6 +106,7 @@ public class ResultUpdateRepository {
                                     rs.getString("result")
                             )
                     ));
+                    counter++;
                 }
                 return masterPlateMap;
             });
