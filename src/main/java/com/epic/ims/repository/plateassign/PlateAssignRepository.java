@@ -59,7 +59,7 @@ public class PlateAssignRepository {
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final int PLATE_SIZE = 93;
-    private final int PLATE_C3_POSITION = 26;
+    private final int PLATE_C3_POSITION = 19;
     private final int PLATE_G12_POSITION = 83;
     private final int PLATE_H12_POSITION = 95;
 
@@ -146,19 +146,6 @@ public class PlateAssignRepository {
                         subList.add(PLATE_C3_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeC3));
                     }
 
-                    //handle the g12 value in master plate
-                    //add 1 to position when checking the length
-                    String barcodeG12 = commonRepository.getCurrentDateAsYYYYMMDD() + maxPlateId + commonVarList.PLATE_POSITION_G12;
-                    if (subList != null && subList.size() > (PLATE_G12_POSITION + 1)) {
-                        subList.add(PLATE_G12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A", barcodeG12));
-                    }
-
-                    //handle the h12 value in master plate
-                    //add 1 to position when checking the length
-                    //if (subList != null && subList.size() > (PLATE_H12_POSITION - 1)) {
-                    //    subList.add(PLATE_H12_POSITION, new SampleFile(null, "", receivedDate, "N/A", "N/A"));
-                    //}
-
                     for (int j = 0; j < subList.size(); j++) {
                         SampleFile sFile = subList.get(j);
                         Map<String, Object> map = jdbcTemplate.queryForMap(SQL_GET_EXCELBLOCK_VALUE, new Object[]{j + ""});
@@ -168,9 +155,6 @@ public class PlateAssignRepository {
                             sFile.setBlockValue(blockCode);
                         }
                     }
-
-                    //remove g12 barcode from sublist
-                    subList = subList.stream().filter(e -> !e.getBarcode().equals(barcodeG12)).collect(Collectors.toList());
 
                     //get the master temp data list using sample file list
                     List<MasterTemp> masterTempList = masterTempDataMapper.sampleListMasterTempList(subList);
