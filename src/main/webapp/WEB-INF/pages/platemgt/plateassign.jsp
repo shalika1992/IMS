@@ -174,7 +174,7 @@
                 for (let i = 0; i < 8; i++) { // rows
                     for (let j = 0; j < 12; j++) { // columns
                         val = i + (8 * j); // change normal filling
-                        if (val < 94)  {
+                        if (val < 94) {
                             if (platesArray[val + shift] !== undefined) {
                                 if (selectedPlate.checked) {
                                     tmpArr.push(platesArray[val + shift][0]['labcode']);
@@ -294,6 +294,13 @@
                 }
             });
         }
+
+        function reset() {
+            setTimeout(function () {
+                Swal.fire('Created successfully', '', 'success');
+                $("#generateDiv").hide();
+            }, 5000);
+        }
     </script>
 </head>
 <!--begin::Content-->
@@ -375,7 +382,8 @@
                             <div class="col-lg-3">
                                 <form:form method="post" modelAttribute="plate" action="createPlate.htm">
                                     <label>Plate creation</label>
-                                    <button type="submit" class="btn btn-success btn-hover-light btn-block">Create
+                                    <button type="submit" onclick="reset()"
+                                            class="btn btn-success btn-hover-light btn-block">Create
                                     </button>
                                 </form:form>
                             </div>
