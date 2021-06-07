@@ -78,28 +78,28 @@ public class ReportMgtRepository {
 
             switch (sortCol) {
                 case 0:
-                    col = "m.referenceno";
+                    col = "m.barcode";
                     break;
                 case 1:
-                    col = "i.name";
+                    col = "m.referenceno";
                     break;
                 case 2:
-                    col = "m.name";
+                    col = "i.name";
                     break;
                 case 3:
-                    col = "m.age";
+                    col = "m.name";
                     break;
                 case 4:
-                    col = "m.gender";
+                    col = "m.age";
                     break;
                 case 6:
-                    col = "m.nic";
+                    col = "m.gender";
                     break;
                 case 7:
-                    col = "m.contactno";
+                    col = "m.nic";
                     break;
                 case 8:
-                    col = "m.serialno";
+                    col = "m.contactno";
                     break;
                 case 9:
                     col = "m.specimenid";
@@ -117,7 +117,7 @@ public class ReportMgtRepository {
                     col = "s.description";
                     break;
                 default:
-                    col = "m.createdtime";
+                    col = "m.barcode";
             }
 
             try {
@@ -418,13 +418,13 @@ public class ReportMgtRepository {
                 try {
                     masterData.setCt_target1(rs.getString("ct_target1"));
                 } catch (Exception e) {
-                    masterData.setCt_target1(null);
+                    masterData.setCt_target1("--");
                 }
 
                 try {
                     masterData.setCt_target2(rs.getString("ct_target2"));
                 } catch (Exception e) {
-                    masterData.setCt_target2(null);
+                    masterData.setCt_target2("--");
                 }
 
                 try {

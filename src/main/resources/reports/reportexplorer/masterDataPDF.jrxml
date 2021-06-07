@@ -2,9 +2,9 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Simple_Blue" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="543cbbff-5086-47b5-87fe-bcaa90329535">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
-	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="2497"/>
+	<property name="ireport.y" value="290"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -52,9 +52,10 @@
 	<field name="gender" class="java.lang.String"/>
 	<field name="nic" class="java.lang.String"/>
 	<field name="barcode" class="java.lang.String"/>
-	<field name="serialNumber" class="java.lang.String"/>
+	<field name="referenceNumber" class="java.lang.String"/>
 	<field name="ct_target2" class="java.lang.String"/>
 	<field name="ct_target1" class="java.lang.String"/>
+	<field name="resultDescription" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
@@ -469,44 +470,60 @@
 				<reportElement uuid="999cba30-9e1d-4cb3-928f-32426ae21acd" x="510" y="-3" width="1" height="30"/>
 			</line>
 			<textField>
-				<reportElement uuid="c121c162-6312-4562-9f8c-242a61c6844a" x="0" y="-3" width="80" height="30"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{barcode}]]></textFieldExpression>
+				<reportElement uuid="c121c162-6312-4562-9f8c-242a61c6844a" stretchType="RelativeToTallestObject" x="0" y="-3" width="80" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{barcode}==null?"--":$F{barcode}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="339664fe-6520-4a8a-b12a-379e630e9f34" x="80" y="-2" width="80" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{serialNumber}]]></textFieldExpression>
+				<reportElement uuid="339664fe-6520-4a8a-b12a-379e630e9f34" stretchType="RelativeToTallestObject" x="80" y="-2" width="80" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{referenceNumber}==null?"--":$F{referenceNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a57cbf9f-ab80-4013-b0b6-060147d72673" x="160" y="-2" width="118" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<reportElement uuid="a57cbf9f-ab80-4013-b0b6-060147d72673" stretchType="RelativeToTallestObject" x="160" y="-2" width="118" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}==null?"--":$F{name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="9d5970a0-1681-4051-8fa9-b70eab802c7c" x="278" y="-3" width="52" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{age}]]></textFieldExpression>
+				<reportElement uuid="9d5970a0-1681-4051-8fa9-b70eab802c7c" stretchType="RelativeToTallestObject" x="278" y="-3" width="52" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{age}==null?"--":$F{age}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="306cbc20-3983-448c-bd64-fd4f1c9136d9" x="331" y="-2" width="50" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{gender}]]></textFieldExpression>
+				<reportElement uuid="306cbc20-3983-448c-bd64-fd4f1c9136d9" stretchType="RelativeToTallestObject" x="331" y="-2" width="50" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{gender}==null?"--":$F{gender}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="f697c9cb-d1dc-4f47-b481-73b02bebc6d5" x="380" y="-2" width="82" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{nic}]]></textFieldExpression>
+				<reportElement uuid="f697c9cb-d1dc-4f47-b481-73b02bebc6d5" stretchType="RelativeToTallestObject" x="380" y="-2" width="82" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{resultDescription}==null?"--":$F{resultDescription}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="966cf385-e5f6-4229-9e7c-f1b05591b9c4" x="461" y="-3" width="48" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{ct_target1}]]></textFieldExpression>
+				<reportElement uuid="966cf385-e5f6-4229-9e7c-f1b05591b9c4" stretchType="RelativeToTallestObject" x="461" y="-3" width="48" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ct_target1}==null?"--":$F{ct_target1}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="11ca5e3e-5874-41d8-9902-203d39780b44" x="511" y="-2" width="40" height="28"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{ct_target2}]]></textFieldExpression>
+				<reportElement uuid="11ca5e3e-5874-41d8-9902-203d39780b44" stretchType="RelativeToTallestObject" x="511" y="-2" width="40" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ct_target2}==null?"--":$F{ct_target2}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

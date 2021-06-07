@@ -191,7 +191,7 @@
                         sortable: false,
                         className: "dt-center",
                         mRender: function (data, type, full) {
-                            if(data.statusCode === 'PLASG' ){
+                            if(full.statusCode === 'PLASG' ){
                                 return '--';
                             }else{
                                 return '' +
@@ -328,10 +328,10 @@
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label class="label-right">Reference Number:</label>
+                                        <label class="label-right">Serial No:</label>
                                         <input id="referenceNumber" name="referenceNumber" type="text"
                                                maxlength="64"
-                                               class="form-control" placeholder="Reference Number"/>
+                                               class="form-control" placeholder="Serial No"/>
                                     </div>
 
                                     <div class="col-lg-3">
