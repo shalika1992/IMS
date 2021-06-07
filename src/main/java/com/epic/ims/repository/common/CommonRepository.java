@@ -53,6 +53,7 @@ public class CommonRepository {
     private final String SQL_GET_PLATE_LIST = "select id , code , receiveddate , createddate from plate where receiveddate = ? order by id asc";
     private final String SQL_GET_RESULT_TYPE_LIST = "select code , description from result order by code asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
+    private final String SQL_SYSTEM_DATE = "select CURDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
     private final String SQL_GET_RESULT_LIST = "select code,description from result";
@@ -113,12 +114,14 @@ public class CommonRepository {
     @LogRepository
     @Transactional(readOnly = true)
     public String getCurrentDateAsYYYYMMDD() throws Exception {
-        DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formatterOne = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat formatterTwo = new SimpleDateFormat("yyyyMMdd");
         String currentDateAsString = "";
         try {
-            Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_TIME);
-            Date formattedCurrentDate = formatter.parse(currentDate.get("currentdate").toString());
-            currentDateAsString = formatter.format(formattedCurrentDate);
+            Map<String, Object> currentDate = jdbcTemplate.queryForMap(SQL_SYSTEM_DATE);
+            String date = currentDate.get("currentdate").toString();
+            Date formattedCurrentDate = formatterOne.parse(date);
+            currentDateAsString = formatterTwo.format(formattedCurrentDate);
         } catch (Exception e) {
             throw e;
         }

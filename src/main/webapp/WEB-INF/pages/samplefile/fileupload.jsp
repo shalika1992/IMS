@@ -29,9 +29,22 @@
                 forceParse: false,
                 autoclose: true
             });
-            setReceivedDate();
+            $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
             loadDataTable();
         });
+
+        function getReceivedDate() {
+            var date = new Date();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return (date.getFullYear() + "-" + month + "-" + day);
+        }
 
         function loadDataTable() {
             var token = $("meta[name='_csrf']").attr("content");
@@ -110,7 +123,7 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Reference No",
+                        title: "Serial No",
                         targets: 1,
                         mDataProp: "referenceNo",
                         defaultContent: "--"
@@ -293,33 +306,6 @@
             $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
             oTable.fnDraw();
         }
-
-        function setReceivedDate() {
-            var date = new Date();
-            var month = date.getMonth() + 1;
-            var day = date.getDate();
-            if (day < 10) {
-                day = '0' + day;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-            var today = (date.getFullYear() + "-" + month + "-" + day);
-            $('#searchReceivedDate').val(today);
-        }
-
-        function getReceivedDate() {
-            var date = new Date();
-            var month = date.getMonth() + 1;
-            var day = date.getDate();
-            if (day < 10) {
-                day = '0' + day;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-            return (date.getFullYear() + "-" + month + "-" + day);
-        }
     </script>
 </head>
 <!--begin::Content-->
@@ -368,7 +354,7 @@
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label class="label-right">Reference No:</label>
+                                        <label class="label-right">Serial No:</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -377,7 +363,7 @@
                                             </div>
                                             <input id="referenceNo" name="referenceNo" type="text"
                                                    maxlength="64" class="form-control "
-                                                   placeholder="Reference No" autocomplete="off">
+                                                   placeholder="Serial No" autocomplete="off">
                                         </div>
                                     </div>
 
@@ -482,7 +468,7 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Reference No</th>
+                                <th>Serial No</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
                                 <th>Age</th>

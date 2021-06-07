@@ -141,7 +141,7 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Reference Number",
+                        title: "Serial No",
                         targets: 3,
                         mDataProp: "referenceNo",
                         defaultContent: "--"
@@ -628,10 +628,10 @@
                                     </div>
 
                                     <div class="col-lg-3">
-                                        <label class="label-right">Reference No:</label>
+                                        <label class="label-right">Serial No:</label>
                                         <input id="referenceNo" name="referenceNo" type="text"
                                                maxlength="10"
-                                               class="form-control " placeholder="Reference Number">
+                                               class="form-control " placeholder="Serial No">
                                     </div>
 
                                     <div class="col-lg-3">
@@ -764,7 +764,7 @@
                                 <th><input id="select_all" name="select_all" value="1" type="checkbox"></th>
                                 <th>Id</th>
                                 <th>Lab Code</th>
-                                <th>Reference Number</th>
+                                <th>Serial No</th>
                                 <th>Institution Code</th>
                                 <th>Name</th>
                                 <th>Age</th>

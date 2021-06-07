@@ -129,6 +129,20 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
+    @RequestMapping(value = "/deletePlate", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public Map<Integer, List<DefaultBean>> postDeletePlate(@RequestBody PlateDeleteBean plateDeleteBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
+        try {
+            defaultPlateMap = plateAssignService.deletePlate(plateDeleteBean);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return defaultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/createPlate", method = RequestMethod.POST)
     public void createPlate(@ModelAttribute("plate") PlateInputBean plateInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         logger.info("[" + sessionBean.getSessionid() + "]  MASTER PLATE CREATION");

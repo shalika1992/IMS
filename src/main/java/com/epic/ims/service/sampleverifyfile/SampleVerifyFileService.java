@@ -62,7 +62,7 @@ public class SampleVerifyFileService {
     @Autowired
     ExcelCommon excelCommon;
 
-    private final int labReportColumnCount = 16;
+    private final int labReportColumnCount = 10;
     private final int labReportHeaderRowCount = 2;
 
     @LogService
@@ -245,62 +245,38 @@ public class SampleVerifyFileService {
             cell.setCellStyle(columnHeaderCell);
 
             cell = row.createCell(1);
-            cell.setCellValue("ID");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(2);
             cell.setCellValue("Lab No");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(3);
+            cell = row.createCell(2);
             cell.setCellValue("Serial No");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(4);
+            cell = row.createCell(3);
             cell.setCellValue("Institution Code");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(5);
+            cell = row.createCell(4);
             cell.setCellValue("Name");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(6);
-            cell.setCellValue("Age");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(7);
-            cell.setCellValue("Gender");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(8);
-            cell.setCellValue("Symptomatic");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(9);
-            cell.setCellValue("Contact Type");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(10);
+            cell = row.createCell(5);
             cell.setCellValue("Nic");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(11);
-            cell.setCellValue("Address");
-            cell.setCellStyle(columnHeaderCell);
-
-            cell = row.createCell(12);
+            cell = row.createCell(6);
             cell.setCellValue("District");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(13);
+            cell = row.createCell(7);
             cell.setCellValue("Contact No");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(14);
+            cell = row.createCell(8);
             cell.setCellValue("Received Date");
             cell.setCellStyle(columnHeaderCell);
 
-            cell = row.createCell(15);
+            cell = row.createCell(9);
             cell.setCellValue("Ward");
             cell.setCellStyle(columnHeaderCell);
         } catch (Exception e) {
@@ -351,62 +327,38 @@ public class SampleVerifyFileService {
             cell.setCellStyle(style);
 
             cell = row.createCell(1);
-            cell.setCellValue(sampleVerifyFile.getId() + "");
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(2);
             cell.setCellValue(sampleVerifyFile.getBarcode());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(3);
+            cell = row.createCell(2);
             cell.setCellValue(sampleVerifyFile.getReferenceNo());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(4);
+            cell = row.createCell(3);
             cell.setCellValue(sampleVerifyFile.getInstitutionCode());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(5);
+            cell = row.createCell(4);
             cell.setCellValue(sampleVerifyFile.getName());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(6);
-            cell.setCellValue(sampleVerifyFile.getAge());
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(7);
-            cell.setCellValue(sampleVerifyFile.getGender());
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(8);
-            cell.setCellValue(sampleVerifyFile.getSymptomatic());
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(9);
-            cell.setCellValue(sampleVerifyFile.getContactType());
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(10);
+            cell = row.createCell(5);
             cell.setCellValue(sampleVerifyFile.getNic());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(11);
-            cell.setCellValue(sampleVerifyFile.getAddress());
-            cell.setCellStyle(rowColumnCell);
-
-            cell = row.createCell(12);
+            cell = row.createCell(6);
             cell.setCellValue(sampleVerifyFile.getResidentDistrict());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(13);
+            cell = row.createCell(7);
             cell.setCellValue(sampleVerifyFile.getContactNumber());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(14);
+            cell = row.createCell(8);
             cell.setCellValue(sampleVerifyFile.getReceivedDate());
             cell.setCellStyle(rowColumnCell);
 
-            cell = row.createCell(15);
+            cell = row.createCell(9);
             cell.setCellValue(sampleVerifyFile.getWard());
             cell.setCellStyle(rowColumnCell);
         } catch (Exception e) {

@@ -21,7 +21,7 @@
                     <div class="form-group row">
                         <label for="uReceivedDate" class="col-sm-4 col-form-label">Received Date<span
                                 class="text-danger">*</span></label>
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 btn-group div-inline input-group input-group-sm input-append date">
                             <input path="receivedDate" name="receivedDate" id="uReceivedDate"
                                    class="form-control" readonly="true" onkeydown="return false"
                                    autocomplete="off" type="text"/>
@@ -71,12 +71,14 @@
             month = '0' + month;
         }
         var today = (date.getFullYear() + "-" + month + "-" + day);
-        $('#searchReceivedDate').val(today);
+        $("#uReceivedDate").datepicker('setDate', today);
     }
 
     function resetAdd() {
-        $('form[name=sampleFileUploadForm]').trigger("reset");
+        //$('form[name=sampleFileUploadForm]').trigger("reset");
         $('#responseMsgAdd').hide();
+        $("#sampleFile").val(null);
+        setReceivedDate();
     }
 
     function add() {
@@ -101,6 +103,7 @@
                 }
                 $('form[name=sampleFileUploadForm]').trigger("reset");
                 $("#sampleFile").val(null);
+                setReceivedDate();
             },
             error: function (err) {
                 window.location = "${pageContext.request.contextPath}/logout.htm";

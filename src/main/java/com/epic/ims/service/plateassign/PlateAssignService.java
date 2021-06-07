@@ -2,8 +2,8 @@ package com.epic.ims.service.plateassign;
 
 import com.epic.ims.annotation.logservice.LogService;
 import com.epic.ims.bean.plate.DefaultBean;
+import com.epic.ims.bean.plate.PlateDeleteBean;
 import com.epic.ims.bean.plate.PoolBean;
-import com.epic.ims.bean.plate.ResultBean;
 import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.mastertemp.MasterTemp;
@@ -92,6 +92,22 @@ public class PlateAssignService {
         Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
         try {
             String message = plateAssignRepository.MergeBlockPlate(poolBean);
+            if (message.isEmpty()) {
+                plateMap = plateAssignRepository.getDefaultPlateList();
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return plateMap;
+    }
+
+    @LogService
+    public Map<Integer, List<DefaultBean>> deletePlate(PlateDeleteBean plateDeleteBean) {
+        Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
+        try {
+            String message = plateAssignRepository.deletePlate(plateDeleteBean);
             if (message.isEmpty()) {
                 plateMap = plateAssignRepository.getDefaultPlateList();
             }
