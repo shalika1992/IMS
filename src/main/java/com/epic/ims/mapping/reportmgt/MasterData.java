@@ -31,6 +31,7 @@ public class MasterData {
     private String specimenID;
     private String barcode;
     private String receivedDate;
+    private String statusCode;
     private String statusDescription;
     private String result;
     private String resultDescription;

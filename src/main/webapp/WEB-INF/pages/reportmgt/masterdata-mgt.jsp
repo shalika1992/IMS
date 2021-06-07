@@ -108,7 +108,7 @@
                         defaultContent: "--"
                     },
                     {
-                        title: "Serial Number",
+                        title: "Serial No",
                         targets: 1,
                         mDataProp: "referenceNumber",
                         defaultContent: "--"
@@ -191,9 +191,17 @@
                         sortable: false,
                         className: "dt-center",
                         mRender: function (data, type, full) {
-                            return '<div><a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2"' +
-                                '  title="Download" id=' + full.institutionCode + ' onclick="downloadIndividualReport(\'' + full.id + '\')">' +
-                                '<span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0,0H24V24H0Z" fill="none"/><path d="M19,9H15V3H9V9H5l7,7ZM5,18v2H19V18Z" fill="#b5b5c3"/></svg></span></a></div>';
+                            if(data.statusCode === 'PLASG' ){
+                                return '--';
+                            }else{
+                                return '' +
+                                    '<div>' +
+                                        '<a href="javascript:;" class="btn btn-sm btn-clean btn-icon mr-2" title="Download" id=' + full.institutionCode + ' onclick="downloadIndividualReport(\'' + full.id + '\')">' +
+                                        '<span class="svg-icon svg-icon-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0,0H24V24H0Z" fill="none"/><path d="M19,9H15V3H9V9H5l7,7ZM5,18v2H19V18Z" fill="#b5b5c3"/></svg></span>' +
+                                        '</a>' +
+                                    '</div>';
+                            }
+
                         },
                         targets: 13,
                         defaultContent: "--"
