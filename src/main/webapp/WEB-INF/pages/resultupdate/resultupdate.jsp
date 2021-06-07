@@ -443,7 +443,6 @@
                                         </div>
                                         <span class="form-text text-muted">Please select received date</span>
                                     </div>
-
                                     <div class="col-lg-4">
                                         <label>Plate :</label>
                                         <select id="plateId" name="plateId" class="form-control">
@@ -453,7 +452,6 @@
                                             </c:forEach>
                                         </select>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="card-footer">

@@ -71,7 +71,7 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
 
-    private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser,receiveddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -228,7 +228,8 @@ public class ResultUpdateRepository {
                         repeatData.getContactNumber(),
                         repeatData.getSecondaryContactNumber(),
                         commonVarList.STATUS_PENDING,
-                        sessionBean.getUsername());
+                        sessionBean.getUsername(),
+                        repeatData.getReceiveddate());
             }
         } catch (DataAccessException e) {
             throw e;
