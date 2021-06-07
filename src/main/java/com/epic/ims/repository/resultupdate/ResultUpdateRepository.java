@@ -2,6 +2,7 @@ package com.epic.ims.repository.resultupdate;
 
 import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.plate.ResultBean;
+import com.epic.ims.bean.resultupdate.RepeatSampleBean;
 import com.epic.ims.bean.resultupdate.ResultIdListBean;
 import com.epic.ims.bean.resultupdate.ResultPlateBean;
 import com.epic.ims.bean.resultupdate.ResultUpdateInputBean;
@@ -16,14 +17,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +70,8 @@ public class ResultUpdateRepository {
 
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
+
+    private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -154,9 +161,79 @@ public class ResultUpdateRepository {
             }
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
+            } else {
+                if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REPEATED)) {
+                    message = getRepeatRecords(resultPlateBean.getBarcode());
+                }
             }
         } catch (Exception ex) {
             throw ex;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String getRepeatRecords(String barcode) {
+        String message = "";
+        List<RepeatSampleBean> resultList = null;
+        try {
+            String sql = "" +
+                    " select " +
+                    " md.referenceno , md.institutioncode , md.name , md.age , md.gender, md.symptomatic, md.contacttype , md.nic , md.address , md.district , md.contactno ," +
+                    " md.receiveddate from master_data md " +
+                    " where md.barcode =?";
+
+            resultList = jdbcTemplate.query(sql, new Object[]{barcode}, (rs, id) -> {
+                RepeatSampleBean result = new RepeatSampleBean();
+                result.setReferenceNo(rs.getString("referenceno"));
+                result.setMohArea(rs.getString("institutioncode"));
+                result.setName(rs.getString("name"));
+                result.setAge(rs.getString("age"));
+                result.setGender(rs.getString("gender"));
+                result.setSymptomatic(rs.getString("symptomatic"));
+                result.setContactType(rs.getString("contacttype"));
+                result.setNic(rs.getString("nic"));
+                result.setAddress(rs.getString("address"));
+                result.setResidentDistrict(rs.getString("district"));
+                result.setContactNumber(rs.getString("contactno"));
+                result.setReceiveddate(rs.getString("receiveddate"));
+                return result;
+            });
+            message = insertSampleDataRepeat(resultList);
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String insertSampleDataRepeat(List<RepeatSampleBean> repeatSampleBeanList) {
+        String message = "";
+        try {
+            for (int j = 0; j < repeatSampleBeanList.size(); j++) {
+                RepeatSampleBean repeatData = repeatSampleBeanList.get(j);
+                jdbcTemplate.update(SQL_INSERT_SAMPLEDATA,
+                        repeatData.getReferenceNo(),
+                        repeatData.getMohArea(),
+                        repeatData.getName(),
+                        repeatData.getAge(),
+                        repeatData.getGender(),
+                        repeatData.getSymptomatic(),
+                        repeatData.getContactType(),
+                        repeatData.getNic(),
+                        repeatData.getAddress(),
+                        repeatData.getResidentDistrict(),
+                        repeatData.getContactNumber(),
+                        repeatData.getSecondaryContactNumber(),
+                        commonVarList.STATUS_PENDING,
+                        sessionBean.getUsername());
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
         }
         return message;
     }
