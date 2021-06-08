@@ -45,9 +45,9 @@ Generate Plates Function
  */
 function _generatePlates(platesArray) {
     // get modulus
-    let module = Object.keys(platesArray).length % 93;
+    let module = Object.keys(platesArray).length % 94;
     // get plate count
-    let round = Math.floor(Object.keys(platesArray).length / 93);
+    let round = Math.floor(Object.keys(platesArray).length / 94);
 
     // plate count final
     if (module != 0) {
@@ -94,7 +94,7 @@ function _generatePlates(platesArray) {
         for (let i = 0; i < 8; i++) { // rows
             for (let j = 0; j < 12; j++) { // columns
                 val = i + (8 * j); // change normal filling
-                if (val < 94)  {
+                if (val < 94) {
                     if (platesArray[val + shift] !== undefined) { // after finish filling
                         // tooltip creation
                         let ul = '<span class="label label-success label-inline ">Candidate Details</span>' +

@@ -110,9 +110,9 @@
         function _storeMergePlate(platesArray) {
             let mergedIdList = [];
             // get modulus
-            let module = Object.keys(platesArray).length % 93;
+            let module = Object.keys(platesArray).length % 94;
             // get plate count
-            let round = Math.floor(Object.keys(platesArray).length / 93);
+            let round = Math.floor(Object.keys(platesArray).length / 94);
             // plate count final
             if (module != 0) {
                 round++;
@@ -156,9 +156,9 @@
             let finalizedMergedArr = [];
             $(this).addClass("active");
             // get modulus
-            let module = Object.keys(platesArray).length % 93;
+            let module = Object.keys(platesArray).length % 94;
             // get plate count
-            let round = Math.floor(Object.keys(platesArray).length / 93);
+            let round = Math.floor(Object.keys(platesArray).length / 94);
 
             // plate count final
             if (module != 0) {
@@ -265,9 +265,9 @@
         function deletePlate() {
             let mergedIdList = [];
             // get modulus
-            let module = Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length % 93;
+            let module = Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length % 94;
             // get plate count
-            let round = Math.floor(Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length / 93);
+            let round = Math.floor(Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length / 94);
             // plate count final
             if (module != 0) {
                 round++;
@@ -311,9 +311,10 @@
                     }),
                     dataType: 'json',
                     success: function (res) {
+                        platesNum = res;
                         Swal.fire('Successfully deleted', '', 'success');
                         sessionStorage.setItem('plates', JSON.stringify(res));
-                        _generatePlates(res)
+                        _generatePlates(platesNum)
                     },
                     error: function (jqXHR) {
                         swal.fire({
@@ -363,7 +364,6 @@
         }
 
         function plateCreation() {
-            alert();
             form = document.getElementById('platecretionform');
             form.action = 'createPlate.htm';
             form.submit();
