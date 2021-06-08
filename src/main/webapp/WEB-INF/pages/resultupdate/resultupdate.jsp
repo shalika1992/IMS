@@ -270,9 +270,9 @@
         */
         function _generatePlates(platesArray) {
             // get modulus
-            let module = Object.keys(platesArray).length % 93;
+            let module = Object.keys(platesArray).length % 94;
             // get plate count
-            let round = Math.floor(Object.keys(platesArray).length / 93);
+            let round = Math.floor(Object.keys(platesArray).length / 94);
 
             // plate count final
             if (module != 0) {
