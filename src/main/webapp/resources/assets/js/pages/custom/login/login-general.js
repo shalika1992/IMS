@@ -55,7 +55,7 @@ var KTLogin = function() {
             validation.validate().then(function(status) {
 		        if (status == 'Valid') {
                     swal.fire({
-		                text: "All is cool! Now you submit this form",
+		                text: "Processing",
 		                icon: "success",
 		                buttonsStyling: false,
 		                confirmButtonText: "Ok, got it!",
@@ -162,7 +162,7 @@ var KTLogin = function() {
             validation.validate().then(function(status) {
 		        if (status == 'Valid') {
                     swal.fire({
-		                text: "All is cool! Now you submit this form",
+		                text: "Processing",
 		                icon: "success",
 		                buttonsStyling: false,
 		                confirmButtonText: "Ok, got it!",

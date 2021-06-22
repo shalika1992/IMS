@@ -129,7 +129,7 @@
                                                 <i class="menu-bullet menu-bullet-dot">
                                                     <span></span>
                                                 </i>
-                                                <span class="menu-text">${page.description}</span>
+                                                <span class="menu-text" style="font-size: 12px;">${page.description}</span>
                                             </a>
                                         </li>
                                     </c:forEach>

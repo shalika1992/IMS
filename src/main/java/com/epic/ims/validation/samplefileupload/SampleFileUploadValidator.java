@@ -71,13 +71,28 @@ public class SampleFileUploadValidator implements Validator {
                                 errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_NAME, MessageVarList.SAMPLERECORD_EMPTY_NAME);
                             }
 
-                        } else if (fieldName.equals("nic")) {
-                            //validate nic
-                            String nic = ((SampleFileInputBean) o).getNic();
-                            if (validation.isEmptyFieldValue(nic)) {
-                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_NIC, MessageVarList.SAMPLERECORD_EMPTY_NIC);
+                        } else if (fieldName.equals("age")) {
+                            //validate name
+                            String name = ((SampleFileInputBean) o).getName();
+                            if (validation.isEmptyFieldValue(name)) {
+                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_AGE, MessageVarList.SAMPLERECORD_EMPTY_AGE);
                             }
+
+                        } else if (fieldName.equals("gender")) {
+                            //validate name
+                            String name = ((SampleFileInputBean) o).getName();
+                            if (validation.isEmptyFieldValue(name)) {
+                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_GENDER, MessageVarList.SAMPLERECORD_EMPTY_GENDER);
+                            }
+
                         }
+//                        else if (fieldName.equals("nic")) {
+//                            //validate nic
+//                            String nic = ((SampleFileInputBean) o).getNic();
+//                            if (validation.isEmptyFieldValue(nic)) {
+//                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_NIC, MessageVarList.SAMPLERECORD_EMPTY_NIC);
+//                            }
+//                        }
                     }
                 }
             } else {
@@ -95,7 +110,9 @@ public class SampleFileUploadValidator implements Validator {
                 allFields.get("referenceNo"),
                 allFields.get("institutionCode"),
                 allFields.get("name"),
-                allFields.get("nic")
+                allFields.get("age"),
+                allFields.get("gender")
+                // allFields.get("nic")
         };
     }
 }

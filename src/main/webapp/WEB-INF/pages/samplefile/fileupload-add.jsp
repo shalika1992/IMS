@@ -85,29 +85,41 @@
         var formData = new FormData();
         formData.append('sampleFile', $('input[type=file]')[0].files[0]);
         formData.append('receivedDate', $("#uReceivedDate").val());
-        $.ajax({
-            url: '${pageContext.request.contextPath}/sampleFileUpload.json',
-            data: formData,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            success: function (res) {
-                if (res.flag) {
-                    // handle success response
-                    $('#responseMsgAdd').show();
-                    $('#responseMsgAdd').addClass('success-response').text(res.successMessage);
-                    search();
-                } else {
-                    $('#responseMsgAdd').show();
-                    $('#responseMsgAdd').addClass('error-response').text(res.errorMessage);
+        if ($('input[type=file]')[0].files[0] !== undefined) {
+            $.ajax({
+                url: '${pageContext.request.contextPath}/sampleFileUpload.json',
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function (res) {
+                    if (res.flag) {
+                        // handle success response
+                        $('#responseMsgAdd').show();
+                        $('#responseMsgAdd').addClass('success-response').text(res.successMessage);
+                        search();
+                    } else {
+                        $('#responseMsgAdd').show();
+                        $('#responseMsgAdd').addClass('error-response').text(res.errorMessage);
+                    }
+                    $('form[name=sampleFileUploadForm]').trigger("reset");
+                    $("#sampleFile").val(null);
+                    setReceivedDate();
+                },
+                error: function (err) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
                 }
-                $('form[name=sampleFileUploadForm]').trigger("reset");
-                $("#sampleFile").val(null);
-                setReceivedDate();
-            },
-            error: function (err) {
-                window.location = "${pageContext.request.contextPath}/logout.htm";
-            }
-        });
+            });
+        } else {
+            swal.fire({
+                text: "Please upload a file to proceed.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "OK",
+                customClass: {
+                    confirmButton: "btn font-weight-bold btn-light-primary"
+                }
+            });
+        }
     }
 </script>

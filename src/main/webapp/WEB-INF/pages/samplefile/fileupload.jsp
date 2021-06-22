@@ -304,6 +304,10 @@
 
         function resetSearch() {
             $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
+            $('#referenceNo').val("");
+            $('#institutionCode').val("");
+            $('#name').val("");
+            $('#nic').val("");
             oTable.fnDraw();
         }
     </script>

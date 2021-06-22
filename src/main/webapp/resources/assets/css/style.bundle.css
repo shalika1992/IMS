@@ -59902,6 +59902,7 @@ body {
     .header-menu .menu-nav > .menu-item .menu-link:hover, .header-menu .menu-nav > .menu-item .menu-link:active, .header-menu .menu-nav > .menu-item .menu-link:focus {
         text-decoration: none; }
     .header-menu .menu-nav > .menu-item > .menu-link > .menu-text {
+        font-size: 12px;
         width: auto; }
     .header-menu .menu-nav > .menu-item.menu-item-icon > .menu-link {
         -webkit-box-pack: center;

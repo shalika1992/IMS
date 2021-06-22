@@ -18,7 +18,7 @@ body {
 
 .menu-submenu li.second-menu-item {
   margin: 0px 20px;
-  padding: 12px;
+  padding: 12px !important;
   margin-left: 56px;
   background: #eee;
 }

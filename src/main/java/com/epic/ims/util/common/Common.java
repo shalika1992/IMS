@@ -54,6 +54,18 @@ public class Common {
         return strDate;
     }
 
+    public Date formatStringtoDate(String date) throws Exception {
+        Date fdate = null;
+        try {
+            String pattern = "yyyy-MM-dd HH:mm:ss";
+            SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+            fdate = dateFormat.parse(date);
+        } catch (Exception e) {
+            throw e;
+        }
+        return fdate;
+    }
+
     /**
      * @Author shalika_w
      * @CreatedTime 2021-01-22 12:20:06 PM

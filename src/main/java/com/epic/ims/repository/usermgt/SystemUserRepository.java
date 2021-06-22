@@ -5,6 +5,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.bean.sysuser.SystemUserInputBean;
 import com.epic.ims.mapping.user.usermgt.SystemUser;
 import com.epic.ims.service.common.CommonService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,8 @@ public class SystemUserRepository {
     @Autowired
     MessageSource messageSource;
 
+    @Autowired
+    Common common;
 
     private final String SQL_GET_COUNT = "select count(*) from web_systemuser wu where ";
     private final String SQL_INSERT_SYSTEMUSER = "insert into web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -162,7 +166,7 @@ public class SystemUserRepository {
                 }
 
                 try {
-                    systemUser.setLastLoggedDate(rs.getDate("lastloggeddate"));
+                    systemUser.setLastLoggedDate(common.formatStringtoDate(rs.getString("lastloggeddate")));
                 } catch (Exception e) {
                     systemUser.setLastLoggedDate(null);
                 }

@@ -68,7 +68,7 @@ var KTLogin = function() {
 
 					if (response && typeof response === 'object' && response.status && response.status == 'success') {
 						Swal.fire({
-			                text: "All is cool! Now you submit this form",
+			                text: "Processing",
 			                icon: "success",
 			                buttonsStyling: false,
 							confirmButtonText: "Ok, got it!",

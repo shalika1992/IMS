@@ -4,6 +4,7 @@ import com.epic.ims.bean.institutionmgt.InstitutionInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.service.common.CommonService;
+import com.epic.ims.util.common.Common;
 import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import org.apache.commons.logging.Log;
@@ -45,6 +46,9 @@ public class InstitutionRepository {
 
     @Autowired
     MessageSource messageSource;
+
+    @Autowired
+    Common common;
 
     private final String SQL_GET_COUNT = "select count(*) from institution i where ";
     private final String SQL_FIND_INSTITUTION = "select institutioncode, name, address, contactno, status,lastupdateduser,lastupdatedtime,createdtime from institution where lower(institutioncode) = ?";
@@ -313,13 +317,13 @@ public class InstitutionRepository {
                 }
 
                 try {
-                    institution.setCreatedTime(rs.getDate("createdtime"));
+                    institution.setCreatedTime(common.formatStringtoDate(rs.getString("createdtime")));
                 } catch (Exception e) {
                     institution.setCreatedTime(null);
                 }
 
                 try {
-                    institution.setLastUpdatedTime(rs.getDate("lastupdatedtime"));
+                    institution.setLastUpdatedTime(common.formatStringtoDate(rs.getString("lastupdatedtime")));
                 } catch (Exception e) {
                     institution.setLastUpdatedTime(null);
                 }
@@ -356,7 +360,7 @@ public class InstitutionRepository {
             }
 
             if (institutionInputBean.getStatus() != null && !institutionInputBean.getStatus().isEmpty()) {
-                dynamicClause.append("and i.status like '%").append(institutionInputBean.getStatus()).append("%' ");
+                dynamicClause.append("and i.status = '").append(institutionInputBean.getStatus()).append("' ");
             }
         } catch (Exception exception) {
             throw exception;

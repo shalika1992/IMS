@@ -92,8 +92,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-sm-4 col-form-label">Nic<span
-                                    class="text-danger">*</span></label>
+                            <label class="col-sm-4 col-form-label">Nic</label>
                             <div class="col-sm-8">
                                 <form:input path="nic" name="nic" type="text"
                                             class="form-control form-control-sm" maxlength="16"
@@ -125,8 +124,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-sm-4 col-form-label">Contact No<span
-                                    class="text-danger">*</span></label>
+                            <label class="col-sm-4 col-form-label">Contact No</label>
                             <div class="col-sm-8">
                                 <form:input path="contactNumber" name="contactNumber" type="text"
                                             class="form-control form-control-sm" maxlength="16"
@@ -135,8 +133,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-sm-4 col-form-label">Secondary Contact No<span
-                                    class="text-danger">*</span></label>
+                            <label class="col-sm-4 col-form-label">Secondary Contact No</label>
                             <div class="col-sm-8">
                                 <form:input path="secondaryContactNumber" name="secondaryContactNumber" type="text"
                                             class="form-control form-control-sm" maxlength="16"
@@ -145,8 +142,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-sm-4 col-form-label">Ward No<span
-                                    class="text-danger">*</span></label>
+                            <label class="col-sm-4 col-form-label">Ward No</label>
                             <div class="col-sm-8">
                                 <form:input path="wardNumber" name="wardNumber" type="text"
                                             class="form-control form-control-sm" maxlength="4"

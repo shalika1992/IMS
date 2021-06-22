@@ -3,6 +3,10 @@ li {
     font-size: 8px !important;
 }
 
+.menu-text {
+    font-size: 12px !important;
+}
+
 .first-elmt {
     background: repeating-linear-gradient(
             45deg

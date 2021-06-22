@@ -71,41 +71,49 @@
 
     function addBulk() {
         resetAddInstitutionBulkError();
-
         let formData = new FormData();
-
         formData.append('userTask', $('#abUserTask').val());
         formData.append('institutionBulk', $('#abInstitutionBulk')[0].files[0]);
-        console.log(formData)
+        if ($('#abInstitutionBulk')[0].files[0] !== undefined) {
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/addInstitutionBulk.json',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function (xhr) {
+                    if (header && token) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function (res) {
+                    if (res.flag) {
+                        // handle success response
 
-        $.ajax({
-            type: 'POST',
-            url: '${pageContext.request.contextPath}/addInstitutionBulk.json',
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function (xhr) {
-                if (header && token) {
-                    xhr.setRequestHeader(header, token);
+                        $('#responseMsgAddBulk').show();
+                        $('#responseMsgAddBulk').addClass('success-response').text(res.successMessage);
+                        $('form[name=addInstitutionBulkForm]').trigger("reset");
+                        searchStart();
+                    } else {
+                        $('#responseMsgAddBulk').show();
+                        $('#responseMsgAddBulk').addClass('error-response').text(res.errorMessage);
+                    }
+                },
+                error: function (jqXHR) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
                 }
-            },
-            success: function (res) {
-                if (res.flag) {
-                    // handle success response
-
-                    $('#responseMsgAddBulk').show();
-                    $('#responseMsgAddBulk').addClass('success-response').text(res.successMessage);
-                    $('form[name=addInstitutionBulkForm]').trigger("reset");
-                    searchStart();
-                } else {
-                    $('#responseMsgAddBulk').show();
-                    $('#responseMsgAddBulk').addClass('error-response').text(res.errorMessage);
+            });
+        } else {
+            swal.fire({
+                text: "Please upload a file to proceed.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "OK",
+                customClass: {
+                    confirmButton: "btn font-weight-bold btn-light-primary"
                 }
-            },
-            error: function (jqXHR) {
-                window.location = "${pageContext.request.contextPath}/logout.htm";
-            }
-        });
+            });
+        }
     }
 
     function resetAddInstitutionBulkError() {
