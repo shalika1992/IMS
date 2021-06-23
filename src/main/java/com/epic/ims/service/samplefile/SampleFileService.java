@@ -106,6 +106,7 @@ public class SampleFileService {
     public String validateMandatoryFields(List<SampleData> sampleDataList, Locale locale) {
         String message = "";
         try {
+            int MANDATORY_FIELDCOUNT = 2;
             for (int i = 0; i < sampleDataList.size(); i++) {
                 SampleData s = sampleDataList.get(i);
                 if (s != null) {
@@ -129,10 +130,10 @@ public class SampleFileService {
                     if (s.getContactNumber() == null || s.getContactNumber().isEmpty()) {
                         count++;
                     }
-
-                    if (count < commonVarList.MINIMUM_MANDATORY_FIELDCOUNT) {
+                    if (count > MANDATORY_FIELDCOUNT) {
                         message = messageSource.getMessage(MessageVarList.SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
                         message = message + (s.getReferenceNo() != null && !s.getReferenceNo().isEmpty() ? "Reference No - " + s.getReferenceNo() : "");
+                        break;
                     }
                 } else {
                     message = messageSource.getMessage(MessageVarList.SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);

@@ -136,7 +136,7 @@ public class PlateAssignRepository {
                     if (sampleFileList.size() >= (endingIndex - 1)) {
                         subList = new ArrayList<>(sampleFileList.subList(startingIndex, endingIndex));
                     } else {
-                        endingIndex = sampleFileList.size() - 1;
+                        endingIndex = sampleFileList.size();
                         subList = new ArrayList<>(sampleFileList.subList(startingIndex, endingIndex));
                     }
 

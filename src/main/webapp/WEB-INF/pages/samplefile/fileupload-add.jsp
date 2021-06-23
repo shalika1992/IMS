@@ -16,7 +16,8 @@
             <form:form class="form-horizontal sm" id="sampleFileUploadForm" modelAttribute="samplefile" method="post"
                        name="sampleFileUploadForm" enctype="multipart/form-data">
                 <div class="modal-body">
-                    <div class="form-group"><span id="responseMsgAdd"></span></div>
+                    <div class="form-group"><span id="responseMsgAddSuccess"></span></div>
+                    <div class="form-group"><span id="responseMsgAddError"></span></div>
 
                     <div class="form-group row">
                         <label for="uReceivedDate" class="col-sm-4 col-form-label">Received Date<span
@@ -75,8 +76,8 @@
     }
 
     function resetAdd() {
-        //$('form[name=sampleFileUploadForm]').trigger("reset");
-        $('#responseMsgAdd').hide();
+        $('#responseMsgAddSuccess').hide();
+        $('#responseMsgAddError').hide();
         $("#sampleFile").val(null);
         setReceivedDate();
     }
@@ -95,12 +96,14 @@
                 success: function (res) {
                     if (res.flag) {
                         // handle success response
-                        $('#responseMsgAdd').show();
-                        $('#responseMsgAdd').addClass('success-response').text(res.successMessage);
+                        $('#responseMsgAddSuccess').show();
+                        $('#responseMsgAddError').hide();
+                        $('#responseMsgAddSuccess').addClass('success-response').text(res.successMessage);
                         search();
                     } else {
-                        $('#responseMsgAdd').show();
-                        $('#responseMsgAdd').addClass('error-response').text(res.errorMessage);
+                        $('#responseMsgAddSuccess').hide();
+                        $('#responseMsgAddError').show();
+                        $('#responseMsgAddError').addClass('error-response').text(res.errorMessage);
                     }
                     $('form[name=sampleFileUploadForm]').trigger("reset");
                     $("#sampleFile").val(null);

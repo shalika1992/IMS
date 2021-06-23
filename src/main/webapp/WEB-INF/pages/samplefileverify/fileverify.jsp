@@ -304,8 +304,10 @@
 
                     //disable and enable the select_all input
                     if (oTable.fnGetData().length > 0) {
+                        $("#generateLabCodeBtn").prop("disabled", false);
                         document.getElementById("select_all").disabled = false;
                     } else {
+                        $("#generateLabCodeBtn").prop("disabled", true);
                         document.getElementById("select_all").disabled = true;
                     }
 
@@ -668,6 +670,7 @@
                                     <div class="col-lg-3"></div>
                                     <div class="col-lg-3 text-right">
                                         <button type="button" class="btn btn-primary mr-2 btn-sm"
+                                                id="generateLabCodeBtn"
                                                 onclick="generateLabCodePopUp()">
                                             Generate Lab Codes
                                         </button>
@@ -708,9 +711,10 @@
                             </button>
                             <!--end::Button-->
                         </div>
-    
+
                         <div class="card-toolbar">
-                            <button onclick="openInvalidModal()" class="btn btn-primary font-weight-bolder" id="btnInvalid">
+                            <button onclick="openInvalidModal()" class="btn btn-primary font-weight-bolder"
+                                    id="btnInvalid">
                                 <span class="svg-icon svg-icon-md">
                                     <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
                                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -728,7 +732,7 @@
                             </button>
                             <!--end::Button-->
                         </div>
-    
+
                         <div class="card-toolbar">
                             <button onclick="openNoSampleFoundModal()" class="btn btn-primary font-weight-bolder"
                                     id="btnNosample">
@@ -748,7 +752,7 @@
                                 </span>Mark As Sample Not Found
                             </button>
                             <!--end::Button-->
-                    </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

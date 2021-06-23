@@ -446,7 +446,12 @@ public class SampleFileUploadRepository {
                 jdbcTemplate.batchUpdate(SQL_INSERT_SAMPLEFILERECORD, new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
+
                         SampleData sampleData = batchList.get(i);
+                        System.out.println("-----------------------------------");
+                        System.out.println("MohArea : "+ sampleData.getMohArea());
+                        System.out.println("-----------------------------------");
+
                         ps.setString(1, sampleData.getReferenceNo());
                         ps.setString(2, sampleData.getMohArea());
                         ps.setString(3, sampleData.getName());
