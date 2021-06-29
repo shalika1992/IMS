@@ -21,6 +21,7 @@ import com.epic.ims.validation.institution.InstitutionBulkValidation;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 @Controller
@@ -125,7 +124,12 @@ public class MasterDataReportController {
             List<MasterData> masterDataList = masterDataReportService.getMasterDataSearchResultListForReport(masterDataInputBeen);
             if (masterDataList != null && !masterDataList.isEmpty() && masterDataList.size() > 0) {
                 String currentDateTime = commonRepository.getCurrentDateTimeAsString();
-                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/masterDataPDF.jasper");
+                String masterDataReportFileJasperPath = this.getMasterDataReportJasperPath();
+
+                //report file initialization
+                File file = new File(masterDataReportFileJasperPath);
+                InputStream jasperStream = new FileInputStream(file);
+
                 Map<String, Object> parameterMap = new HashMap<>();
 
                 //set parameters to map
@@ -174,9 +178,13 @@ public class MasterDataReportController {
             MasterData masterData = masterDataReportService.getMasterDataSearchObjectForIndividualReport(masterDataInputBeen);
             if (masterData != null) {
                 String currentDateTime = commonRepository.getCurrentDateTimeAsString();
-                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/reportexplorer/individualfinalreport.jasper");
-                Map<String, Object> parameterMap = new HashMap<>();
+                String indivudualReportFileJasperPath = this.getIndividualDataReportJasperPath();
 
+                //report file initialization
+                File file = new File(indivudualReportFileJasperPath);
+                InputStream jasperStream = new FileInputStream(file);
+
+                Map<String, Object> parameterMap = new HashMap<>();
                 //set parameters to map
                 parameterMap.put("reportTime", currentDateTime);
                 parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterData.getReceivedDate()));
@@ -220,6 +228,37 @@ public class MasterDataReportController {
         }
     }
 
+    private String getMasterDataReportJasperPath() {
+        String filePath = "";
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                filePath = commonVarList.MASTERREPORTFILE_LINUX_JASPER_FILEPATH;
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                filePath = commonVarList.MASTERREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            } else {
+                filePath = commonVarList.MASTERREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return filePath;
+    }
+
+    private String getIndividualDataReportJasperPath() {
+        String filePath = "";
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                filePath = commonVarList.INDIVIDUALREPORTFILE_LINUX_JASPER_FILEPATH;
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                filePath = commonVarList.INDIVIDUALREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            } else {
+                filePath = commonVarList.INDIVIDUALREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return filePath;
+    }
 
     @ModelAttribute
     public void getMasterDataBean(Model map) throws Exception {
