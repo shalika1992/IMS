@@ -207,5 +207,31 @@ public class CommonVarList {
     @Value("${plate.pooldescription.yes}")
     public String PLATE_POOLDESCRIPTION_NO;
     //-------------------------------plate pool codes-----------------------------------------------------------------//
+
+    //-------------------------------report content codes-------------------------------------------------------------//
+    @Value("${rejectedfile.linux.jasperfilepath}")
+    public String REJECTEDREPORTFILE_LINUX_JASPER_FILEPATH;
+
+    @Value("${rejectedfile.windows.jasperfilepath}")
+    public String REJECTEDREPORTFILE_WINDOWS_JASPER_FILEPATH;
+
+    @Value("${masterfile.linux.jasperfilepath}")
+    public String MASTERFILE_LINUX_JASPER_FILEPATH;
+
+    @Value("${masterfile.windows.jasperfilepath}")
+    public String MASTERFILE_WINDOWS_JASPER_FILEPATH;
+
+    @Value("${masterreportfile.linux.jasperfilepath}")
+    public String MASTERREPORTFILE_LINUX_JASPER_FILEPATH;
+
+    @Value("${masterreportfile.windows.jasperfilepath}")
+    public String MASTERREPORTFILE_WINDOWS_JASPER_FILEPATH;
+
+    @Value("${individualreportfile.linux.jasperfilepath}")
+    public String INDIVIDUALREPORTFILE_LINUX_JASPER_FILEPATH;
+
+    @Value("${individualreportfile.windows.jasperfilepath}")
+    public String INDIVIDUALREPORTFILE_WINDOWS_JASPER_FILEPATH;
+    //-------------------------------report content codes-------------------------------------------------------------//
 }
 

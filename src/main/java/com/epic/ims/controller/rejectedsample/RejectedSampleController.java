@@ -11,6 +11,7 @@ import com.epic.ims.repository.institutionmgt.InstitutionRepository;
 import com.epic.ims.service.rejectedsample.RejectedSampleService;
 import com.epic.ims.util.common.Common;
 import com.epic.ims.util.common.DataTablesResponse;
+import com.epic.ims.util.varlist.CommonVarList;
 import com.epic.ims.util.varlist.MessageVarList;
 import com.epic.ims.util.varlist.PageVarList;
 import com.epic.ims.util.varlist.SectionVarList;
@@ -20,6 +21,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 @Controller
@@ -60,6 +60,9 @@ public class RejectedSampleController {
 
     @Autowired
     RejectedSampleService rejectedSampleService;
+
+    @Autowired
+    CommonVarList commonVarList;
 
     @GetMapping(value = "/viewRejectSample")
     @AccessControl(sectionCode = SectionVarList.SECTION_REPORT_EXPLORER, pageCode = PageVarList.REPEATED_SAMPLES)
@@ -113,7 +116,12 @@ public class RejectedSampleController {
         try {
             List<RejectedSampleData> rejectedSampleDataList = rejectedSampleService.getRejectedSampleSearchResultListForReport(rejectedSampleDataInputBean);
             if (rejectedSampleDataList != null && !rejectedSampleDataList.isEmpty() && rejectedSampleDataList.size() > 0) {
-                InputStream jasperStream = this.getClass().getResourceAsStream("/reports/rejectsamples/rejectsamples_report.jasper");
+                String indivudualReportFileJasperPath = this.getJasperPath();
+                
+                //report file initialization
+                File file = new File(indivudualReportFileJasperPath);
+                InputStream jasperStream = new FileInputStream(file);
+
                 Map<String, Object> parameterMap = new HashMap<>();
                 //set parameters to map
                 parameterMap.put("receiveddate", common.replaceEmptyorNullStringToALL(rejectedSampleDataInputBean.getReceivedDate()));
@@ -143,6 +151,22 @@ public class RejectedSampleController {
                 //do nothing
             }
         }
+    }
+
+    private String getJasperPath() {
+        String filePath = "";
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                filePath = commonVarList.REJECTEDREPORTFILE_LINUX_JASPER_FILEPATH;
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                filePath = commonVarList.REJECTEDREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            } else {
+                filePath = commonVarList.REJECTEDREPORTFILE_WINDOWS_JASPER_FILEPATH;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return filePath;
     }
 
     @ModelAttribute

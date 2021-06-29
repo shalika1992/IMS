@@ -190,6 +190,7 @@ public class PlateAssignService {
     private String createMasterFile(List<MasterTemp> masterTempList, String currentDate, String masterTablePlateId) throws Exception {
         String filePath = "";
         try {
+            String masterFileJasperPath = this.getJasperPath();
             //get the copy of master temp list
             List<MasterTemp> masterTemps = masterTempList.stream().collect(Collectors.toList());
             //update the master temp list new plate id
@@ -203,11 +204,26 @@ public class PlateAssignService {
             //initialize file path
             String folderPath = this.getFolderPath(currentDate);
             filePath = folderPath + File.separator + MASTERFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + masterTablePlateId);
-            String masterFileJasperPath = this.getClass().getResource("/reports/masterfile/masterfile_report.jasper").getPath();
             String printFileName = JasperFillManager.fillReportToFile(masterFileJasperPath, parameterMap, new JRBeanCollectionDataSource(masterTempList));
             //create the pdf location
             if (Objects.nonNull(printFileName) && !printFileName.isEmpty()) {
                 JasperExportManager.exportReportToPdfFile(printFileName, filePath);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return filePath;
+    }
+
+    private String getJasperPath() {
+        String filePath = "";
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                filePath = commonVarList.MASTERFILE_LINUX_JASPER_FILEPATH;
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                filePath = commonVarList.MASTERFILE_WINDOWS_JASPER_FILEPATH;
+            } else {
+                filePath = commonVarList.MASTERFILE_WINDOWS_JASPER_FILEPATH;
             }
         } catch (Exception e) {
             throw e;
