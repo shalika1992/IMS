@@ -65,6 +65,8 @@ public class PlateAssignRepository {
 
     private final String SQL_DELETE_MASTER_TEMP_TABLE = "delete from master_temp_data";
     private final String SQL_DELETE_MASTER_TEMP_TABLE_PLATEID = "delete from master_temp_data where plateid = ?";
+    private final String SQL_GET_MASTER_TEMP_RECORD_BLOCKVALUE = "select a.blockvalue from master_temp_data a where a.labcode = ? ";
+    private final String SQL_DELETE_MASTER_TEMP_EMPTY_RECORD_ID = "delete from master_temp_data where labcode = ?";
     private final String SQL_GET_MAX_PLATE_CODE = "select max(code) as maxplateid from plate where receiveddate = ?";
 
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
@@ -701,12 +703,46 @@ public class PlateAssignRepository {
     }
 
     @LogRepository
+    @Transactional(readOnly = true)
+    public String getMasterTempBlockValue(String labcode) {
+        String blockvalue = "";
+        try {
+
+             blockvalue = jdbcTemplate.queryForObject(SQL_GET_MASTER_TEMP_RECORD_BLOCKVALUE, new Object[]{labcode}, String.class);
+            //check the value
+
+        } catch (Exception ex) {
+            throw ex;
+        }
+        return blockvalue;
+    }
+
+    @LogRepository
     @Transactional
     public String deletePlate(PlateDeleteBean plateDeleteBean) {
         String message = "";
         try {
             int value = 0;
             value = jdbcTemplate.update(SQL_DELETE_MASTER_TEMP_TABLE_PLATEID, new Object[]{plateDeleteBean.getPlateId()});
+            if (value <= 0) {
+                message = MessageVarList.COMMON_ERROR_PROCESS;
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String deleteWell(String labCode1) {
+        String message = "";
+        try {
+            int value = 0;
+            value = jdbcTemplate.update(SQL_DELETE_MASTER_TEMP_EMPTY_RECORD_ID, new Object[]{labCode1});
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }

@@ -120,6 +120,22 @@ public class PlateAssignService {
     }
 
     @LogService
+    public Map<Integer, List<DefaultBean>> deleteWell(String  labCode) {
+        Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
+        try {
+            String message = plateAssignRepository.deleteWell(labCode);
+            if (message.isEmpty()) {
+                plateMap = plateAssignRepository.getDefaultPlateList();
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return plateMap;
+    }
+
+    @LogService
     public String getFilePathList() throws Exception {
         String zipFilePath = "";
         List<String> filePathList = new ArrayList<>();

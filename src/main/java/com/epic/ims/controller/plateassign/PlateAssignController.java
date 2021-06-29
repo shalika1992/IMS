@@ -5,6 +5,7 @@ import com.epic.ims.annotation.logcontroller.LogController;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.plate.*;
 import com.epic.ims.bean.session.SessionBean;
+import com.epic.ims.mapping.mastertemp.MasterTemp;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.plateassign.PlateAssignService;
 import com.epic.ims.util.varlist.CommonVarList;
@@ -135,6 +136,20 @@ public class PlateAssignController {
         Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
         try {
             defaultPlateMap = plateAssignService.deletePlate(plateDeleteBean);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return defaultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
+    @RequestMapping(value = "/deleteWell", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public Map<Integer, List<DefaultBean>> postDeleteWell(@RequestBody MasterTemp masterTempBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        Map<Integer, List<DefaultBean>> defaultPlateMap = new HashMap<>();
+        try {
+            defaultPlateMap = plateAssignService.deleteWell(masterTempBean.getBarcode());//labcode
         } catch (Exception e) {
             logger.error("Exception  :  ", e);
         }

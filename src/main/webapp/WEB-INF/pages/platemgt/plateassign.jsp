@@ -262,6 +262,67 @@
             }
         }
 
+        function deleteWell() {
+            const del = [];
+            let swapArray = {}
+            let activeElements = $('.cell-elmt.active');
+
+            $.each(activeElements, function (x, y) {
+                swapArray[y.dataset.key] = y.dataset.value;
+                del.push(y.dataset.value);
+            });
+
+            if (del.length < 1) {
+                swal.fire({
+                    text: "Select a well to delete.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Exit",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else if (del.length > 1) {
+                swal.fire({
+                    text: "Cannot delete more than one well.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Exit",
+                    customClass: {
+                        confirmButton: "btn font-weight-bold btn-light-primary"
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '${pageContext.request.contextPath}/deleteWell.json',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        barcode: del[0]
+                    }),
+                    dataType: 'json',
+                    success: function (res) {
+                        platesNum = res;
+                        Swal.fire('Successfully deleted', '', 'success');
+                        sessionStorage.setItem('plates', JSON.stringify(res));
+                        _generatePlates(platesNum)
+                    },
+                    error: function (jqXHR) {
+                        swal.fire({
+                            text: "Error occurred while processing.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Exit",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+                    }
+                });
+            }
+
+        }
+
         function deletePlate() {
             let mergedIdList = [];
             // get modulus
@@ -436,20 +497,20 @@
                 <div class="card-body">
                     <div class="py-8">
                         <h4>Following operations can be done</h4>
-                        <div class="form-group row">
-                            <div class="col-lg-3">
+                        <div class="form-group row ">
+                            <div class="col-lg-2">
                                 <label>Pool selected tables</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
                                         onclick="merge()">Pool
                                 </button>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <label>Swap selected cells</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
                                         onclick="swap()">Swap
                                 </button>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <form:form method="post" modelAttribute="plate" id="platecretionform" action="">
                                     <label>Plate creation</label>
                                     <button type="button" onclick="plateCreation()"
@@ -457,10 +518,17 @@
                                     </button>
                                 </form:form>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <label>Delete plate</label>
                                 <button type="button" class="btn btn-success btn-hover-light btn-block"
                                         onclick="deletePlate()">Delete
+                                </button>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <label>Delete well</label>
+                                <button type="button" class="btn btn-success btn-hover-light btn-block"
+                                        onclick="deleteWell()">Delete
                                 </button>
                             </div>
                         </div>
