@@ -148,6 +148,9 @@ public class ResultUpdateRepository {
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REPEATED)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_REPEATED);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_REPEATED);
+            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_INVALID)) {
+                idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
+                idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_INVALID);
             }
             idSetParameterMap.addValue("isverified", 1);
             idSetParameterMap.addValue("iscomplete", 1);

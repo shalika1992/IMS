@@ -158,6 +158,9 @@ public class CommonVarList {
     @Value("${result.code.repeated}")
     public String RESULT_CODE_REPEATED;
 
+    @Value("${result.code.invalid}")
+    public String RESULT_CODE_INVALID;
+
     @Value("${result.code.inconclusive}")
     public String RESULT_CODE_INCONCLUSIVE;
     //-------------------------------result codes---------------------------------------------------------------------//
