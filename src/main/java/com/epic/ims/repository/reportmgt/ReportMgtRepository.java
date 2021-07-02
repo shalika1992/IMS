@@ -293,7 +293,7 @@ public class ReportMgtRepository {
         try {
             StringBuilder dynamicClause = this.setDynamicClause(masterDataInputBeen, new StringBuilder());
             //create sorting order
-            String sortingStr = " order by m.createdtime desc ";
+            String sortingStr = " order by m.barcode desc ";
 
             String sql = "" +
                     "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
@@ -452,6 +452,9 @@ public class ReportMgtRepository {
     public MasterData getMasterDataSearchObjectForIndividualReport(MasterDataInputBeen masterDataInputBeen) {
         MasterData masterData;
         try {
+
+            //create sorting order
+            String sortingStr = " order by m.barcode desc ";
             String sql = "" +
                     "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic,m.address as address, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
                     "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2 " +
@@ -459,7 +462,7 @@ public class ReportMgtRepository {
                     "left join status s on s.code = m.status " +
                     "left join plate p on m.plateid = p.id " +
                     "left join institution i on i.institutioncode = m.institutioncode " +
-                    "left join result r on r.code = m.result where m.id = '" + masterDataInputBeen.getId() + "'";
+                    "left join result r on r.code = m.result where m.id = '" + masterDataInputBeen.getId() + "' " +sortingStr;
 
             masterData = jdbcTemplate.queryForObject(sql, new RowMapper<MasterData>() {
                 @Override

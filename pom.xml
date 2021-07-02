@@ -271,6 +271,12 @@
             <version>2.2.2</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>ar.com.fdvs</groupId>
+            <artifactId>DynamicJasper-core-fonts</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

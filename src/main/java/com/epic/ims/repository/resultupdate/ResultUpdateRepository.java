@@ -69,6 +69,7 @@ public class ResultUpdateRepository {
             "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
 
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
+    private final String SQL_UPDATE_MASTER_RESULT_WITH_REMARK = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, rejectremark=:remark where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
 
     private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser,receiveddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -151,6 +152,10 @@ public class ResultUpdateRepository {
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_INVALID)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_INVALID);
+            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REJECT)) {
+                idSetParameterMap.addValue("status", commonVarList.STATUS_REJECT);
+                idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_REJECT);
+                idSetParameterMap.addValue("remark", resultPlateBean.getRemark());
             }
             idSetParameterMap.addValue("isverified", 1);
             idSetParameterMap.addValue("iscomplete", 1);
@@ -159,6 +164,8 @@ public class ResultUpdateRepository {
             int value;
             if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT, idSetParameterMap);
+            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REJECT)) {
+                value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITH_REMARK, idSetParameterMap);
             } else {
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITHOUT_CT, idSetParameterMap);
             }

@@ -164,7 +164,7 @@ public class PlateAssignController {
         ServletContext context = httpServletRequest.getServletContext();
         OutputStream outputStream = null;
         try {
-            String zipFilePath = plateAssignService.getFilePathList();
+            String zipFilePath = plateAssignService.getFilePathList(httpServletRequest);
             if (zipFilePath != null && !zipFilePath.isEmpty()) {
                 File downloadFile = new File(zipFilePath);
                 FileInputStream inputStream = new FileInputStream(downloadFile);

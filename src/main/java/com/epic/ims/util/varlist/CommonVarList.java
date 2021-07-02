@@ -52,6 +52,9 @@ public class CommonVarList {
     @Value("${statuscode.invalid}")
     public String STATUS_INVALID;
 
+    @Value("${statuscode.rejected}")
+    public String STATUS_REJECT;
+
     @Value("${statuscode.samplenotfound}")
     public String STATUS_NOSAMPLEFOUND;
 
@@ -163,6 +166,9 @@ public class CommonVarList {
 
     @Value("${result.code.inconclusive}")
     public String RESULT_CODE_INCONCLUSIVE;
+
+    @Value("${result.code.reject}")
+    public String RESULT_CODE_REJECT;
     //-------------------------------result codes---------------------------------------------------------------------//
 
     //-------------------------------report content codes-------------------------------------------------------------//
@@ -171,6 +177,12 @@ public class CommonVarList {
 
     @Value("${report.consultant.description}")
     public String REPORT_CONSULTANT_DESCRIPTION;
+
+    @Value("${report.consultant2.name}")
+    public String REPORT_CONSULTANT2_NAME;
+
+    @Value("${report.consultant2.description}")
+    public String REPORT_CONSULTANT2_DESCRIPTION;
 
     @Value("${report.test.method}")
     public String REPORT_TEST_METHOD;
@@ -183,6 +195,17 @@ public class CommonVarList {
     @Value("${plate.position.g12}")
     public String PLATE_POSITION_G12;
     //-------------------------------report content codes-------------------------------------------------------------//
+
+    //-------------------------------color codes-------------------------------------------------------------//
+    @Value("${well.color.code.normal}")
+    public String COLOR_CODE_NORMAL;
+    @Value("${well.color.code.pbs}")
+    public String COLOR_CODE_PBS;
+    @Value("${well.color.code.blank}")
+    public String COLOR_CODE_BLANK;
+    @Value("${well.color.code.positive}")
+    public String COLOR_CODE_POSITIVE;
+    //-------------------------------color codes-------------------------------------------------------------//
 
     //-------------------------------report content codes-------------------------------------------------------------//
     @Value("${masterfile.linux.filepath}")

@@ -165,6 +165,14 @@
                 $('#ct2').val("");
                 document.getElementById("ct_txt").style.display = "none";
             }
+
+            if (event.value === 'RJCT') {
+                document.getElementById("rej_remark_txt").style.display = "block";
+            } else {
+                $('#rej_remark').val("");
+                document.getElementById("rej_remark_txt").style.display = "none";
+            }
+
         }
 
         function search() {
@@ -196,15 +204,27 @@
         function updateValidation() {
             $('#responseMsg').text('');
             if ($('#resultId').val()) {
-                if ($('#resultId').val() !== 'DTCD') {
+                if ($('#resultId').val() !== 'DTCD' || $('#resultId').val() !== 'RJCT') {
                     update();
                 } else {
-                    if ($('#ct1').val()) {
-                        if ($('#ct2').val()) {
-                            update();
+                    if ($('#resultId').val() === 'DTCD'){
+                        if ($('#ct1').val()) {
+                            if ($('#ct2').val()) {
+                                update();
+                            } else {
+                                swal.fire({
+                                    text: "Please enter a value for ct2",
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Proceed",
+                                    customClass: {
+                                        confirmButton: "btn font-weight-bold btn-light-primary"
+                                    }
+                                });
+                            }
                         } else {
                             swal.fire({
-                                text: "Please enter a value for ct2",
+                                text: "Please enter a value for ct1",
                                 icon: "error",
                                 buttonsStyling: false,
                                 confirmButtonText: "Proceed",
@@ -213,18 +233,24 @@
                                 }
                             });
                         }
-                    } else {
-                        swal.fire({
-                            text: "Please enter a value for ct1",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Proceed",
-                            customClass: {
-                                confirmButton: "btn font-weight-bold btn-light-primary"
-                            }
-                        });
+                    } else if ($('#resultId').val() === 'RJCT') {
+                        if ($('#remark').val()) {
+                            update();
+                        } else {
+                            swal.fire({
+                                text: "Please enter a reject remark",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Proceed",
+                                customClass: {
+                                    confirmButton: "btn font-weight-bold btn-light-primary"
+                                }
+                            });
+                        }
                     }
+
                 }
+
             } else {
                 swal.fire({
                     text: "Please select a result",
@@ -248,6 +274,7 @@
                     ct1: $('#ct1').val(),
                     ct2: $('#ct2').val(),
                     plateid: $('#plateId').val(),
+                    remark: $('#remark').val(),
                     receivedDate: $('#receivedDate').val()
                 }),
                 dataType: "json",
@@ -371,6 +398,7 @@
             getResultTypeList();
             // hide ct fields
             document.getElementById("ct_txt").style.display = "none";
+            document.getElementById("rej_remark_txt").style.display = "none";
             // monitor selected plates
             let checkIfAlreadySelected = $('.cell-elmt.active');
             $.each(checkIfAlreadySelected, function (x, y) {
@@ -539,6 +567,21 @@
                                         <div class="col-lg-8">
                                             <div class="btn-group div-inline input-group input-group-sm input-append date">
                                                 <input path="ct2" name="ct2" id="ct2"
+                                                       class="form-control"
+                                                       autocomplete="off" type="text"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="rej_remark_txt">
+                                    <div class="form-group row">
+                                        <div class="col-lg-3">
+                                            <label>REMARK:</label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                                <input path="remark" name="remark" id="remark"
                                                        class="form-control"
                                                        autocomplete="off" type="text"/>
                                             </div>

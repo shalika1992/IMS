@@ -15,4 +15,5 @@ public class ResultPlateBean {
     String ct2;
     String plateid;
     String receivedDate;
+    String remark;
 }

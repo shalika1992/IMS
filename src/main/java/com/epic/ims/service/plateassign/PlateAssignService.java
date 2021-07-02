@@ -5,27 +5,41 @@ import com.epic.ims.bean.plate.DefaultBean;
 import com.epic.ims.bean.plate.PlateDeleteBean;
 import com.epic.ims.bean.plate.PoolBean;
 import com.epic.ims.bean.plate.SwapBean;
+import com.epic.ims.bean.samplefileverification.SampleFileVerificationInputBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.mastertemp.MasterTemp;
+import com.epic.ims.mapping.sampleverifyfile.SampleVerifyFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.repository.plateassign.PlateAssignRepository;
 import com.epic.ims.service.samplefile.SampleFileService;
 import com.epic.ims.util.common.Common;
+import com.epic.ims.util.common.ExcelCommon;
 import com.epic.ims.util.varlist.CommonVarList;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +47,8 @@ import java.util.stream.Collectors;
 @Scope("prototype")
 public class PlateAssignService {
     private static Logger logger = LogManager.getLogger(SampleFileService.class);
+    private final int labReportColumnCount = 3;
+    private final int labReportHeaderRowCount = 2;
 
     @Autowired
     MessageSource messageSource;
@@ -52,7 +68,11 @@ public class PlateAssignService {
     @Autowired
     PlateAssignRepository plateAssignRepository;
 
+    @Autowired
+    ExcelCommon excelCommon;
+
     private final String MASTERFILE_NAME = "MASTERFILE-XXXXX.pdf";
+    private final String MASTERXLFILE_NAME = "MASTERFILE-XXXXX.xlsx";
     private final String MASTERZIPFILE_NAME = "MASTERZIPFILE.zip";
 
     @LogService
@@ -136,7 +156,7 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String getFilePathList() throws Exception {
+    public String getFilePathList(HttpServletRequest httpServletRequest) throws Exception {
         String zipFilePath = "";
         List<String> filePathList = new ArrayList<>();
         try {
@@ -167,6 +187,8 @@ public class PlateAssignService {
                                     //create the master file in machine location
                                     String filePath = this.createMasterFile(masterTempList, currentDate, masterTablePlateId);
                                     filePathList.add(filePath);
+                                    String xlFilePath  = this.generateExcelReport(httpServletRequest, masterTempList, currentDate, masterTablePlateId);
+                                    filePathList.add(xlFilePath);
                                 } else {
                                     break;
                                 }
@@ -293,4 +315,260 @@ public class PlateAssignService {
             throw e;
         }
     }
+
+
+    /**
+     * New Dev PCR file integration
+     *
+     */
+
+    @LogService
+    public String generateExcelReport(HttpServletRequest httpServletRequest, List<MasterTemp> masterTempList, String currentDate, String masterTablePlateId) throws Exception {
+
+        String filePath = "";
+        long count = 0;
+        try {
+
+            String folderPath = this.getFolderPath(currentDate);
+            filePath = folderPath + File.separator + MASTERXLFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + masterTablePlateId);
+            File file = new File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
+            //get count
+            count = masterTempList.size();
+            if (count > 0) {
+
+                    long maxRow = Long.parseLong(httpServletRequest.getServletContext().getInitParameter("numberofrowsperexcel"));
+                    SXSSFWorkbook workbook = this.createExcelTopSection();
+                    Sheet sheet = workbook.getSheetAt(0);
+
+                    int fileCount = 0;
+                    int currRow = labReportHeaderRowCount;
+                    currRow = this.createExcelTableHeaderSection(workbook, currRow);
+
+                    int selectRow = Integer.parseInt(httpServletRequest.getServletContext().getInitParameter("numberofselectrows"));
+                    long numberOfTimes = count / selectRow;
+                    if ((count % selectRow) > 0) {
+                        numberOfTimes += 1;
+                    }
+
+                    int from = 0;
+                    int listrownumber = 1;
+                    for (int i = 0; i < numberOfTimes; i++) {
+
+                            for (MasterTemp masterTempFile : masterTempList) {
+                                if (currRow + 1 > maxRow) {
+                                    fileCount++;
+                                    this.writeTemporaryFile(workbook, fileCount, filePath);
+                                    workbook = this.createExcelTopSection();
+                                    sheet = workbook.getSheetAt(0);
+                                    currRow = labReportHeaderRowCount;
+                                    this.createExcelTableHeaderSection(workbook, currRow);
+                                }
+                                currRow = this.createExcelTableBodySection(workbook, masterTempFile, currRow, listrownumber);
+                                listrownumber++;
+                                if (currRow % 100 == 0) {
+                                    // retain 100 last rows and flush all others
+                                    ((SXSSFSheet) sheet).flushRows(100);
+                                }
+                            }
+                        this.createExcelTableBodyBottom(workbook, currRow, listrownumber);
+
+                        from = from + selectRow;
+                    }
+
+                    //Date createdTime = commonRepository.getCurrentDate();
+                    //this.createExcelBotomSection(workbook, currRow, count, createdTime);
+                    for (int i = 0; i < labReportColumnCount; i++) {
+                        //to auto size all column in the sheet
+                        sheet.autoSizeColumn(i);
+                    }
+                    try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+                        workbook.write(outputStream);
+                    }
+
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return filePath;
+    }
+
+
+    private SXSSFWorkbook createExcelTopSection() throws Exception {
+        SXSSFWorkbook workbook = null;
+        try {
+            workbook = new SXSSFWorkbook(-1);
+            Sheet sheet = workbook.createSheet("BIOER Import Sample Info");
+
+            CellStyle fontBoldedUnderlinedCell = excelCommon.getFontBoldedUnderlinedCell(workbook);
+
+            Row row = sheet.createRow(0);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("BIOER Import Sample Info Report");
+            cell.setCellStyle(fontBoldedUnderlinedCell);
+        } catch (Exception e) {
+            throw e;
+        }
+        return workbook;
+    }
+
+    private int createExcelTableHeaderSection(SXSSFWorkbook workbook, int currrow) throws Exception {
+        try {
+            CellStyle columnHeaderCell = ExcelCommon.getColumnHeadeCell(workbook);
+            Sheet sheet = workbook.getSheetAt(0);
+            Row row = sheet.createRow(currrow++);
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Sample Id");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(1);
+            cell.setCellValue("Color ");
+            cell.setCellStyle(columnHeaderCell);
+
+            cell = row.createCell(2);
+            cell.setCellValue("Sample Name ");
+            cell.setCellStyle(columnHeaderCell);
+
+        } catch (Exception e) {
+            throw e;
+        }
+        return currrow;
+    }
+
+    private void writeTemporaryFile(SXSSFWorkbook workbook, int fileCount, String directory) throws Exception {
+        File file;
+        FileOutputStream outputStream = null;
+        try {
+            file = new File(directory);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            if (fileCount > 0) {
+                file = new File(directory + File.separator + "BIOERReport_" + fileCount + ".xlsx");
+            } else {
+                file = new File(directory + File.separator + "BIOERReport.xlsx");
+            }
+            outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (outputStream != null) {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
+    }
+
+    private int createExcelTableBodySection(SXSSFWorkbook workbook, MasterTemp masterTempFile, int currrow, int rownumber) throws Exception {
+        try {
+            String colorCode = "#0000FF";
+            String colorCodePBS = "#00FFFF";
+
+            Sheet sheet = workbook.getSheetAt(0);
+            CellStyle rowColumnCell = ExcelCommon.getRowColumnCell(workbook);
+            Row row = sheet.createRow(currrow++);
+
+            CellStyle style = workbook.createCellStyle();
+            style.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+            style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+
+            Cell cell = row.createCell(0);
+            cell.setCellValue(masterTempFile.getBarcode());
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            switch (masterTempFile.getBlockValue()){
+                case "C3"://PBS
+                    cell.setCellValue(commonVarList.COLOR_CODE_PBS);
+                    break;
+                default://Normal
+                    cell.setCellValue(commonVarList.COLOR_CODE_NORMAL);
+                    break;
+            }
+            cell.setCellStyle(rowColumnCell);
+
+            cell = row.createCell(2);
+            cell.setCellValue("");
+            cell.setCellStyle(rowColumnCell);
+
+
+        } catch (Exception e) {
+            throw e;
+        }
+        return currrow;
+    }
+
+    private int createExcelTableBodyBottom(SXSSFWorkbook workbook, int currrow, int rownumber) throws Exception {
+        try {
+
+            for (int iterator = 0; iterator < 2; iterator++) {
+
+                Sheet sheet = workbook.getSheetAt(0);
+                CellStyle rowColumnCell = ExcelCommon.getRowColumnCell(workbook);
+                Row row = sheet.createRow(currrow++);
+
+                CellStyle style = workbook.createCellStyle();
+                style.setAlignment(XSSFCellStyle.ALIGN_LEFT);
+                style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+
+                Cell cell = row.createCell(0);
+                if(iterator==0) {
+                    cell.setCellValue("Blank");
+                    cell.setCellStyle(style);
+                    cell = row.createCell(1);
+                    cell.setCellValue(commonVarList.COLOR_CODE_BLANK);
+                }else if(iterator==1){
+                    cell.setCellValue("Positive");
+                    cell.setCellStyle(style);
+                    cell = row.createCell(1);
+                    cell.setCellValue(commonVarList.COLOR_CODE_POSITIVE);
+                }
+                cell.setCellStyle(rowColumnCell);
+
+                cell = row.createCell(2);
+                cell.setCellValue("");
+                cell.setCellStyle(rowColumnCell);
+
+            }
+
+        } catch (Exception e) {
+            throw e;
+        }
+        return currrow;
+    }
+
+
+    private void createExcelBotomSection(SXSSFWorkbook workbook, int currrow, long count, Date date) throws Exception {
+        try {
+            CellStyle fontBoldedCell = ExcelCommon.getFontBoldedCell(workbook);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            currrow++;
+            Row row = sheet.createRow(currrow++);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("Summary");
+            cell.setCellStyle(fontBoldedCell);
+
+            row = sheet.createRow(currrow++);
+            cell = row.createCell(0);
+            cell.setCellValue("Report Created Time");
+            cell = row.createCell(1);
+
+            if (date != null && !date.toString().isEmpty()) {
+                cell.setCellValue(date.toString().substring(0, 19));
+            } else {
+                cell.setCellValue("--");
+            }
+            cell.setCellStyle(ExcelCommon.getAligneCell(workbook, null, XSSFCellStyle.ALIGN_RIGHT));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
 }

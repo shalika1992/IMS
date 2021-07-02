@@ -672,7 +672,7 @@ public class PlateAssignRepository {
                 } catch (Exception e) {
                     masterTemp.setCreatedTime(null);
                 }
-
+                System.out.println(masterTemp.getBarcode()+" | "+ masterTemp.getBlockValue());
                 return masterTemp;
             });
         } catch (EmptyResultDataAccessException ex) {

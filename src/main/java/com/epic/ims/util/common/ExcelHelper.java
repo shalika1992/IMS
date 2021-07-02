@@ -76,8 +76,13 @@ public class ExcelHelper {
                             break;
 
                         case 4:
-                            String age = NumberToTextConverter.toText(currentCell.getNumericCellValue());
-                            sampleData.setAge(age);
+                            //currentCell.setCellType(Cell.CELL_TYPE_STRING);
+                            if(currentCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                                sampleData.setAge(NumberToTextConverter.toText(currentCell.getNumericCellValue()));
+                            }else {
+                                //Enable 1D, 6M.
+                                sampleData.setAge(currentCell.getStringCellValue());
+                            }
                             break;
 
                         case 5:
@@ -130,5 +135,23 @@ public class ExcelHelper {
         } finally {
             inputStream.close();
         }
+    }
+
+    //if numeric value found return true, else return false
+    //allowed only any digit
+    public boolean isNumeric(String theInputString) {
+        boolean isValid = false;
+
+        for (int i = 0; i < theInputString.length(); i++) {
+            char c = theInputString.charAt(i);
+
+            if ((c >= '0') && (c <= '9')) {
+                isValid = true;
+            } else {
+                isValid = false;
+                break;
+            }
+        }
+        return isValid;
     }
 }

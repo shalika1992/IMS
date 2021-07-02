@@ -143,9 +143,16 @@ public class MasterDataReportController {
                 parameterMap.put("status", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getStatus()));
                 parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getResult()));
                 parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
+                //right
                 parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
                 parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);
+                //left
+                parameterMap.put("consultant2Name", commonVarList.REPORT_CONSULTANT2_NAME);
+                parameterMap.put("consultant2Des", commonVarList.REPORT_CONSULTANT2_DESCRIPTION);
 
+                JasperReportsContext jasperReportsContext = DefaultJasperReportsContext.getInstance();
+                JRPropertiesUtil jrPropertiesUtil = JRPropertiesUtil.getInstance(jasperReportsContext);
+                jrPropertiesUtil.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
                 JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JRBeanCollectionDataSource(masterDataList));
 
@@ -202,11 +209,18 @@ public class MasterDataReportController {
                 parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterData.getResultDescription()));
                 parameterMap.put("ct_target1", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
                 parameterMap.put("ct_target2", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
-
+                //right
                 parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
                 parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);
+                //left
+                parameterMap.put("consultant2Name", commonVarList.REPORT_CONSULTANT2_NAME);
+                parameterMap.put("consultant2Des", commonVarList.REPORT_CONSULTANT2_DESCRIPTION);
 
+                JasperReportsContext jasperReportsContext = DefaultJasperReportsContext.getInstance();
+                JRPropertiesUtil jrPropertiesUtil = JRPropertiesUtil.getInstance(jasperReportsContext);
+                jrPropertiesUtil.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
                 JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
+                //jasperReport.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, new JREmptyDataSource());
 
                 httpServletResponse.setContentType("application/x-download");
