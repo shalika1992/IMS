@@ -29,7 +29,7 @@
             </div>
             <div class="modal-footer justify-content-end">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button id="generateLabCodeBtn" type="button" onclick="generateLabCodes()" class="btn btn-primary">
+                <button id="generateLabCodeBtn" type="button" onclick="checkInitLabCodeExist()" class="btn btn-primary">
                     yes
                 </button>
             </div>

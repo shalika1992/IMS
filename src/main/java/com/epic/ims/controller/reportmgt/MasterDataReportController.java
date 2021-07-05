@@ -208,7 +208,7 @@ public class MasterDataReportController {
                 parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
                 parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterData.getResultDescription()));
                 parameterMap.put("ct_target1", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
-                parameterMap.put("ct_target2", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
+                parameterMap.put("ct_target2", common.replaceEmptyorNullStringToALL(masterData.getCt_target2()));
                 //right
                 parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
                 parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);

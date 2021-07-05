@@ -37,7 +37,7 @@
         $(document).ready(function () {
             $('#receivedDate').datepicker({
                 format: 'yyyy-mm-dd',
-                endDate: '+0d',
+                //endDate: '+0d',
                 setDate: new Date(),
                 todayHighlight: true,
                 forceParse: false,
@@ -133,7 +133,7 @@
             });
         }
 
-        function getResultTypeList() {
+        function getResultTypeList(resulttype) {
             $.ajax({
                 url: "${pageContext.request.contextPath}/getResultList.json",
                 data: {},
@@ -146,7 +146,12 @@
                     var options = '<option selected value=""><strong>Select Result</strong></option>';
                     if (data && data.length > 0) {
                         $(data).each(function (index, value) {
-                            options += '<option value="' + value.code + '">' + value.description + '</option>';
+                            //options += '<option value="' + value.code + '">' + value.description + '</option>';
+                            options += '<option value="' + value.code + '"';
+                            if(resulttype===value.code){
+                                 options+= 'selected = "selected"';
+                            }
+                            options += '>' + value.description + '</option>';
                         });
                     }
                     $('#resultId').html(options);
@@ -351,11 +356,18 @@
                                 });
                                 ul += '</ul>';
                                 // check if pooled or not
+                                // if (platesArray[val + shift][0]['iscomplete'] === '0') {
+                                //     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
+                                // } else {
+                                //     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
+                                // }
+
                                 if (platesArray[val + shift][0]['iscomplete'] === '0') {
                                     html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
                                 } else {
-                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-disable plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
+                                    html += "<div data-html='true' data-toggle='tooltip' data-placement='right' class='col-1 cell-elmt cell-click plate-" + (k + 1) + "' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "' data-value='" + platesArray[val + shift][0]['barcode'] + "' title='" + ul + "'>" + platesArray[val + shift][0]['barcode'] + "</div>\n";
                                 }
+
                             } else {
                                 html += "<div class='col-1 cell-elmt cell-disable' data-cellNum='" + (val + 1) + "' data-key='" + (val + shift) + "'>N/A</div>\n";
                             }
@@ -394,8 +406,7 @@
         }
 
         $(document).on("click", ".cell-click", function () {
-            //result list
-            getResultTypeList();
+
             // hide ct fields
             document.getElementById("ct_txt").style.display = "none";
             document.getElementById("rej_remark_txt").style.display = "none";
@@ -416,10 +427,65 @@
                 $('#resultModal').modal('show');
             }
             let activeElements = $('.cell-elmt.active');
+
+            //get marked cell's detail when click
+            getMarkedDetails(activeElements);
+            //set barcode on modelbox
             $.each(activeElements, function (x, y) {
                 document.getElementById('barcode').value = y.dataset.value;
             });
         });
+
+        //get marked cell's detail
+        function getMarkedDetails(activeElements) {
+            const well = [];
+
+            $.each(activeElements, function (x, y) {
+                well.push(y.dataset.value);
+            });
+
+            if (well.length == 1) {
+                let barcodeNo = well[0];
+                $.ajax({
+                    url: "${pageContext.request.contextPath}/getMarkedDetails.json",
+                    data: {
+                        barcode: barcodeNo
+                    },
+                    dataType: "json",
+                    type: 'GET',
+                    contentType: "application/json",
+                    success: function (data) {
+                        //console.log(data.barcode+" :: "+data.ct1 +" :: "+data.ct2+" :: "+data.remark+" :: "+data.resultId);
+                        //get result list
+                        getResultTypeList(data.resultId);
+                        switch (data.resultId) {
+                            case "DTCD" :  // Detected
+                                $("#ct_txt").css("display","block");
+                                $("#ct1").val(data.ct1);
+                                $("#ct2").val(data.ct2);
+                                break;
+                            case "RJCT" :  // Rejected
+                                $("#rej_remark_txt").css("display","block");
+                                $("#remark").val(data.remark);
+                                break;
+                            case "INCON" : // Inconclusive
+                                break;
+                            case "INVALD" :// Invalid
+                                break;
+                            case "NDTD" :  // Not Detected
+                                break;
+                            case "RPTD" :  // Pending Result
+                                break;
+
+                        }
+
+                    },
+                    error: function (data) {
+                        window.location = "${pageContext.request.contextPath}/logout.htm";
+                    }
+                });
+            }
+        }
 
         function cancel(){
             $('#responseMsg').text('');

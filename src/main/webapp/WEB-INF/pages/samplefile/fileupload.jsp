@@ -22,12 +22,12 @@
 
         $(document).ready(function () {
             $('#searchReceivedDate').datepicker({
-                format: 'yyyy-mm-dd',
-                endDate: '+0d',
-                setDate: new Date(),
-                todayHighlight: true,
-                forceParse: false,
-                autoclose: true
+                 format: 'yyyy-mm-dd',
+                 //endDate: '+0d',
+                 setDate: new Date(),
+                 todayHighlight: true,
+                 forceParse: false,
+                 autoclose: true
             });
             $("#searchReceivedDate").datepicker('setDate', getReceivedDate());
             loadDataTable();

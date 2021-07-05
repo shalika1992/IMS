@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Scope("prototype")
@@ -50,7 +51,7 @@ public class SampleFileUploadRepository {
     private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? ,ward = ? where sd.id = ?";
     private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_INSERT_SAMPLEWARDENTRY = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,ward,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.receiveddate = ? and sd.institutioncode = ? and sd.ward = ?";
+    private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.referenceno = ? and sd.receiveddate = ? and sd.institutioncode = ? and sd.ward = ? limit 1";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -434,7 +435,48 @@ public class SampleFileUploadRepository {
         }
         return sampleDataList;
     }
+    //Dev
+    @LogRepository
+    @Transactional(readOnly = true)
+    public List<SampleFileInputBean> getExistingWardSampleDataList(String receiveDate) {
+        List<SampleFileInputBean> sampleDataList = null;
+        try {
+            String sql = "" +
+                    " select s.referenceno, s.institutioncode , s.receiveddate" +
+                    " from sample_data s left join master_data m  on s.id = m.sampleid  " +
+                    " where (m.status != ?  or m.status is null) and (m.result != ? or m.result is null) and s.receiveddate = ?";
 
+            sampleDataList = jdbcTemplate.query(sql, new Object[]{commonVarList.STATUS_REPEATED, commonVarList.RESULT_CODE_PENDING, receiveDate}, (rs, id) -> {
+                SampleFileInputBean sampleData = new SampleFileInputBean();
+
+                try {
+                    sampleData.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
+                } catch (Exception e) {
+                    sampleData.setReferenceNo("--");
+                }
+
+                try {
+                    sampleData.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
+                } catch (Exception e) {
+                    sampleData.setInstitutionCode("--");
+                }
+
+                try {
+                    sampleData.setReceivedDate(common.handleNullAndEmptyValue(rs.getString("receiveddate")));
+                } catch (Exception e) {
+                    sampleData.setReceivedDate("--");
+                }
+                return sampleData;
+            });
+
+        } catch (EmptyResultDataAccessException ex) {
+            return sampleDataList;
+        } catch (Exception e) {
+            throw e;
+        }
+        return sampleDataList;
+    }
+    //End
     @LogRepository
     @Transactional
     public String insertSampleRecordBatch(List<SampleData> sampleDataList, String receivedDate) throws Exception {

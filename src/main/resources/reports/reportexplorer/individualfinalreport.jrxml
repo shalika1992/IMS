@@ -2,9 +2,9 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Simple_Blue" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="543cbbff-5086-47b5-87fe-bcaa90329535">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="0.75"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="125"/>
+	<property name="ireport.y" value="96"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -37,7 +37,7 @@
 	</style>
 	<parameter name="consultantName" class="java.lang.String"/>
 	<parameter name="consultantDes" class="java.lang.String"/>
-        <parameter name="consultant2Name" class="java.lang.String"/>
+	<parameter name="consultant2Name" class="java.lang.String"/>
 	<parameter name="consultant2Des" class="java.lang.String"/>
 	<parameter name="receivedDate" class="java.lang.String"/>
 	<parameter name="reportTime" class="java.lang.String"/>
@@ -223,14 +223,14 @@
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Name:]]></text>
+				<text><![CDATA[Name]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Opaque" x="77" y="10" width="210" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="62bc6d85-23d4-4c09-971a-694bfb2cc57c">
+				<reportElement mode="Opaque" x="96" y="10" width="191" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="62bc6d85-23d4-4c09-971a-694bfb2cc57c">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -243,14 +243,14 @@
 				<reportElement mode="Opaque" x="0" y="130" width="78" height="30" backcolor="#F2EEED" uuid="9cbf5d87-2051-4074-8189-41d3e1f7e8ca">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Contact No:]]></text>
+				<text><![CDATA[Contact No]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="77" y="160" width="210" height="30" forecolor="#030303" uuid="175db32c-e527-4d1f-a1e2-587663468647">
+				<reportElement x="96" y="160" width="191" height="30" forecolor="#030303" uuid="175db32c-e527-4d1f-a1e2-587663468647">
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -263,14 +263,14 @@
 				<reportElement x="0" y="40" width="78" height="30" uuid="41f417ea-48f8-4597-a247-1ef11665b124">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Age:]]></text>
+				<text><![CDATA[Age]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="77" y="40" width="210" height="30" forecolor="#030303" uuid="87cc7a0d-00a3-4b0a-9abe-507dffeef7a2">
+				<reportElement x="96" y="40" width="191" height="30" forecolor="#030303" uuid="87cc7a0d-00a3-4b0a-9abe-507dffeef7a2">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -280,17 +280,17 @@
 				<textFieldExpression><![CDATA[$P{age}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Opaque" x="0" y="70" width="79" height="30" backcolor="#F2EEED" uuid="d507d073-6287-4688-b3dc-1d3411a74bc4">
+				<reportElement mode="Opaque" x="0" y="70" width="78" height="30" backcolor="#F2EEED" uuid="d507d073-6287-4688-b3dc-1d3411a74bc4">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Gender:]]></text>
+				<text><![CDATA[Gender]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Opaque" x="76" y="70" width="210" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="6021447b-fa28-4323-9e96-3b4fd405a8e0">
+				<reportElement mode="Opaque" x="96" y="70" width="191" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="6021447b-fa28-4323-9e96-3b4fd405a8e0">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -303,14 +303,14 @@
 				<reportElement x="0" y="100" width="78" height="30" uuid="f07e225b-0870-4113-987e-8fad24aa340d">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[NIC:]]></text>
+				<text><![CDATA[NIC]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="77" y="100" width="210" height="30" forecolor="#030303" uuid="974a9e1f-e0a6-4f47-b07e-3bfe14a981c5"/>
+				<reportElement x="96" y="100" width="191" height="30" forecolor="#030303" uuid="974a9e1f-e0a6-4f47-b07e-3bfe14a981c5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="12" isBold="false"/>
 					<paragraph leftIndent="0"/>
@@ -321,14 +321,14 @@
 				<reportElement x="0" y="160" width="78" height="30" uuid="9b90c5a2-cb69-4443-85bc-90e0aa07de1d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
 				<text><![CDATA[Address:]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Opaque" x="77" y="130" width="210" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="2fe0da64-12c5-44df-8fdd-291c7d4a8875">
+				<reportElement mode="Opaque" x="96" y="130" width="191" height="30" forecolor="#030303" backcolor="#F2EEED" uuid="2fe0da64-12c5-44df-8fdd-291c7d4a8875">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -344,29 +344,29 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement mode="Transparent" x="288" y="10" width="91" height="30" uuid="9a8af895-182f-4b30-8605-c86bb2a5bc5d">
+				<reportElement mode="Transparent" x="288" y="10" width="78" height="30" uuid="9a8af895-182f-4b30-8605-c86bb2a5bc5d">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Serial No:]]></text>
+				<text><![CDATA[Serial No]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="289" y="40" width="90" height="30" uuid="9b1dc65b-3a6f-4818-a285-9a35c125e717">
+				<reportElement mode="Transparent" x="288" y="40" width="78" height="30" uuid="9b1dc65b-3a6f-4818-a285-9a35c125e717">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Lab No:]]></text>
+				<text><![CDATA[Lab No]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Transparent" x="379" y="10" width="172" height="30" uuid="61259166-8330-4406-8ba7-cfa1c31ac14d">
+				<reportElement mode="Transparent" x="384" y="10" width="170" height="30" uuid="61259166-8330-4406-8ba7-cfa1c31ac14d">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 				</reportElement>
@@ -377,7 +377,7 @@
 				<textFieldExpression><![CDATA[$P{serialNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="379" y="40" width="172" height="30" uuid="255b5817-f556-447a-812c-693712d104d8">
+				<reportElement mode="Transparent" x="384" y="40" width="170" height="30" uuid="255b5817-f556-447a-812c-693712d104d8">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -394,11 +394,11 @@
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement mode="Transparent" x="289" y="71" width="90" height="28" backcolor="#FFFFFF" uuid="9670831d-e6ef-46b6-b375-397dea058493">
+				<reportElement mode="Transparent" x="288" y="70" width="78" height="30" backcolor="#FFFFFF" uuid="9670831d-e6ef-46b6-b375-397dea058493">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle" markup="styled">
+				<textElement verticalAlignment="Middle" markup="styled">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
@@ -450,7 +450,7 @@
 				<textFieldExpression><![CDATA[$P{ct_target2}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="379" y="71" width="172" height="28" backcolor="#FFFFFF" uuid="c4cb7982-e2e9-4d1a-abc7-e14b91925ae8">
+				<reportElement mode="Transparent" x="384" y="70" width="170" height="30" backcolor="#FFFFFF" uuid="c4cb7982-e2e9-4d1a-abc7-e14b91925ae8">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
@@ -462,24 +462,24 @@
 				<textFieldExpression><![CDATA[$P{testMethod}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement mode="Transparent" x="289" y="99" width="159" height="46" backcolor="#FFFFFF" uuid="7c22a36e-8ed0-41b5-9d06-8b049c1fb64b">
+				<reportElement mode="Transparent" x="289" y="99" width="150" height="46" backcolor="#FFFFFF" uuid="7c22a36e-8ed0-41b5-9d06-8b049c1fb64b">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
 					<font size="12"/>
 					<paragraph leftIndent="10"/>
 				</textElement>
-				<text><![CDATA[Test Result SARS- CoV-2:]]></text>
+				<text><![CDATA[Test Result SARS-CoV-2]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Transparent" x="448" y="99" width="102" height="46" backcolor="#FFFFFF" uuid="2aeb2d0b-2b98-49c1-ab13-2b1bd20bdb72">
+				<reportElement mode="Transparent" x="448" y="99" width="105" height="46" backcolor="#FFFFFF" uuid="2aeb2d0b-2b98-49c1-ab13-2b1bd20bdb72">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 					<propertyExpression name="net.sf.jasperreports.style.forecolor"><![CDATA[$P{fontColor}]]></propertyExpression>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="13" isBold="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
 					<paragraph leftIndent="10" rightIndent="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{result}]]></textFieldExpression>
@@ -519,6 +519,106 @@
 				<reportElement x="37" y="434" width="190" height="15" uuid="4ffdf982-a2a5-46d4-b80d-be05554a10fb"/>
 				<textElement textAlignment="Center" verticalAlignment="Top"/>
 				<text><![CDATA[Colombo East Base Hospital]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="100" width="18" height="30" uuid="cad466e2-21df-4ae3-943f-ec6ced19c8fb">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="78" y="130" width="18" height="30" backcolor="#F2EEED" uuid="ee6d0ec6-0479-405e-b285-b3e007b72781">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="160" width="18" height="30" uuid="4ed1fbe2-e37a-4399-aa60-4ddb9ecb3d1f">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="78" y="10" width="18" height="30" backcolor="#F2EEED" uuid="d5785812-58ba-40de-bab8-465b62d6bb2e">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="40" width="18" height="30" uuid="c021079b-9497-4815-b20e-c9ba7d4f8ea2">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="78" y="70" width="18" height="30" backcolor="#F2EEED" uuid="95f8f598-e101-460d-b651-9411a4aff049">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="366" y="10" width="18" height="30" uuid="bbf88857-76f6-47e1-882c-89cd7eb038a5">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="366" y="40" width="18" height="30" uuid="9107769b-206e-4ce1-a277-f63f8c976229">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="366" y="70" width="18" height="30" uuid="097e3f00-9d45-4904-9200-d65d014fc7f6">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="438" y="99" width="10" height="46" uuid="bbee195c-b370-4f25-9795-8115283b41db">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+					<paragraph leftIndent="10"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
 			</staticText>
 		</band>
 	</detail>

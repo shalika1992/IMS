@@ -411,4 +411,62 @@ public class Common {
         }
         return isContainSpecialCharacter;
     }
+
+    public static boolean checkSpecialCharacterOfReferenceNo(String s) {
+        boolean isContainSpecialCharacter = false;
+        try {
+            String specialCharactersString = "!@#$%&*()'+,-:;<=>?[]^_`{|}";
+            for (int i = 0; i < s.length(); i++) {
+                char ch = s.charAt(i);
+                if (specialCharactersString.contains(Character.toString(ch))) {
+                    isContainSpecialCharacter = true;
+                    break;
+                } else if (i == s.length() - 1) {
+                    isContainSpecialCharacter = false;
+                }
+            }
+        } catch (Exception e) {
+            isContainSpecialCharacter = false;
+        }
+        return isContainSpecialCharacter;
+    }
+
+    /**
+     * Allow a-zA-Z0-9 - / , .
+     * @param s
+     * @return
+     */
+    public static boolean checkSpecialCharacterForAddress(String s) {
+            boolean isContainSpecialCharacter = false;
+            try {
+                String specialCharactersString = "!@#$%&*()'+:;<=>?[]^_`{|}";
+                for (int i = 0; i < s.length(); i++) {
+                    char ch = s.charAt(i);
+                    if (specialCharactersString.contains(Character.toString(ch))) {
+                        isContainSpecialCharacter = true;
+                        break;
+                    } else if (i == s.length() - 1) {
+                        isContainSpecialCharacter = false;
+                    }
+                }
+            } catch (Exception e) {
+                isContainSpecialCharacter = false;
+            }
+            return isContainSpecialCharacter;
+        }
+
+        /**
+         * Allow only dddd.mm.dd
+         * @param d
+         * @return
+         */
+    public static boolean checkSpecialCharacterForDate(String d) {
+        boolean isValid = false;
+
+            if (d.matches("\\d\\d\\d\\d\\.\\d\\d\\.\\d\\d")) {
+                isValid = true;
+            }
+            return isValid;
+
+    }
 }

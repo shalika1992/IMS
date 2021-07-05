@@ -571,6 +571,34 @@
                 $('#modalResponse').modal('show');
             }
         }
+
+        function checkInitLabCodeExist() {
+            var labcode = $('#labCode').val();
+            $.ajax({
+                url: "${pageContext.request.contextPath}/checkInitLabCode.json",
+                data: { initialLabCode: labcode},
+                dataType: "json",
+                type: 'GET',
+                contentType: "application/json",
+                success: function (data) {
+                    //alert(JSON.stringify(data));
+                    if(data.initialLabCode==null || data.initialLabCode==""){
+                        generateLabCodes();
+                    }else{
+                        $('#modalGenerateLabCode').modal('hide');
+                        //popup the error messae
+                        $('#responseHeader').text('Initial Lab Code Already Exists');
+                        $('#responseMsg').text('Please enter valid lab code');
+                        $('#modalResponse').modal('show');
+                    }
+                },
+                error: function (data) {
+                    // alert(JSON.stringify(data));
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
+        }
+
     </script>
 </head>
 <!--begin::Content-->

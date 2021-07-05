@@ -52,7 +52,7 @@
     $(document).ready(function () {
         $('#uReceivedDate').datepicker({
             format: 'yyyy-mm-dd',
-            endDate: '+0d',
+            //endDate: '+0d',
             setDate: new Date(),
             todayHighlight: true,
             forceParse: false,

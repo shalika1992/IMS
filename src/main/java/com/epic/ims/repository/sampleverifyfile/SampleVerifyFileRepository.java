@@ -15,17 +15,17 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -54,6 +54,7 @@ public class SampleVerifyFileRepository {
     private final String SQL_GET_COUNT = "select count(*) from sample_data i where ";
     private final String SQL_UPDATE_STATUS = "update sample_data set status =:status where id in (:ids)";
     private final String SQL_DELETE_SAMPLEDATA = "delete from sample_data where id in (:ids)";
+    private final String SQL_CHECK_INIT_LABCODE_EXIST = "select barcode from sample_data where barcode = ? ";
 
     private final String SQL_INSERT_REJECTDATAINVALID = "" +
             "insert into reject_data(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)" +
@@ -82,6 +83,25 @@ public class SampleVerifyFileRepository {
         }
         return count;
     }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String checkInitLabCodeExist(String initLabCode) {
+        String existInitLabCode = "";
+        try {
+            Map<String, Object> map = jdbcTemplate.queryForMap(SQL_CHECK_INIT_LABCODE_EXIST, new Object[]{initLabCode});
+            if (map.size() != 0) {
+                existInitLabCode = map.get("barcode") != null ? map.get("barcode").toString() : "";
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            existInitLabCode = "";
+        } catch (Exception e) {
+            logger.error(e);
+            throw e;
+        }
+        return existInitLabCode;
+    }
+
 
     @LogRepository
     @Transactional(readOnly = true)

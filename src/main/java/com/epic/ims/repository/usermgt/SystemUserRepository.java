@@ -407,7 +407,7 @@ public class SystemUserRepository {
             }
 
             if (systemUserInputBean.getStatus() != null && !systemUserInputBean.getStatus().isEmpty()) {
-                dynamicClause.append("and wu.status like '%").append(systemUserInputBean.getStatus()).append("%' ");
+                dynamicClause.append("and wu.status in ('").append(systemUserInputBean.getStatus()).append("') ");
             }
         } catch (Exception exception) {
             throw exception;

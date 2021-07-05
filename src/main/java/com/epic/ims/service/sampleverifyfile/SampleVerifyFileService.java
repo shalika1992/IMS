@@ -79,6 +79,19 @@ public class SampleVerifyFileService {
     }
 
     @LogService
+    public String checkInitLabCodeExist(String initLabCode) throws Exception {
+        String existInitLabCode = "";
+        try {
+            existInitLabCode = sampleVerifyFileRepository.checkInitLabCodeExist(initLabCode);
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return existInitLabCode;
+    }
+
+    @LogService
     public List<SampleVerifyFile> getSampleVerifySearchResultList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
         List<SampleVerifyFile> sampleVerifyFileList;
         try {
@@ -209,6 +222,8 @@ public class SampleVerifyFileService {
                     }
                     returnObject = workbook;
                 }
+            }else{
+                returnObject = new String("samples not available");
             }
         } catch (Exception e) {
             throw e;

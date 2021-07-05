@@ -64,7 +64,7 @@ public class ResultUpdateRepository {
             "select m.id,m.referenceno,m.name,m.nic,m.barcode,m.plateid,m.blockvalue,m.ispool,m.iscomplete,m.result from " +
             "(select GROUP_CONCAT(id SEPARATOR '|') as id, " +
             "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
-            "barcode,plateid,blockvalue,ispool ,iscomplete,result  from master_data as mt where plateid = ? and createdtime = ? " +
+            "barcode,plateid,blockvalue,ispool ,iscomplete,result  from master_data as mt where plateid = ? and receiveddate = ? " +
             "group by barcode , plateid , blockvalue , ispool , iscomplete,result ) as m " +
             "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
 
@@ -146,9 +146,9 @@ public class ResultUpdateRepository {
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_INCONCLUSIVE)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_INCONCLUSIVE);
-            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REPEATED)) {
-                idSetParameterMap.addValue("status", commonVarList.STATUS_REPEATED);
-                idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_REPEATED);
+            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_PENDING)) {
+                idSetParameterMap.addValue("status", commonVarList.STATUS_PENDING);
+                idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_PENDING);
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_INVALID)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_INVALID);

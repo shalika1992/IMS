@@ -4,10 +4,14 @@ import com.epic.ims.annotation.logrespository.LogRepository;
 import com.epic.ims.bean.common.CommonInstitution;
 import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.common.Status;
+import com.epic.ims.bean.resultupdate.ResultPlateBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.district.District;
 import com.epic.ims.mapping.institution.Institution;
+import com.epic.ims.mapping.mastertemp.MasterTemp;
 import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.plate.ResultPlate;
+import com.epic.ims.mapping.reportmgt.MasterData;
 import com.epic.ims.mapping.result.ResultType;
 import com.epic.ims.mapping.user.usermgt.UserRole;
 import com.epic.ims.util.varlist.CommonVarList;
@@ -59,7 +63,12 @@ public class CommonRepository {
     private final String SQL_GET_RESULT_LIST = "select code,description from result";
     private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?, ?)";
     private final String SQL_GET_STATUS_LIST_REPORT = "select code, description from status where code in (?, ?, ?)";
-
+    private final String SQL_GET_RESULT_PLATE = " select sampleid,    " +
+                                                " IFNULL(ct_target1,'NA') as ct_target1," +
+                                                " IFNULL(ct_target2,'NA') as ct_target2," +
+                                                " IFNULL(rejectremark,'NA') as rejectremark, " +
+                                                " IFNULL(result,'NA') as result " +
+                                                " from master_data where barcode = ? ";
     @LogRepository
     @Transactional(readOnly = true)
     public List<Status> getStatusList(String statusCategory) throws Exception {
@@ -309,6 +318,36 @@ public class CommonRepository {
             throw e;
         }
         return plateList;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public ResultPlate getMarkedDetails(String barcode) {
+        List<ResultPlate> resultPlateList = new ArrayList<>();
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_RESULT_PLATE, new Object[]{barcode});
+            if(list!=null && !list.isEmpty()) {
+                resultPlateList = list.stream().map((record) -> {
+                    Plate plate = new Plate();
+
+                    ResultPlate resultPlate = new ResultPlate();
+                    resultPlate.setBarcode(barcode);//barcode
+                    resultPlate.setCt1(record.get("ct_target1").toString());//ct_target1
+                    resultPlate.setCt2(record.get("ct_target2").toString());//ct_target2
+                    resultPlate.setRemark(record.get("rejectremark").toString());//rejectremark
+                    resultPlate.setResultId(record.get("result").toString());//result
+                    //resultPlate.setReceivedDate("");
+
+                    return resultPlate;
+                }).collect(Collectors.toList());
+            }
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            resultPlateList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return resultPlateList.get(0);
     }
 
     @LogRepository

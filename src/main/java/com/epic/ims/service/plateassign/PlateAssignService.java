@@ -156,7 +156,7 @@ public class PlateAssignService {
     }
 
     @LogService
-    public String getFilePathList(HttpServletRequest httpServletRequest) throws Exception {
+    public String getFilePathList(HttpServletRequest httpServletRequest, String receiveDate) throws Exception {
         String zipFilePath = "";
         List<String> filePathList = new ArrayList<>();
         try {
@@ -172,9 +172,9 @@ public class PlateAssignService {
                     if (masterTempList != null && !masterTempList.isEmpty() && masterTempList.size() > 0) {
                         //insert to plate table
                         //this is the correct plate id for plate creation
-                        String masterTablePlateId = plateAssignRepository.getMaxPlateId(currentDate);
+                        String masterTablePlateId = plateAssignRepository.getMaxPlateId(receiveDate);
                         //create the plate
-                        message = plateAssignRepository.createPlate(masterTablePlateId);
+                        message = plateAssignRepository.createPlate(masterTablePlateId, receiveDate);
                         if (message.isEmpty()) {
                             //insert the master batch
                             message = plateAssignRepository.insertMasterBatch(masterTempList, masterTablePlateId);

@@ -78,11 +78,11 @@ public class SampleFileService {
     }
 
     @LogService
-    public String insertSampleWardEntry(SampleFileInputBean sampleFileInputBean, Locale locale) {
+    public String insertSampleWardEntry(SampleFileInputBean sampleFileInputBean,Boolean isExist, Locale locale) {
         String message = "";
         try {
-            SampleFile existingSampleFile = sampleFileUploadRepository.getSampleWardEntry(sampleFileInputBean);
-            if (existingSampleFile == null) {
+            //SampleFile existingSampleFile = sampleFileUploadRepository.getSampleWardEntry(sampleFileInputBean);
+            if (!isExist) {
                 //set the other values to input bean
                 String currentDate = commonRepository.getCurrentDateAsString();
                 String createdUser = sessionBean.getUsername();
@@ -209,6 +209,68 @@ public class SampleFileService {
                             break;
                         }
                     }
+
+                    //Symptomatic
+                    String symptomatic = s.getSymptomatic();
+                    if (symptomatic != null && !symptomatic.isEmpty()) {
+                        if (common.checkSpecialCharacter(symptomatic)) {
+                            System.out.println("Symptomatic");
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    //Contact Type
+                    String contactType = s.getContactType();
+                    if (contactType != null && !contactType.isEmpty()) {
+                        if (common.checkSpecialCharacter(contactType)) {
+                            System.out.println("Contact Type");
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    //Address
+                    String address = s.getAddress();
+                    if (address != null && !address.isEmpty()) {
+                        if (common.checkSpecialCharacterForAddress(address)) {
+                            System.out.println("Address");
+                            System.out.println(address);
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    //Resident District
+                    String residentDistrict = s.getResidentDistrict();
+                    if (residentDistrict != null && !residentDistrict.isEmpty()) {
+                        if (common.checkSpecialCharacter(residentDistrict)) {
+                            System.out.println("Resident District");
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    //Date
+                    String date = s.getDate();
+                    if (date != null && !date.isEmpty()) {
+                        if (common.checkSpecialCharacterForDate(date)) {
+                            System.out.println("Date");
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
+                    // Reference No.
+                    String referenceNo = s.getReferenceNo();
+                    if (referenceNo != null && !referenceNo.isEmpty()) {
+                        if (common.checkSpecialCharacterOfReferenceNo(referenceNo)) {
+                            System.out.println("reference");
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+                            break;
+                        }
+                    }
+
                 } else {
                     message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
                 }
@@ -244,7 +306,27 @@ public class SampleFileService {
         }
         return message;
     }
-
+    //dev
+    @LogService
+    public boolean checkDuplicateWardEntry(List<SampleFileInputBean> sampleDataFileList, Locale locale) throws Exception {
+        String message = "";
+        boolean isExist = false;
+        String receivedDate = commonRepository.getCurrentDateAsString();
+        try {
+            List<SampleFileInputBean> sampleDataRepositoryList = sampleFileUploadRepository.getExistingWardSampleDataList(receivedDate);
+            if (sampleDataRepositoryList != null && !sampleDataRepositoryList.isEmpty() && sampleDataRepositoryList.size() > 0) {
+                List<SampleFileInputBean> duplicateList = this.getDuplicateWardList(sampleDataFileList, sampleDataRepositoryList);
+                //check the duplicate list
+                if (duplicateList != null && !duplicateList.isEmpty() && duplicateList.size() > 0) {
+                    isExist = true;
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return isExist;
+    }
+    //end
     @LogService
     public String uploadSampleFile(List<SampleData> sampleDataList, String receivedDate, Locale locale) {
         String message = "";
@@ -580,5 +662,28 @@ public class SampleFileService {
         return duplicateList;
     }
 
+    private List<SampleFileInputBean> getDuplicateWardList(List<SampleFileInputBean> sampleWardDataFileList, List<SampleFileInputBean> sampleDataRepositoryList) {
+        List<SampleFileInputBean> duplicateList = new ArrayList<>();
+        try {
+            outerLoop:
+            for (int i = 0; i < sampleDataRepositoryList.size(); i++) {
+                SampleFileInputBean sampleData1 = sampleDataRepositoryList.get(i);
+                for (int j = 0; j < sampleWardDataFileList.size(); j++) {
+                    SampleFileInputBean sampleData2 = sampleWardDataFileList.get(j);
+                    if(sampleData1.getInstitutionCode().equals(sampleData2.getInstitutionCode()) &&
+                            sampleData1.getReceivedDate().equals(sampleData2.getReceivedDate()) &&
+                            sampleData1.getReferenceNo().equals(sampleData2.getReferenceNo())
+                            ) {
+                        //sampleData1.getWardNumber().equals(sampleData2.getWardNumber())
+                        duplicateList.add(sampleData2);
+                        break outerLoop;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return duplicateList;
+    }
 
 }

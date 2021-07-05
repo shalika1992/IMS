@@ -101,6 +101,22 @@ public class PlateAssignController {
 
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
+    @RequestMapping(value = "/isEligibleToPool", method = RequestMethod.POST)
+    public @ResponseBody
+    String checkEligibleToPool(@RequestBody Map<String, String[]> mergedPool, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        String poolStatus = "yes";
+        try {
+            if(!isEligibleToPool(mergedPool)){
+                poolStatus = "no";
+            }
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return poolStatus;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/mergeBlockPlate", method = RequestMethod.POST)
     public @ResponseBody
     Map<Integer, List<DefaultBean>> postMergeBlockPlate(@RequestBody Map<String, String[]> mergedPool, HttpServletRequest request, HttpServletResponse response, Locale locale) {
@@ -126,6 +142,25 @@ public class PlateAssignController {
         }
         poolBean.setPoolList(poolList);
         return poolBean;
+    }
+
+    private static boolean isEligibleToPool(Map<String, String[]> mergedPool) {
+        boolean itr = true;
+        for (Map.Entry<String,String[]> entry : mergedPool.entrySet()){
+            //System.out.println("Key = " + entry.getKey());
+
+            for (String string : entry.getValue()) {
+                //System.out.println("Value = "+string);
+                if(string==null || string.equals("")){
+                    //System.out.println("Value = empty");
+                    itr = false;
+                }
+            }
+            if(itr==false){
+                break;
+            }
+        }
+        return itr;
     }
 
     @LogController
@@ -159,12 +194,12 @@ public class PlateAssignController {
     @LogController
     @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
     @RequestMapping(value = "/createPlate", method = RequestMethod.POST)
-    public void createPlate(@ModelAttribute("plate") PlateInputBean plateInputBean, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public void createPlate(@ModelAttribute("plate") PlateInputBean plateInputBean, @RequestParam String receiveDate, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         logger.info("[" + sessionBean.getSessionid() + "]  MASTER PLATE CREATION");
         ServletContext context = httpServletRequest.getServletContext();
         OutputStream outputStream = null;
         try {
-            String zipFilePath = plateAssignService.getFilePathList(httpServletRequest);
+            String zipFilePath = plateAssignService.getFilePathList(httpServletRequest, receiveDate);
             if (zipFilePath != null && !zipFilePath.isEmpty()) {
                 File downloadFile = new File(zipFilePath);
                 FileInputStream inputStream = new FileInputStream(downloadFile);

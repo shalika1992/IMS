@@ -644,6 +644,11 @@ public class ReportMgtRepository {
             if (masterDataInputBeen.getResult() != null && !masterDataInputBeen.getResult().isEmpty()) {
                 dynamicClause.append("and m.result = '").append(masterDataInputBeen.getResult()).append("' ");
             }
+
+            if (masterDataInputBeen.getPlateID() != 0) {
+                dynamicClause.append(" and m.plateid = '").append(masterDataInputBeen.getPlateID()).append("'");
+            }
+
         } catch (Exception exception) {
             throw exception;
         }

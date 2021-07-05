@@ -8,6 +8,8 @@ import com.epic.ims.bean.plate.SwapBean;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapper.mastertemp.MasterTempDataMapper;
 import com.epic.ims.mapping.mastertemp.MasterTemp;
+import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.plate.ResultPlate;
 import com.epic.ims.mapping.samplefile.SampleFile;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.util.common.Common;
@@ -31,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Scope("prototype")
@@ -67,12 +70,13 @@ public class PlateAssignRepository {
     private final String SQL_DELETE_MASTER_TEMP_TABLE_PLATEID = "delete from master_temp_data where plateid = ?";
     private final String SQL_GET_MASTER_TEMP_RECORD_BLOCKVALUE = "select a.blockvalue from master_temp_data a where a.labcode = ? ";
     private final String SQL_DELETE_MASTER_TEMP_EMPTY_RECORD_ID = "delete from master_temp_data where labcode = ?";
+    private final String SQL_UPDATE_AS_DELETED_MASTER_TEMP_RECORD = "update master_temp_data set status = ? where labcode = ? ";
     private final String SQL_GET_MAX_PLATE_CODE = "select max(code) as maxplateid from plate where receiveddate = ?";
 
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
             "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , " +
             "sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser " +
-            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' order by  barcode";
+            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' and sd.receiveddate = ? order by  barcode";
     //"from sample_data sd where sd.status in (?,?) ";
 
 
@@ -109,6 +113,14 @@ public class PlateAssignRepository {
     private final String SQL_INSERT_MASTERRECORD = "insert into master_data(sampleid,referenceno,institutioncode ,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,serialno,specimenid,barcode,receiveddate,status,plateid,blockvalue,ward,ispool,createduser,createdtime) values(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_UPDATE_SAMPLEDATA_LIST = "update sample_data set status = :status where id in (:ids)";
 
+    private final String SQL_GET_MASTER_TEMP_PLATE_DETAIL = " " +
+            " SELECT m.id, m.sampleid, m.labcode, m.blockvalue, m.plateid   "+
+            " FROM master_temp_data m where m.sampleid not in   "+
+            " (SELECT b.sampleid FROM master_temp_data b where b.labcode = ? )  and m.status != ? and m.receiveddate = ?";
+
+    private final String SQL_UPDATE_AFTER_DELETE_WELL =" update master_temp_data m set m.plateid = ?, m.blcokvalue = ? where m.id = ? and sampleid = ? ";
+
+
     @LogRepository
     public String createDefaultPlateList(String receivedDate) throws Exception {
         String message = "";
@@ -117,9 +129,9 @@ public class PlateAssignRepository {
             //delete all from master temp table
             this.deleteAllFromMasterTempTable();
             //get the max plate id for corresponding date
-            int maxPlateId = this.getMaxPlateIdForCorrespondingDate(currentDate);
+            int maxPlateId = this.getMaxPlateIdForCorrespondingDate(receivedDate);
             //get the sample data list from sample table
-            List<SampleFile> sampleFileList = this.getSampleFileList(currentDate);
+            List<SampleFile> sampleFileList = this.getSampleFileList(receivedDate);
             //check the sample file length
             if (sampleFileList != null && sampleFileList.size() > 0) {
                 int plateSize = sampleFileList.size();
@@ -175,6 +187,76 @@ public class PlateAssignRepository {
         return message;
     }
 
+    //Dev
+    @LogRepository
+    public String createDefaultPlateListAfterDeleteWell(String receivedDate, List<MasterTemp>masterTempListExceptDeleted) throws Exception {
+        String message = "";
+        try {
+            String currentDate = commonRepository.getCurrentDateAsString();
+
+            //get the max plate id for corresponding date
+                //int maxPlateId = this.getMaxPlateIdForCorrespondingDate(currentDate);
+            //get the sample data list from sample table
+                //List<SampleFile> sampleFileList = this.getSampleFileList(currentDate);
+            List<MasterTemp> masterTempList = masterTempListExceptDeleted;
+            //check the sample file length
+            if (masterTempList != null && masterTempList.size() > 0) {
+                int plateSize = masterTempList.size();
+                int noOfPaltes = (plateSize / PLATE_SIZE) + 1;
+                //get the list
+                int startStartingIndex = 0;
+                int startEndingIndex = 93;
+                for (int i = 1; i <= noOfPaltes; i++) {
+                    //maxPlateId = maxPlateId + 1;
+
+                    int startingIndex = startStartingIndex + (i - 1) * PLATE_SIZE;
+                    int endingIndex = startEndingIndex + (i - 1) * PLATE_SIZE;
+
+                    //get the sub list
+                    //check the sample file list size is enough for sub list
+                    List<MasterTemp> subList = null;
+                    if (masterTempList.size() >= (endingIndex - 1)) {
+                        subList = new ArrayList<>(masterTempList.subList(startingIndex, endingIndex));
+                    } else {
+                        endingIndex = masterTempList.size();
+                        subList = new ArrayList<>(masterTempList.subList(startingIndex, endingIndex));
+                    }
+
+                    //handle the c3 value in master plate
+                    //add 1 to position when checking the length
+                    String barcodeC3 = commonRepository.getCurrentDateAsYYYYMMDD() + i + commonVarList.PLATE_POSITION_C3;
+                    if (subList != null && subList.size() > (PLATE_C3_POSITION + 1)) {
+                        subList.add(PLATE_C3_POSITION, new MasterTemp(null, "", receivedDate, "N/A", "N/A", barcodeC3));
+                    }
+
+                    for (int j = 0; j < subList.size(); j++) {
+                        MasterTemp sFile = subList.get(j);
+                        Map<String, Object> map = jdbcTemplate.queryForMap(SQL_GET_EXCELBLOCK_VALUE, new Object[]{j + ""});
+                        if (map.size() != 0) {
+                            String blockCode = map.get("code") != null ? map.get("code").toString() : "";
+                            sFile.setPlateId(i + "");
+                            sFile.setBlockValue(blockCode);
+                        }
+                    }
+
+                    //get the master temp data list using sample file list
+                    //List<MasterTemp> masterTempList = masterTempDataMapper.sampleListMasterTempList(subList);
+                    List<MasterTemp> masterTempFileList = subList;
+                    //insert the batch to master temp data table
+                    this.updateMasterTempBatch(masterTempFileList);
+                }
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            logger.error(ex);
+            message = MessageVarList.COMMON_ERROR_RECORD_DOESNOT_EXISTS;
+        } catch (Exception e) {
+            logger.error(e);
+            message = MessageVarList.COMMON_ERROR_PROCESS;
+        }
+        return message;
+    }
+    //End
+
     @LogRepository
     @Transactional
     public void deleteAllFromMasterTempTable() {
@@ -212,7 +294,7 @@ public class PlateAssignRepository {
     public List<SampleFile> getSampleFileList(String receivedDate) {
         List<SampleFile> sampleFileList = null;
         try {
-            sampleFileList = jdbcTemplate.query(SQL_GET_SAMPLEFILE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED}, (rs, id) -> {
+            sampleFileList = jdbcTemplate.query(SQL_GET_SAMPLEFILE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED, receivedDate}, (rs, id) -> {
                 SampleFile sampleFile = new SampleFile();
 
                 try {
@@ -391,6 +473,39 @@ public class PlateAssignRepository {
         }
         return message;
     }
+
+    //Dev
+    @LogRepository
+    @Transactional
+    public String updateMasterTempBatch(List<MasterTemp> masterTempList) throws Exception {
+        String message = "";
+        try {
+            for (int j = 0; j < masterTempList.size(); j += commonVarList.BULKUPLOAD_BATCH_SIZE) {
+                final List<MasterTemp> batchList = masterTempList.subList(j, j + commonVarList.BULKUPLOAD_BATCH_SIZE > masterTempList.size() ? masterTempList.size() : j + commonVarList.BULKUPLOAD_BATCH_SIZE);
+                jdbcTemplate.batchUpdate(SQL_UPDATE_AFTER_DELETE_WELL, new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        MasterTemp masterTemp = batchList.get(i);
+                        ps.setString(1, masterTemp.getPlateId());
+                        ps.setString(2, masterTemp.getBlockValue());
+                        ps.setInt(3,    masterTemp.getId());
+                        ps.setString(4, masterTemp.getSampleId());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return batchList.size();
+                    }
+                });
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+    //End
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -755,14 +870,67 @@ public class PlateAssignRepository {
         return message;
     }
 
+//    @LogRepository
+//    @Transactional
+//    public List<MasterTemp> updateWellStatusToDeleted(MasterTemp temp) {
+//        String message = "";
+//        List<MasterTemp> masterTempList = null;
+//        try {
+//            int value = 0;
+//            MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+//            idSetParameterMap.addValue("status", commonVarList.STATUS_DELETED);
+//            idSetParameterMap.addValue("labcode", temp.getBarcode());
+//            value = namedParameterJdbcTemplate.update(SQL_UPDATE_AS_DELETED_MASTER_TEMP_RECORD, idSetParameterMap);
+//            if (value <= 0) {
+//                message = MessageVarList.COMMON_ERROR_PROCESS;
+//            }else{
+//                //Get DLTD samples data from master_temp
+//                masterTempList = getMasterTempListExceptDeleted(temp);
+//            }
+//        } catch (EmptyResultDataAccessException ex) {
+//            logger.error(ex);
+//        } catch (Exception e) {
+//            logger.error(e);
+//            throw e;
+//        }
+//        return masterTempList;
+//    }
+
+//    @LogRepository
+//    @Transactional(readOnly = true)
+//    public List<MasterTemp> getMasterTempListExceptDeleted(MasterTemp temp) {
+//        List<MasterTemp> masterTempList = new ArrayList<>();
+//        try {
+//            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_MASTER_TEMP_PLATE_DETAIL, new Object[]{temp.getBarcode(), commonVarList.STATUS_DELETED, temp.getReceivedDate()});
+//            if(list!=null && !list.isEmpty()) {
+//                masterTempList = list.stream().map((record) -> {
+//
+//                    MasterTemp resultTemp = new MasterTemp();
+//                    resultTemp.setBarcode(temp.getBarcode());//barcode
+//                    resultTemp.setId(Integer.parseInt(record.get("id").toString()));
+//                    resultTemp.setSampleId(record.get("sampleid").toString());
+//                    resultTemp.setPlateId(record.get("plateid").toString());
+//                    resultTemp.setBlockValue(record.get("blockvalue").toString());
+//                    return resultTemp;
+//                }).collect(Collectors.toList());
+//            }
+//        } catch (EmptyResultDataAccessException ere) {
+//            //handle the empty result data access exception
+//            masterTempList = new ArrayList<>();
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//        return masterTempList;
+//    }
+
     @LogRepository
     @Transactional
-    public String createPlate(String plateId) {
+    public String createPlate(String plateId, String receiveDate) {
         String message = "";
         try {
             int value = 0;
             String currentDate = commonRepository.getCurrentDateAsString();
-            value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, currentDate});
+            value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, receiveDate});
 
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;

@@ -198,8 +198,47 @@
             }
             this._updateMergeDatabase(finalizedMergedArr, mergedIdList);
         }
-
+        //check eligibility to pool
         function _updateMergeDatabase(mergeArray, mergedIdList) {
+
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/isEligibleToPool.json',
+                contentType: "application/json",
+                data: JSON.stringify(Object.assign({}, mergeArray)),
+                dataType: 'text',
+                success: function (pool) {
+                    //alert(pool);
+                    if (pool == 'yes') {
+                        generatePool(mergeArray, mergedIdList)
+                    } else if (pool == 'no') {
+                        swal.fire({
+                            text: "All the wells are filled plate can't be pooled with a plate where all the wells are not filled.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Exit",
+                            customClass: {
+                                confirmButton: "btn font-weight-bold btn-light-primary"
+                            }
+                        });
+                    }
+                },
+                error: function (jqXHR) {
+                    swal.fire({
+                        text: "Error occurred while processing.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function generatePool(mergeArray, mergedIdList){
             $.ajax({
                 type: 'POST',
                 url: '${pageContext.request.contextPath}/mergeBlockPlate.json',
@@ -427,6 +466,7 @@
         function plateCreation() {
             form = document.getElementById('platecretionform');
             form.action = 'createPlate.htm';
+            $("#receiveDate").val($('#kt_datepicker_1').val());
             form.submit();
             setTimeout(function () {
                 $("#generateDiv").hide();
@@ -512,6 +552,7 @@
                             </div>
                             <div class="col-lg-2">
                                 <form:form method="post" modelAttribute="plate" id="platecretionform" action="">
+                                    <input type="hidden" name="receiveDate" id="receiveDate"/>
                                     <label>Plate creation</label>
                                     <button type="button" onclick="plateCreation()"
                                             class="btn btn-success btn-hover-light btn-block">Create

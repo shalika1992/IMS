@@ -37,7 +37,14 @@ public class MasterTemp {
 
     public MasterTemp() {
     }
-
+    public MasterTemp(String id, String referenceNo, String receivedDate, String name, String nic, String barcode) {
+        this.sampleId = id;
+        this.referenceNo = referenceNo;
+        this.receivedDate = receivedDate;
+        this.name = name;
+        this.nic = nic;
+        this.barcode = barcode;
+    }
     public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String serialNo, String specimenid, String barcode, String receivedDate, String status, String plateId, String blockValue, String indexValue, String isPool, String ward, Date createdTime, String createdUser) {
         this.id = id;
         this.sampleId = sampleId;

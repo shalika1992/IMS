@@ -10,6 +10,7 @@ import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.controller.samplefileupload.SampleFileUploadController;
 import com.epic.ims.mapping.institution.Institution;
 import com.epic.ims.mapping.plate.Plate;
+import com.epic.ims.mapping.plate.ResultPlate;
 import com.epic.ims.mapping.result.Result;
 import com.epic.ims.mapping.result.ResultType;
 import com.epic.ims.repository.common.CommonRepository;
@@ -98,6 +99,21 @@ public class ResultUpdateController {
             logger.error("Exception  :  ", e);
         }
         return resultTypeList;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.RESULT_UPDATE)
+    @RequestMapping(value = "/getMarkedDetails", method = RequestMethod.GET)
+    public @ResponseBody
+    ResultPlate getMarkedDetails(@RequestParam("barcode") String barcode, Locale locale) {
+        logger.info("[" + sessionBean.getSessionid() + "] GET MARKED CELL DATA");
+        ResultPlate resultPlate = new ResultPlate();
+        try {
+            resultPlate = commonRepository.getMarkedDetails(barcode);
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return resultPlate;
     }
 
     @LogController

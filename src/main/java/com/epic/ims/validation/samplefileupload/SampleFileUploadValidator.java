@@ -73,15 +73,22 @@ public class SampleFileUploadValidator implements Validator {
 
                         } else if (fieldName.equals("age")) {
                             //validate name
-                            String name = ((SampleFileInputBean) o).getName();
+                            String name = ((SampleFileInputBean) o).getAge();
                             if (validation.isEmptyFieldValue(name)) {
                                 errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_AGE, MessageVarList.SAMPLERECORD_EMPTY_AGE);
                             }
 
                         } else if (fieldName.equals("gender")) {
                             //validate name
-                            String name = ((SampleFileInputBean) o).getName();
+                            String name = ((SampleFileInputBean) o).getGender();
                             if (validation.isEmptyFieldValue(name)) {
+                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_GENDER, MessageVarList.SAMPLERECORD_EMPTY_GENDER);
+                            }
+
+                        } else if (fieldName.equals("address")) {
+                            //validate name
+                            String address = ((SampleFileInputBean) o).getAddress();
+                            if (validation.isEmptyFieldValue(address)) {
                                 errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_GENDER, MessageVarList.SAMPLERECORD_EMPTY_GENDER);
                             }
 
@@ -111,7 +118,8 @@ public class SampleFileUploadValidator implements Validator {
                 allFields.get("institutionCode"),
                 allFields.get("name"),
                 allFields.get("age"),
-                allFields.get("gender")
+                allFields.get("gender"),
+                allFields.get("address")
                 // allFields.get("nic")
         };
     }

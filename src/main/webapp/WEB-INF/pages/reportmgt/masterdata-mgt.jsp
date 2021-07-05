@@ -30,6 +30,10 @@
                 autoclose: true
             });
             setReceivedDate();
+            getCorrespondingPlateList()
+            $('#receivedDate').datepicker().on('changeDate', function (ev) {
+                getCorrespondingPlateList();
+            });
             loadDataTable();
         });
 
@@ -73,7 +77,8 @@
                         {'name': 'nic', 'value': $('#nic').val()},
                         {'name': 'institutionCode', 'value': $('#institutionCode').val()},
                         {'name': 'status', 'value': $('#status').val()},
-                        {'name': 'result', 'value': $('#result').val()}
+                        {'name': 'result', 'value': $('#result').val()},
+                        {'name': 'plateID', 'value': $('#plateId').val()}
                     );
                     $.ajax({
                         dataType: 'json',
@@ -231,7 +236,9 @@
             $('#institutionCode').val("");
             $('#status').val("");
             $('#result').val("");
-
+            $('#plateId').val("");
+            //reset plate list
+            getCorrespondingPlateList();
             oTable.fnDraw();
         }
 
@@ -273,6 +280,34 @@
             form = document.getElementById('masterDataForm');
             form.action = 'downloadMasterDataIndividualPdf.htm';
             form.submit();
+        }
+
+
+        function getCorrespondingPlateList() {
+            var receivedDate = $("#receivedDate").val();
+            $.ajax({
+                url: "${pageContext.request.contextPath}/getPlateList.json",
+                data: {
+                    receivedDate: receivedDate
+                },
+                dataType: "json",
+                type: 'GET',
+                contentType: "application/json",
+                success: function (data) {
+                    $('#plateId')[0].options.length = 0;
+                    //append the new list
+                    var options = '<option selected value="0"><strong>Select Plate</strong></option>';
+                    if (data && data.length > 0) {
+                        $(data).each(function (index, value) {
+                            options += '<option value="' + value.code + '">' + value.code + '</option>';
+                        });
+                    }
+                    $('#plateId').html(options);
+                },
+                error: function (data) {
+                    window.location = "${pageContext.request.contextPath}/logout.htm";
+                }
+            });
         }
     </script>
 </head>
@@ -378,6 +413,18 @@
                                             </c:forEach>
                                         </select>
                                     </div>
+
+
+                                    <div class="col-lg-3">
+                                        <label class="label-right">Plate:</label>
+                                        <select id="plateId" name="plateID" class="form-control">
+                                            <option selected value="0">Select Plate</option>
+                                            <c:forEach items="${resultupdate.plateList}" var="plate">
+                                                <option value="${plate.code}">${plate.code}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="card-footer">
