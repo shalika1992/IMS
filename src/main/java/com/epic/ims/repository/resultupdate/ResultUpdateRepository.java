@@ -71,7 +71,8 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_MASTER_RESULT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, ct_target1=:ct1, ct_target2=:ct2 where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITH_REMARK = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result, rejectremark=:remark where barcode =:barcode";
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
-
+    private final String SQL_RESET_CT1_CT2_VALUES = "UPDATE master_data set ct_target1 = null, ct_target2 = null, rejectremark = null WHERE barcode  =:barcode AND ct_target1 IS NOT NULL and ct_target2 IS NOT NULL";
+    private final String SQL_RESET_REMARK_VALUES = "UPDATE master_data set rejectremark = null WHERE barcode  =:barcode AND rejectremark IS NOT NULL";
     private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser,receiveddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     @LogRepository
@@ -135,6 +136,7 @@ public class ResultUpdateRepository {
         try {
             //create the parameter map
             MapSqlParameterSource idSetParameterMap = new MapSqlParameterSource();
+            MapSqlParameterSource barCodeParameterMap = new MapSqlParameterSource();
             if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_COMPLETED);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_DETECTED);
@@ -160,19 +162,25 @@ public class ResultUpdateRepository {
             idSetParameterMap.addValue("isverified", 1);
             idSetParameterMap.addValue("iscomplete", 1);
             idSetParameterMap.addValue("barcode", resultPlateBean.getBarcode());
+            barCodeParameterMap.addValue("barcode", resultPlateBean.getBarcode());
             //execute the query
             int value;
             if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
+                namedParameterJdbcTemplate.update(SQL_RESET_REMARK_VALUES,barCodeParameterMap);
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT, idSetParameterMap);
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REJECT)) {
+                namedParameterJdbcTemplate.update(SQL_RESET_CT1_CT2_VALUES,barCodeParameterMap);
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITH_REMARK, idSetParameterMap);
             } else {
+                namedParameterJdbcTemplate.update(SQL_RESET_REMARK_VALUES,barCodeParameterMap);
+                namedParameterJdbcTemplate.update(SQL_RESET_CT1_CT2_VALUES,barCodeParameterMap);
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITHOUT_CT, idSetParameterMap);
             }
+
             if (value <= 0) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             } else {
-                if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REPEATED)) {
+                if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_PENDING)) {
                     message = getRepeatRecords(resultPlateBean.getBarcode());
                 }
             }

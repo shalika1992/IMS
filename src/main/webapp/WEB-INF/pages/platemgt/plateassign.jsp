@@ -301,10 +301,14 @@
             }
         }
 
+
+        //validate delete well func #1
         function deleteWell() {
+
             const del = [];
             let swapArray = {}
             let activeElements = $('.cell-elmt.active');
+            let receivedDate = $('#kt_datepicker_1').val();
 
             $.each(activeElements, function (x, y) {
                 swapArray[y.dataset.key] = y.dataset.value;
@@ -331,24 +335,33 @@
                         confirmButton: "btn font-weight-bold btn-light-primary"
                     }
                 });
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '${pageContext.request.contextPath}/deleteWell.json',
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        barcode: del[0]
-                    }),
-                    dataType: 'json',
-                    success: function (res) {
-                        platesNum = res;
-                        Swal.fire('Successfully deleted', '', 'success');
-                        sessionStorage.setItem('plates', JSON.stringify(res));
-                        _generatePlates(platesNum)
-                    },
-                    error: function (jqXHR) {
+            }else{
+                ifEligibleThenDelete(del[0], receivedDate)
+            }
+        }
+
+        //check eligibility to delete and call delete #2
+        function ifEligibleThenDelete(labcode, receivedDate) {
+
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/isEligibleToDeleteWell.json',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    barcode: labcode,
+                    receivedDate : receivedDate
+                }),
+                dataType: 'text',
+                success: function (response) {
+
+                    if (response == 'yes')
+                    {
+                        deleteFunc(labcode,receivedDate);
+                    }
+                    else if (response == 'no')
+                    {
                         swal.fire({
-                            text: "Error occurred while processing.",
+                            text: "To delete a well, you've to swap that with the last well of the last plate for the date",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Exit",
@@ -357,8 +370,52 @@
                             }
                         });
                     }
-                });
-            }
+                },
+                error: function (jqXHR) {
+                    swal.fire({
+                        text: "Error occurred while processing.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    });
+                }
+            });
+
+        }
+
+        //Delete well #3
+        function deleteFunc(barcode, receivedDate){
+            $.ajax({
+                type: 'POST',
+                url: '${pageContext.request.contextPath}/deleteWell.json',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    barcode: barcode,
+                    receivedDate : receivedDate
+                }),
+                dataType: 'json',
+                success: function (res) {
+                    platesNum = res;
+                    Swal.fire('Successfully deleted', '', 'success');
+                    sessionStorage.setItem('plates', JSON.stringify(res));
+                    _generatePlates(platesNum);
+                    $(".container").click();
+                },
+                error: function (jqXHR) {
+                    swal.fire({
+                        text: "Error occurred while processing.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Exit",
+                        customClass: {
+                            confirmButton: "btn font-weight-bold btn-light-primary"
+                        }
+                    });
+                }
+            });
 
         }
 
@@ -568,7 +625,7 @@
 
                             <div class="col-lg-2">
                                 <label>Delete well</label>
-                                <button type="button" class="btn btn-success btn-hover-light btn-block"
+                                <button type="button" id="del_btn" class="btn btn-success btn-hover-light btn-block"
                                         onclick="deleteWell()">Delete
                                 </button>
                             </div>

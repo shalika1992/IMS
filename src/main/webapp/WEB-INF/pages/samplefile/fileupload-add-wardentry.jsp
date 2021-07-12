@@ -181,15 +181,20 @@
                 }
             },
             success: function (res) {
+                alert("res.flag :"+res.flag);
                 if (res.flag) {
                     // handle success response
+                    alert("res.successMessage :"+res.successMessage);
                     $('#responseMsgEntry').show();
-                    $('#responseMsgEntry').addClass('success-response').text(res.successMessage);
+                    $('#responseMsgEntry').removeClass('error-response').addClass('success-response')
+                        .text(res.successMessage);
                     $('form[name=sampleWardEntryForm]').trigger("reset");
                     search();
                 } else {
+                    alert("res.errorMessage :"+res.errorMessage);
                     $('#responseMsgEntry').show();
-                    $('#responseMsgEntry').addClass('error-response').text(res.errorMessage);
+                    $('#responseMsgEntry').removeClass('success-response').addClass('error-response')
+                        .text(res.errorMessage);
                 }
             },
             error: function (jqXHR) {

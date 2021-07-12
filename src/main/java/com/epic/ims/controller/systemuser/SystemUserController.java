@@ -161,6 +161,7 @@ public class SystemUserController implements RequestBeanValidation<Object> {
         logger.info("[" + sessionBean.getSessionid() + "] UPDATE SYSTEM USER");
         ResponseBean responseBean;
         try {
+            systemUserInputBean.setLastUpdatedUser(sessionBean.getUsername());
             BindingResult bindingResult = validateRequestBean(systemUserInputBean);
             if (bindingResult.hasErrors()) {
                 responseBean = new ResponseBean(false, null, messageSource.getMessage(bindingResult.getAllErrors().get(0).getCode(), new Object[]{bindingResult.getAllErrors().get(0).getDefaultMessage()}, Locale.US));

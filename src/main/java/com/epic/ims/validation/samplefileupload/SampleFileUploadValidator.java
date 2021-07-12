@@ -89,7 +89,7 @@ public class SampleFileUploadValidator implements Validator {
                             //validate name
                             String address = ((SampleFileInputBean) o).getAddress();
                             if (validation.isEmptyFieldValue(address)) {
-                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_GENDER, MessageVarList.SAMPLERECORD_EMPTY_GENDER);
+                                errors.rejectValue(fieldName, MessageVarList.SAMPLERECORD_EMPTY_ADDRESS, MessageVarList.SAMPLERECORD_EMPTY_ADDRESS);
                             }
 
                         }

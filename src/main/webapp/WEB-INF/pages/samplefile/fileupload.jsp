@@ -23,7 +23,8 @@
         $(document).ready(function () {
             $('#searchReceivedDate').datepicker({
                  format: 'yyyy-mm-dd',
-                 //endDate: '+0d',
+                 endDate: '+0d',
+                 // datesDisabled: '+0d',
                  setDate: new Date(),
                  todayHighlight: true,
                  forceParse: false,
@@ -279,6 +280,7 @@
                     $('#eReferenceNo').val(data.referenceNo);
                     $('#eReferenceNo').attr('readOnly', true);
 
+                    $('#eInstitutionCode').val(data.institutionCode);
                     $('#eName').val(data.name);
                     $('#eAge').val(data.age);
                     $('#eGender').val(data.gender);

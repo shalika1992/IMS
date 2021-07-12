@@ -507,12 +507,35 @@
             });
         }
 
+        function cancel(){
+            $('#responseMsg').text('');
+        }
+
+        function formRejectMsg(){
+            let p_msg = " of samples are selected to invalid, Do you want to continue?";
+            let s_msg = " of sample is selected to invalid, Do you want to continue?";
+            let p1 = rows_selected.length;
+            let p2 = rows_selected.length > 1 ? p_msg : s_msg;
+            let msg = p1+""+p2;
+            console.log(msg);
+            $('#countMsg').text(msg);
+        }
+
         function openInvalidModal() {
             $('#modalInvalid').modal('show');
+            formRejectMsg();
         }
 
         function markAsInvalid() {
-            let dataS = {"idList": rows_selected};
+            let remark = "";
+            if($('#remark').val().trim().length === 0) {
+                remark = "Mark as invalid";
+            }else{
+                remark = $('#remark').val();
+            }
+
+            let dataS = {"idList": rows_selected, "remark" : remark }
+
             $.ajax({
                 type: 'POST',
                 url: "${pageContext.request.contextPath}/invalidsample.json",
@@ -822,7 +845,60 @@
             </div>
             <!--end::Card-->
 
-        </div>
+         <!--model-->
+
+            <div id="modalInvalid" class="modal fade" data-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h6 class="modal-title">Invalid Model</h6>
+                            <button type="button"  id="addPopupClose" class="close" data-dismiss="modal" aria-label="Close" >
+                                <i aria-hidden="true" class="ki ki-close"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-lg-11">
+                                        <p id="countMsg"></p>
+                                    </div>
+                                </div>
+                                <div id="rej_remark_txt">
+                                    <div class="form-group row">
+                                        <div class="col-lg-3">
+                                            <label>Remark:</label>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="btn-group div-inline input-group input-group-sm input-append date">
+                                                <input path="remark" name="remark" id="remark"
+                                                       class="form-control"
+                                                       autocomplete="off" type="text"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <button type="button" class="btn btn-primary mr-2" onclick="markAsInvalid()">
+                                            Invalidate
+                                        </button>
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal" onclick="cancel()">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--model end-->
+
+        </div><!--container end-->
     </div>
 </div>
 <!-- start include jsp files -->

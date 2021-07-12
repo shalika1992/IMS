@@ -37,7 +37,8 @@
         $(document).ready(function () {
             $('#receivedDate').datepicker({
                 format: 'yyyy-mm-dd',
-                //endDate: '+0d',
+                endDate: '+0d',
+                // datesDisabled: '+0d',
                 setDate: new Date(),
                 todayHighlight: true,
                 forceParse: false,
@@ -206,19 +207,82 @@
             }
         }
 
+        function getScaleAndPrecision(num) {
+            console.log("num "+num);
+            let scale;
+            let precision;
+            let msg = '';
+
+            if(!isNaN(num)){
+                num = parseFloat(num) + "";
+                var dotPos = num.indexOf(".");
+
+                if(dotPos!=-1){
+                    if (dotPos == -1) return null;
+                    scale = num.length - dotPos - 1;
+                    integer = dotPos;
+                    precision = scale + integer;
+                }else{
+                    scale = 0;
+                    integer = num.length;
+                    precision = num.length;
+                }
+
+                if(precision > 5){
+                    msg = "error";
+                }
+            }else {
+                msg = "error not a number";
+            }
+            //console.log("msg "+msg);
+            return msg;
+        }
+
         function updateValidation() {
+
             $('#responseMsg').text('');
             if ($('#resultId').val()) {
-                if ($('#resultId').val() !== 'DTCD' || $('#resultId').val() !== 'RJCT') {
+                if ($('#resultId').val() !== 'DTCD' && $('#resultId').val() !== 'RJCT') {
                     update();
                 } else {
+
                     if ($('#resultId').val() === 'DTCD'){
+
                         if ($('#ct1').val()) {
-                            if ($('#ct2').val()) {
-                                update();
+                            if(getScaleAndPrecision($('#ct1').val())===''){
+                                //if ct1 is ok
+                                if ($('#ct2').val()) {
+                                    if(getScaleAndPrecision($('#ct2').val())===''){
+                                        //if ct2 is ok
+                                        update();
+                                    } else {
+                                        //if ct2 not is ok
+                                        swal.fire({
+                                            text: "Please enter a valid value for ct2",
+                                            icon: "error",
+                                            buttonsStyling: false,
+                                            confirmButtonText: "Proceed",
+                                            customClass: {
+                                                confirmButton: "btn font-weight-bold btn-light-primary"
+                                            }
+                                        });
+                                    }
+
+                                } else {
+                                    swal.fire({
+                                        text: "Please enter a value for ct2",
+                                        icon: "error",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Proceed",
+                                        customClass: {
+                                            confirmButton: "btn font-weight-bold btn-light-primary"
+                                        }
+                                    });
+                                }
                             } else {
+                                //if ct1 not is ok
                                 swal.fire({
-                                    text: "Please enter a value for ct2",
+                                    text: "Please enter a valid value for ct1",
                                     icon: "error",
                                     buttonsStyling: false,
                                     confirmButtonText: "Proceed",
@@ -227,6 +291,7 @@
                                     }
                                 });
                             }
+
                         } else {
                             swal.fire({
                                 text: "Please enter a value for ct1",
@@ -410,6 +475,12 @@
             // hide ct fields
             document.getElementById("ct_txt").style.display = "none";
             document.getElementById("rej_remark_txt").style.display = "none";
+            //clear fields
+            $('#responseMsg').text('');
+            $("#ct1").val("");
+            $("#ct2").val("");
+            $("#remark").val("");
+
             // monitor selected plates
             let checkIfAlreadySelected = $('.cell-elmt.active');
             $.each(checkIfAlreadySelected, function (x, y) {
@@ -529,7 +600,7 @@
                             <div class="card-body">
                                 <div class="form-group row">
                                     <div class="col-lg-4">
-                                        <label>Received Date:</label>
+                                        <label>Plate Created Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="receivedDate"
                                                    class="form-control" readonly="true"
@@ -622,7 +693,7 @@
                                             <div class="btn-group div-inline input-group input-group-sm input-append date">
                                                 <input path="ct1" name="ct1" id="ct1"
                                                        class="form-control"
-                                                       autocomplete="off" type="text"/>
+                                                       autocomplete="off" type="text" maxlength="6"/>
                                             </div>
                                         </div>
                                     </div>
@@ -634,7 +705,7 @@
                                             <div class="btn-group div-inline input-group input-group-sm input-append date">
                                                 <input path="ct2" name="ct2" id="ct2"
                                                        class="form-control"
-                                                       autocomplete="off" type="text"/>
+                                                       autocomplete="off" type="text" maxlength="6"/>
                                             </div>
                                         </div>
                                     </div>

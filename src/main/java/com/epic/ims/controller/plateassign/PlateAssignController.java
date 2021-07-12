@@ -6,6 +6,7 @@ import com.epic.ims.bean.common.Result;
 import com.epic.ims.bean.plate.*;
 import com.epic.ims.bean.session.SessionBean;
 import com.epic.ims.mapping.mastertemp.MasterTemp;
+import com.epic.ims.mapping.plate.Plate;
 import com.epic.ims.repository.common.CommonRepository;
 import com.epic.ims.service.plateassign.PlateAssignService;
 import com.epic.ims.util.varlist.CommonVarList;
@@ -175,6 +176,28 @@ public class PlateAssignController {
             logger.error("Exception  :  ", e);
         }
         return defaultPlateMap;
+    }
+
+    @LogController
+    @AccessControl(sectionCode = SectionVarList.SECTION_FILE_GENERATION, pageCode = PageVarList.PLATE_ASSIGN)
+    @RequestMapping(value = "/isEligibleToDeleteWell", method = RequestMethod.POST)
+    public @ResponseBody
+    String checkEligibleToDeleteWell(@RequestBody MasterTemp masterTempBean, HttpServletRequest request, HttpServletResponse response, Locale locale) {
+        String deleteStatus = "yes";
+        try {
+            //get max plate for the date
+            Plate  plate = commonRepository.getMaxPlateId(masterTempBean.getReceivedDate());
+            //get max well from max plate
+            MasterTemp maxTempWell = plateAssignService.getMaxWellLabCodeOfMaxPlate(plate.getId(),masterTempBean.getReceivedDate());
+            //if max well == wellToDelete then allow delete
+            if(!maxTempWell.getBarcode().equalsIgnoreCase(masterTempBean.getBarcode())){
+                deleteStatus = "no";
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception  :  ", e);
+        }
+        return deleteStatus;
     }
 
     @LogController

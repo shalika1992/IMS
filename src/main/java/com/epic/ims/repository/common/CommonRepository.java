@@ -50,18 +50,20 @@ public class CommonRepository {
     CommonVarList commonVarList;
 
     private final String SQL_GET_STATUS_LIST_BY_CATEGORY = "select code, description from status where statuscategory=?";
+    private final String SQL_GET_STATUS_LIST_BY_CATEGORIES = "select code, description from status where statuscategory = ? and code in (?,?)";
     private final String SQL_GET_USERROLE_LIST = "select userrolecode, description, status,createdtime, lastupdatedtime, lastupdateduser from userrole";
     private final String SQL_GET_DISTRICT_LIST = "select code, description from district order by description asc";
     private final String SQL_GET_INSTITUTION_LIST = "select institutioncode as code, name from institution where status=? order by name asc";
     private final String SQL_GETALL_INSTITUTION_LIST = "select * from institution";
     private final String SQL_GET_PLATE_LIST = "select id , code , receiveddate , createddate from plate where receiveddate = ? order by id asc";
+    private final String SQL_GET_MAX_PLATE = "select max(distinct plateid) as max_plate_id from master_temp_data where receiveddate = ?";
     private final String SQL_GET_RESULT_TYPE_LIST = "select code , description from result order by code asc";
     private final String SQL_SYSTEM_TIME = "select SYSDATE() as currentdate";
     private final String SQL_SYSTEM_DATE = "select CURDATE() as currentdate";
     private final String SQL_USERROLE_STATUS_BY_USERROLECODE = "select status from userrole where userrolecode=?";
     private final String SQL_USERPARAM_BY_PARAMCODE = "select value from passwordparam where passwordparam = ?";
     private final String SQL_GET_RESULT_LIST = "select code,description from result";
-    private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?, ?)";
+    private final String SQL_GET_STATUS_LIST_SAMPLEVERIDY = "select code, description from status where code in (?, ?)";
     private final String SQL_GET_STATUS_LIST_REPORT = "select code, description from status where code in (?, ?, ?)";
     private final String SQL_GET_RESULT_PLATE = " select sampleid,    " +
                                                 " IFNULL(ct_target1,'NA') as ct_target1," +
@@ -74,7 +76,7 @@ public class CommonRepository {
     public List<Status> getStatusList(String statusCategory) throws Exception {
         List<Status> statusBeanList;
         try {
-            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_BY_CATEGORY, statusCategory);
+            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_BY_CATEGORIES, statusCategory, commonVarList.STATUS_ACTIVE, commonVarList.STATUS_DEACTIVE);
             statusBeanList = statusList.stream().map((record) -> {
                 Status statusBean = new Status();
                 statusBean.setStatusCode(record.get("code").toString());
@@ -322,6 +324,26 @@ public class CommonRepository {
 
     @LogRepository
     @Transactional(readOnly = true)
+    public Plate getMaxPlateId(String receivedDate) {
+        List<Plate> plateList;
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_MAX_PLATE, new Object[]{receivedDate});
+            plateList = list.stream().map((record) -> {
+                Plate plate = new Plate();
+                plate.setId(record.get("max_plate_id").toString());
+                return plate;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            plateList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return plateList.get(0);
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
     public ResultPlate getMarkedDetails(String barcode) {
         List<ResultPlate> resultPlateList = new ArrayList<>();
         try {
@@ -376,7 +398,8 @@ public class CommonRepository {
     public List<Status> getStatusListForSampleVerify() throws Exception {
         List<Status> statusBeanList;
         try {
-            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED});
+            //List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED});
+            List<Map<String, Object>> statusList = jdbcTemplate.queryForList(SQL_GET_STATUS_LIST_SAMPLEVERIDY, new Object[]{commonVarList.STATUS_PENDING, commonVarList.STATUS_VALIDATED});
             statusBeanList = statusList.stream().map((record) -> {
                 Status statusBean = new Status();
                 statusBean.setStatusCode(record.get("code").toString());

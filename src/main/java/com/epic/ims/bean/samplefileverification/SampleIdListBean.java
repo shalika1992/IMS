@@ -10,4 +10,5 @@ import lombok.*;
 @ToString
 public class SampleIdListBean {
     private int[] idList;
+    private String remark;
 }

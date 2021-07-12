@@ -73,7 +73,7 @@
                         {'name': 'header', 'value': header},
                         {'name': 'receivedDate', 'value': $('#receivedDate').val()},
                         {'name': 'referenceNumber', 'value': $('#referenceNumber').val()},
-                        {'name': 'name', 'value': $('#name').val()},
+                        {'name': 'name', 'value': $('#name').val().trim()},
                         {'name': 'nic', 'value': $('#nic').val()},
                         {'name': 'institutionCode', 'value': $('#institutionCode').val()},
                         {'name': 'status', 'value': $('#status').val()},

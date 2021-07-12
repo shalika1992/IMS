@@ -58,7 +58,7 @@ public class SampleVerifyFileRepository {
 
     private final String SQL_INSERT_REJECTDATAINVALID = "" +
             "insert into reject_data(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, remark, createduser , createdtime)" +
-            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, 'Mark as invalid', createduser, createdtime from sample_data where id in (:ids)";
+            "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, :remark , createduser, createdtime from sample_data where id in (:ids)";
 
 
     private final String SQL_INSERT_REJECTDATANOTFOUND = "" +
@@ -499,6 +499,8 @@ public class SampleVerifyFileRepository {
     public String invalidateSample(SampleIdListBean sampleIdListBean) throws Exception {
         String message = "";
         try {
+            String rej_remark_txt = sampleIdListBean.getRemark();
+
             //create the parameter map
             Set<Integer> idSet = Arrays.stream(sampleIdListBean.getIdList()).boxed().collect(Collectors.toSet());
             //parameter map for update query
@@ -512,6 +514,7 @@ public class SampleVerifyFileRepository {
             } else {
                 //parameter map for insert and delete query
                 MapSqlParameterSource parameterMapTwo = new MapSqlParameterSource();
+                parameterMapTwo.addValue("remark", rej_remark_txt);
                 parameterMapTwo.addValue("ids", idSet);
                 //execute the query
                 int valueTwo = namedParameterJdbcTemplate.update(SQL_INSERT_REJECTDATAINVALID, parameterMapTwo);

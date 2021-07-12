@@ -92,6 +92,20 @@ public class PlateAssignService {
     }
 
     @LogService
+    public MasterTemp getMaxWellLabCodeOfMaxPlate(String plateid, String receivedDate) throws Exception {
+        MasterTemp masterTemp = new MasterTemp();
+        try {
+            masterTemp = plateAssignRepository.getMaxWellLabCodeOfMaxPlate(plateid, receivedDate);
+
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return masterTemp;
+    }
+
+    @LogService
     public Map<Integer, List<DefaultBean>> swapBlockPlate(SwapBean swapBean) {
         Map<Integer, List<DefaultBean>> plateMap = new HashMap<>();
         try {
@@ -483,9 +497,13 @@ public class PlateAssignService {
             cell.setCellStyle(style);
 
             cell = row.createCell(1);
-            switch (masterTempFile.getBlockValue()){
+            switch (masterTempFile.getBlockValue()) {
                 case "C3"://PBS
-                    cell.setCellValue(commonVarList.COLOR_CODE_PBS);
+                    if (isPbs(masterTempFile.getBarcode())) {
+                        cell.setCellValue(commonVarList.COLOR_CODE_PBS);
+                    } else {
+                        cell.setCellValue(commonVarList.COLOR_CODE_NORMAL);
+                    }
                     break;
                 default://Normal
                     cell.setCellValue(commonVarList.COLOR_CODE_NORMAL);
@@ -502,6 +520,20 @@ public class PlateAssignService {
             throw e;
         }
         return currrow;
+    }
+
+    public static boolean isPbs(String word){
+        boolean isPbs = false;
+        String str = "";
+        if(word!=null && word.trim().length() > 0){
+            if (word.length() > 3) {
+                str = word.substring(word.length() - 3);
+            }
+        }
+        if(str.equalsIgnoreCase("PBS")){
+            isPbs = true;
+        }
+        return isPbs;
     }
 
     private int createExcelTableBodyBottom(SXSSFWorkbook workbook, int currrow, int rownumber) throws Exception {

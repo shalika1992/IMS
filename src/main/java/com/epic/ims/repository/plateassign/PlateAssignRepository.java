@@ -89,7 +89,8 @@ public class PlateAssignRepository {
             "labcode,plateid,blockvalue,ispool from master_temp_data as mt where status = ? " +
             "group by labcode , plateid , blockvalue , ispool) as m " +
             "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
-
+    private final String SQL_GET_MAX_WELL_LABCODE = " "+
+            " select labcode from master_temp_data where plateid = ? and receiveddate = ?  order by id desc limit 1 ";
     private final String SQL_SWAP_DEFAULT_PLATE_LIST = "" +
             "update master_temp_data a " +
             "inner join master_temp_data b on a.id <> b.id " +
@@ -120,6 +121,26 @@ public class PlateAssignRepository {
 
     private final String SQL_UPDATE_AFTER_DELETE_WELL =" update master_temp_data m set m.plateid = ?, m.blcokvalue = ? where m.id = ? and sampleid = ? ";
 
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public MasterTemp getMaxWellLabCodeOfMaxPlate(String plateId, String receivedDate) {
+        List<MasterTemp> wellList;
+        try {
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(SQL_GET_MAX_WELL_LABCODE, new Object[]{plateId, receivedDate});
+            wellList = list.stream().map((record) -> {
+                MasterTemp master = new MasterTemp();
+                master.setBarcode(record.get("labcode").toString());
+                return master;
+            }).collect(Collectors.toList());
+        } catch (EmptyResultDataAccessException ere) {
+            //handle the empty result data access exception
+            wellList = new ArrayList<>();
+        } catch (Exception e) {
+            throw e;
+        }
+        return wellList.get(0);
+    }
 
     @LogRepository
     public String createDefaultPlateList(String receivedDate) throws Exception {

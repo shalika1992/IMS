@@ -52,7 +52,7 @@ public class SystemUserRepository {
     private final String SQL_GET_COUNT = "select count(*) from web_systemuser wu where ";
     private final String SQL_INSERT_SYSTEMUSER = "insert into web_systemuser(username, password, userrole, expirydate, fullname, email, mobile, initialloginstatus, status, createduser, createdtime, lastupdateduser, lastupdatedtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_FIND_SYSTEMUSER = "select username, password, userrole, expirydate, fullname, email, mobile,noofinvalidattempt, lastloggeddate,initialloginstatus,status,lastupdateduser,lastupdatedtime,createdtime from web_systemuser where username = ?";
-    private final String SQL_UPDATE_SYSTEMUSER = "update web_systemuser set userrole = ? , fullname = ? , email = ? , mobile = ? , status = ? where username = ?";
+    private final String SQL_UPDATE_SYSTEMUSER = "update web_systemuser set userrole = ? , fullname = ? , email = ? , mobile = ? , status = ?, lastupdateduser = ?, lastupdatedtime = ? where username = ?";
     private final String SQL_CHANGE_PASSWORD = "update web_systemuser set password = ? where username = ?";
 
     @LogRepository
@@ -172,13 +172,13 @@ public class SystemUserRepository {
                 }
 
                 try {
-                    systemUser.setCreatedTime(rs.getDate("createdtime"));
+                    systemUser.setCreatedTime(common.formatStringtoDate(rs.getString("createdtime")));
                 } catch (Exception e) {
                     systemUser.setCreatedTime(null);
                 }
 
                 try {
-                    systemUser.setLastUpdatedTime(rs.getDate("lastupdatedtime"));
+                    systemUser.setLastUpdatedTime(common.formatStringtoDate(rs.getString("lastupdatedtime")));
                 } catch (Exception e) {
                     systemUser.setLastUpdatedTime(null);
                 }
@@ -336,6 +336,8 @@ public class SystemUserRepository {
                     systemUserInputBean.getEmail(),
                     systemUserInputBean.getMobileNumber(),
                     systemUserInputBean.getStatus(),
+                    systemUserInputBean.getLastUpdatedUser(),
+                    systemUserInputBean.getLastUpdatedTime(),
                     systemUserInputBean.getUserName()
             );
 

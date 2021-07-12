@@ -103,6 +103,7 @@ public class MessageVarList {
     public static final String SAMPLERECORD_EMPTY_NAME = "samplerecord.empty.name";
     public static final String SAMPLERECORD_EMPTY_AGE = "samplerecord.empty.age";
     public static final String SAMPLERECORD_EMPTY_GENDER = "samplerecord.empty.gender";
+    public static final String SAMPLERECORD_EMPTY_ADDRESS = "samplerecord.empty.address";
     public static final String SAMPLERECORD_EMPTY_NIC = "samplerecord.empty.nic";
     public static final String SAMPLERECORD_ALREADY_EXISTS = "samplerecord.already.exists";
     public static final String SAMPLERECORD_ADDED_SUCCESSFULLY = "samplerecord.added.success";
