@@ -55,6 +55,7 @@ public class MasterTempDataMapper {
             masterTemp.setWard(s.getWard());
             masterTemp.setPlateId(s.getPlateId());
             masterTemp.setBlockValue(s.getBlockValue());
+            masterTemp.setCollectionDate(s.getCollectionDate());
         } catch (Exception e) {
             throw e;
         }

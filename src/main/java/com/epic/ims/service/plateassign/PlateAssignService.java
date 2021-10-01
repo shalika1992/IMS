@@ -18,6 +18,8 @@ import com.epic.ims.util.varlist.CommonVarList;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +31,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -36,9 +40,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,6 +75,7 @@ public class PlateAssignService {
 
     private final String MASTERFILE_NAME = "MASTERFILE-XXXXX.pdf";
     private final String MASTERXLFILE_NAME = "MASTERFILE-XXXXX.xlsx";
+    private final String MASTERCSVFILE_NAME = "MASTERFILE-XXXXX.csv";
     private final String MASTERZIPFILE_NAME = "MASTERZIPFILE.zip";
 
     @LogService
@@ -103,6 +106,22 @@ public class PlateAssignService {
             throw e;
         }
         return masterTemp;
+    }
+
+    @LogService
+    public int getMaxPlateIdForCorrespondingDate(int plateid) throws Exception {
+        int max_plate_for_cur_date;
+        int deletePlate;
+        String currentDate = commonRepository.getCurrentDateAsString();
+        try {
+            max_plate_for_cur_date = plateAssignRepository.getMaxPlateIdForCorrespondingDate(currentDate);
+            deletePlate = max_plate_for_cur_date + plateid;
+        } catch (EmptyResultDataAccessException ere) {
+            throw ere;
+        } catch (Exception e) {
+            throw e;
+        }
+        return deletePlate;
     }
 
     @LogService
@@ -184,12 +203,23 @@ public class PlateAssignService {
                     List<MasterTemp> masterTempList = plateAssignRepository.getMasterTempList(plateId);
                     //validate the master temp list
                     if (masterTempList != null && !masterTempList.isEmpty() && masterTempList.size() > 0) {
+
+                        //1. delete pending existing from master data, here
+                        //2. check plates in master_data & plates are related.
+                        //  if mofficer marked a whole plate as pending, repeat the pcr process for those samples.
+                        //  delete those pending existing sample records from master data.
+                        //  so now there are no more sample records related to plate2 in master_data.
+                        //  But plate table the record is not deleted. so mofficer can see empty plate 2.
+                        //3. if not delete plate table unwanted record.
+
                         //insert to plate table
                         //this is the correct plate id for plate creation
-                        String masterTablePlateId = plateAssignRepository.getMaxPlateId(receiveDate);
+                        String masterTablePlateId = plateAssignRepository.getMaxPlateId(currentDate);
                         //create the plate
                         message = plateAssignRepository.createPlate(masterTablePlateId, receiveDate);
                         if (message.isEmpty()) {
+                            //before insert: delete existing records
+                            plateAssignRepository.deleteExistingPendingFromMasterData(masterTempList);
                             //insert the master batch
                             message = plateAssignRepository.insertMasterBatch(masterTempList, masterTablePlateId);
                             if (message.isEmpty()) {
@@ -197,12 +227,16 @@ public class PlateAssignService {
                                 List<String> sampleIdList = masterTempList.stream().map(m -> m.getSampleId()).collect(Collectors.toList());
                                 sampleIdList = sampleIdList.stream().filter(s -> (Objects.nonNull(s) && !s.isEmpty())).collect(Collectors.toList());
                                 message = plateAssignRepository.updateSampleDataList(sampleIdList);
+                                //Temporary Pending table clean
+                                //plateAssignRepository.deleteExistingTemporaryPending(masterTempList);
                                 if (message.isEmpty()) {
                                     //create the master file in machine location
                                     String filePath = this.createMasterFile(masterTempList, currentDate, masterTablePlateId);
                                     filePathList.add(filePath);
-                                    String xlFilePath  = this.generateExcelReport(httpServletRequest, masterTempList, currentDate, masterTablePlateId);
-                                    filePathList.add(xlFilePath);
+                                    //String xlFilePath  = this.generateExcelReport(httpServletRequest, masterTempList, currentDate, masterTablePlateId);
+                                    //filePathList.add(xlFilePath);
+                                    String csvFilePath =this.writeBeanAsCSVToOutputStream(httpServletRequest, masterTempList, currentDate, masterTablePlateId);
+                                    filePathList.add(csvFilePath);
                                 } else {
                                     break;
                                 }
@@ -418,10 +452,10 @@ public class PlateAssignService {
 
             CellStyle fontBoldedUnderlinedCell = excelCommon.getFontBoldedUnderlinedCell(workbook);
 
-            Row row = sheet.createRow(0);
-            Cell cell = row.createCell(0);
-            cell.setCellValue("BIOER Import Sample Info Report");
-            cell.setCellStyle(fontBoldedUnderlinedCell);
+//            Row row = sheet.createRow(0);
+//            Cell cell = row.createCell(0);
+//            cell.setCellValue("BIOER Import Sample Info Report");
+//            cell.setCellStyle(fontBoldedUnderlinedCell);
         } catch (Exception e) {
             throw e;
         }
@@ -602,5 +636,122 @@ public class PlateAssignService {
             throw e;
         }
     }
+
+
+    // Write the CSV file
+    private String writeBeanAsCSVToOutputStream(HttpServletRequest httpServletRequest, List<MasterTemp> masterTempList, String currentDate, String masterTablePlateId) throws IOException {
+        CSVPrinter csvPrinter = null;
+        String filePath = "";
+        try {
+
+            //String currentDate = commonRepository.getCurrentDateAsString();
+            String folderPath = this.getFolderPath(currentDate);
+            filePath = folderPath + File.separator + MASTERCSVFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + masterTablePlateId);
+            File file = new File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
+
+            FileWriter out = new FileWriter(filePath);
+            //csv header
+            csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader("Sample Id","Color","Sample Name"));
+
+            //csv body
+            if (masterTempList != null) {
+
+                for(MasterTemp sample : masterTempList){
+                    List<String> record = new ArrayList<>();
+                    record.add(sample.getBarcode());
+                    switch (sample.getBlockValue()) {
+                        case "C3"://PBS
+                            if (isPbs(sample.getBarcode())) {
+                                record.add(commonVarList.COLOR_CODE_PBS);
+                            } else {
+                                record.add(commonVarList.COLOR_CODE_NORMAL);
+                            }
+                            break;
+                        default://Normal
+                            record.add(commonVarList.COLOR_CODE_NORMAL);
+                            break;
+                    }
+                    record.add("");
+
+                    csvPrinter.printRecord(record);
+                }
+                csvPrinter.printRecord("Blank", commonVarList.COLOR_CODE_BLANK,"");
+                csvPrinter.printRecord("Positive",commonVarList.COLOR_CODE_POSITIVE,"");
+                //csv end
+            }
+
+        } catch (Exception e) {
+            System.out.println("Failed to write CSV file to output stream");
+        } finally {
+            try {
+                if (csvPrinter != null) {
+                    csvPrinter.flush(); // Flush and close CSVPrinter
+                    csvPrinter.close();
+                }
+            }
+            catch (IOException ioe) {
+                System.out.println("Error when closing CSV Printer");
+            }
+        }
+        return filePath;
+    }
+
+
+//    // Convert an XSSFWorkbook to CSV and write to provided OutputStream
+//    private String writeWorkbookAsCSVToOutputStream(String  workBookPath,String currentDate, String masterTablePlateId) throws IOException {
+//        CSVPrinter csvPrinter = null;
+//        XSSFWorkbook workbook = null;
+//        String filePath = "";
+//        try {
+//            //FileInputStream fileInStream = new FileInputStream(new File(workBookPath));
+//            workbook = new XSSFWorkbook(new FileInputStream(new File(workBookPath)));
+//            //String currentDate = commonRepository.getCurrentDateAsString();
+//            String folderPath = this.getFolderPath(currentDate);
+//            filePath = folderPath + File.separator + MASTERCSVFILE_NAME.replace("XXXXX", currentDate + "-" + "Plate" + "-" + masterTablePlateId);
+//            File file = new File(filePath);
+//            if (file.exists()) {
+//                file.delete();
+//            }
+//
+//            FileWriter out = new FileWriter(filePath);
+//            csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT);
+//
+//            if (workbook != null) {
+//                XSSFSheet sheet = workbook.getSheetAt(0); // Sheet #0 in this example
+//                Iterator<Row> rowIterator = sheet.rowIterator();
+//                while (rowIterator.hasNext()) {
+//                    Row row = rowIterator.next();
+//                    Iterator<Cell> cellIterator = row.cellIterator();
+//                    List<String> record = new ArrayList<>();
+//                    while (cellIterator.hasNext()) {
+//                        Cell cell = cellIterator.next();
+//                        //csvPrinter.print(cell.getStringCellValue());
+//                        record.add(cell.getStringCellValue());
+//                    }
+//                    csvPrinter.printRecord(record);
+//                    //csvPrinter.println(); // Newline after each row
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            System.out.println("Failed to write CSV file to output stream");
+//        } finally {
+//            try {
+//                if (csvPrinter != null) {
+//                    csvPrinter.flush(); // Flush and close CSVPrinter
+//                    csvPrinter.close();
+//                }
+//            }
+//            catch (IOException ioe) {
+//                System.out.println("Error when closing CSV Printer");
+//            }
+//        }
+//
+//        return filePath;
+//
+//    }
 
 }

@@ -36,7 +36,10 @@ public class MasterDataReportService {
     public long getCount(MasterDataInputBeen masterDataInputBeen) throws Exception {
         long count = 0;
         try {
+            //master data count +
             count = reportMgtRepository.getCount(masterDataInputBeen);
+            //master_pend_data count
+            //count+= reportMgtRepository.getTempPendingCount(masterDataInputBeen);
         } catch (Exception ere) {
             throw ere;
         }

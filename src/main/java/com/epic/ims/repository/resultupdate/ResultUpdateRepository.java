@@ -64,7 +64,7 @@ public class ResultUpdateRepository {
             "select m.id,m.referenceno,m.name,m.nic,m.barcode,m.plateid,m.blockvalue,m.ispool,m.iscomplete,m.result from " +
             "(select GROUP_CONCAT(id SEPARATOR '|') as id, " +
             "GROUP_CONCAT(referenceno SEPARATOR '|') as referenceno, GROUP_CONCAT(name SEPARATOR '|') as name,GROUP_CONCAT(nic SEPARATOR '|') as nic," +
-            "barcode,plateid,blockvalue,ispool ,iscomplete,result  from master_data as mt where plateid = ? and receiveddate = ? " +
+            "barcode,plateid,blockvalue,ispool ,iscomplete,result  from master_data as mt where plateid = ? and createdtime = ? " +
             "group by barcode , plateid , blockvalue , ispool , iscomplete,result ) as m " +
             "inner join excelblock e on m.blockvalue = e. code order by m.plateid , cast(e.indexvalue as unsigned)";
 
@@ -73,8 +73,10 @@ public class ResultUpdateRepository {
     private final String SQL_UPDATE_MASTER_RESULT_WITHOUT_CT = "update master_data set status =:status, isverified=:isverified, iscomplete=:iscomplete , result=:result where barcode =:barcode";
     private final String SQL_RESET_CT1_CT2_VALUES = "UPDATE master_data set ct_target1 = null, ct_target2 = null, rejectremark = null WHERE barcode  =:barcode AND ct_target1 IS NOT NULL and ct_target2 IS NOT NULL";
     private final String SQL_RESET_REMARK_VALUES = "UPDATE master_data set rejectremark = null WHERE barcode  =:barcode AND rejectremark IS NOT NULL";
-    private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser,receiveddate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+    private final String SQL_INSERT_SAMPLEDATA = "insert into sample_data(barcode,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,status,createduser,receiveddate,collectiondate,ispending) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_PEND_DATA = "insert into master_pend_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,barcode, receiveddate,status, plateid,collectiondate, tmp_labcode) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_DELETE_PEND_FROM_MATER_DATA = "delete from master_data where tmp_labcode = ?";
+    private final String SQL_DELETE_ISPENDING_FROM_SAMPLE_DATA = "delete from sample_data where barcode =? and ispending ='YES' ";
     @LogRepository
     @Transactional(readOnly = true)
     public long getDataCount(ResultUpdateInputBean resultUpdateInputBean) {
@@ -154,11 +156,8 @@ public class ResultUpdateRepository {
             } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_INVALID)) {
                 idSetParameterMap.addValue("status", commonVarList.STATUS_INVALID);
                 idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_INVALID);
-            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REJECT)) {
-                idSetParameterMap.addValue("status", commonVarList.STATUS_REJECT);
-                idSetParameterMap.addValue("result", commonVarList.RESULT_CODE_REJECT);
-                idSetParameterMap.addValue("remark", resultPlateBean.getRemark());
             }
+
             idSetParameterMap.addValue("isverified", 1);
             idSetParameterMap.addValue("iscomplete", 1);
             idSetParameterMap.addValue("barcode", resultPlateBean.getBarcode());
@@ -166,14 +165,20 @@ public class ResultUpdateRepository {
             //execute the query
             int value;
             if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_DETECTED)) {
+                //clear sample_data where ispending = yes
+                deleteIsPendingRecordsFromSample_Data(resultPlateBean.getBarcode());
+                //clear master_data reject remark.
                 namedParameterJdbcTemplate.update(SQL_RESET_REMARK_VALUES,barCodeParameterMap);
+                //update master_data as detected.
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT, idSetParameterMap);
-            } else if (resultPlateBean.getResultId().equals(commonVarList.RESULT_CODE_REJECT)) {
-                namedParameterJdbcTemplate.update(SQL_RESET_CT1_CT2_VALUES,barCodeParameterMap);
-                value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITH_REMARK, idSetParameterMap);
             } else {
+                //clear sample_data where ispending = yes
+                deleteIsPendingRecordsFromSample_Data(resultPlateBean.getBarcode());
+                //clear master_data reject remark.
                 namedParameterJdbcTemplate.update(SQL_RESET_REMARK_VALUES,barCodeParameterMap);
+                //clear master_datadetected details.
                 namedParameterJdbcTemplate.update(SQL_RESET_CT1_CT2_VALUES,barCodeParameterMap);
+                //update master_data as pend|invalid|inconclusive|not detected
                 value = namedParameterJdbcTemplate.update(SQL_UPDATE_MASTER_RESULT_WITHOUT_CT, idSetParameterMap);
             }
 
@@ -199,7 +204,7 @@ public class ResultUpdateRepository {
             String sql = "" +
                     " select " +
                     " md.referenceno , md.institutioncode , md.name , md.age , md.gender, md.symptomatic, md.contacttype , md.nic , md.address , md.district , md.contactno ," +
-                    " md.receiveddate from master_data md " +
+                    " md.receiveddate, md.collectiondate, md.tmp_labcode, md.plateid from master_data md " +
                     " where md.barcode =?";
 
             resultList = jdbcTemplate.query(sql, new Object[]{barcode}, (rs, id) -> {
@@ -216,9 +221,44 @@ public class ResultUpdateRepository {
                 result.setResidentDistrict(rs.getString("district"));
                 result.setContactNumber(rs.getString("contactno"));
                 result.setReceiveddate(rs.getString("receiveddate"));
+                result.setCollectionDate(rs.getString("collectiondate"));
+                result.setTmp_labcode(rs.getString("tmp_labcode"));
+                result.setTmp_plate(rs.getString("plateid"));
                 return result;
             });
-            message = insertSampleDataRepeat(resultList);
+
+                message = insertSampleDataRepeat(resultList);//insert to sample_data
+            //if (message=="")
+                //message = insertPendDataTempTable(resultList);//insert to pend_Table
+            //if(message=="")
+                //message = deleteMasterPendingData(resultList);//delete from master_data
+
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+
+    @LogRepository
+    @Transactional(readOnly = true)
+    public String deleteIsPendingRecordsFromSample_Data(String barcode) {
+        String message = "";
+        List<RepeatSampleBean> resultList = null;
+        try {
+            String sql = "" +
+                    " select " +
+                    " md.tmp_labcode from master_data md " +
+                    " where md.barcode =?";
+
+            resultList = jdbcTemplate.query(sql, new Object[]{barcode}, (rs, id) -> {
+                RepeatSampleBean result = new RepeatSampleBean();
+                result.setTmp_labcode(rs.getString("tmp_labcode"));
+                return result;
+            });
+
+            message = deleteIsPendingData(resultList);//delete from sample_data
+
         } catch (Exception e) {
             throw e;
         }
@@ -233,6 +273,7 @@ public class ResultUpdateRepository {
             for (int j = 0; j < repeatSampleBeanList.size(); j++) {
                 RepeatSampleBean repeatData = repeatSampleBeanList.get(j);
                 jdbcTemplate.update(SQL_INSERT_SAMPLEDATA,
+                        repeatData.getTmp_labcode(),
                         repeatData.getReferenceNo(),
                         repeatData.getMohArea(),
                         repeatData.getName(),
@@ -247,7 +288,79 @@ public class ResultUpdateRepository {
                         repeatData.getSecondaryContactNumber(),
                         commonVarList.STATUS_PENDING,
                         sessionBean.getUsername(),
-                        repeatData.getReceiveddate());
+                        repeatData.getReceiveddate(),
+                        repeatData.getCollectionDate(),
+                        "YES");
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String insertPendDataTempTable(List<RepeatSampleBean> repeatSampleBeanList) {
+        String message = "";
+        try {
+            for (int j = 0; j < repeatSampleBeanList.size(); j++) {
+                RepeatSampleBean repeatData = repeatSampleBeanList.get(j);
+                jdbcTemplate.update(SQL_INSERT_PEND_DATA,
+                        repeatData.getReferenceNo(),
+                        repeatData.getMohArea(),
+                        repeatData.getName(),
+                        repeatData.getAge(),
+                        repeatData.getGender(),
+                        repeatData.getSymptomatic(),
+                        repeatData.getContactType(),
+                        repeatData.getNic(),
+                        repeatData.getAddress(),
+                        repeatData.getResidentDistrict(),
+                        repeatData.getContactNumber(),
+                        repeatData.getTmp_labcode(),
+                        repeatData.getReceiveddate(),
+                        commonVarList.STATUS_PENDING,
+                        repeatData.getTmp_plate(),
+                        repeatData.getCollectionDate(),
+                        repeatData.getTmp_labcode());
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String deleteMasterPendingData(List<RepeatSampleBean> repeatSampleBeanList) {
+        String message = "";
+        try {
+            for (int j = 0; j < repeatSampleBeanList.size(); j++) {
+                RepeatSampleBean repeatData = repeatSampleBeanList.get(j);
+                jdbcTemplate.update(SQL_DELETE_PEND_FROM_MATER_DATA,
+                        repeatData.getTmp_labcode());
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    @LogRepository
+    @Transactional
+    public String deleteIsPendingData(List<RepeatSampleBean> repeatSampleBeanList) {
+        String message = "";
+        try {
+            for (int j = 0; j < repeatSampleBeanList.size(); j++) {
+                RepeatSampleBean repeatData = repeatSampleBeanList.get(j);
+                jdbcTemplate.update(SQL_DELETE_ISPENDING_FROM_SAMPLE_DATA,
+                        repeatData.getTmp_labcode());
             }
         } catch (DataAccessException e) {
             throw e;

@@ -34,6 +34,8 @@ public class MasterTemp {
     private String ward;
     private Date createdTime;
     private String createdUser;
+    private String collectionDate;
+    private String tmp_labcode;
 
     public MasterTemp() {
     }
@@ -45,7 +47,7 @@ public class MasterTemp {
         this.nic = nic;
         this.barcode = barcode;
     }
-    public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String serialNo, String specimenid, String barcode, String receivedDate, String status, String plateId, String blockValue, String indexValue, String isPool, String ward, Date createdTime, String createdUser) {
+    public MasterTemp(int id, String sampleId, String referenceNo, String institutionCode, String name, String age, String gender, String nic, String symptomatic, String contactType, String address, String residentDistrict, String contactNumber, String secondaryContactNumber, String serialNo, String specimenid, String barcode, String receivedDate, String status, String plateId, String blockValue, String indexValue, String isPool, String ward, Date createdTime, String createdUser,String collectionDate, String tmp_labcode) {
         this.id = id;
         this.sampleId = sampleId;
         this.referenceNo = referenceNo;
@@ -72,6 +74,8 @@ public class MasterTemp {
         this.ward = ward;
         this.createdTime = createdTime;
         this.createdUser = createdUser;
+        this.collectionDate = collectionDate;
+        this.tmp_labcode = tmp_labcode;
     }
 
     public int getId() {
@@ -280,5 +284,21 @@ public class MasterTemp {
 
     public void setCreatedUser(String createdUser) {
         this.createdUser = createdUser;
+    }
+
+    public String getCollectionDate() {
+        return collectionDate;
+    }
+
+    public void setCollectionDate(String collectionDate) {
+        this.collectionDate = collectionDate;
+    }
+
+    public String getTmp_labcode() {
+        return tmp_labcode;
+    }
+
+    public void setTmp_labcode(String tmp_labcode) {
+        this.tmp_labcode = tmp_labcode;
     }
 }

@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -42,7 +44,7 @@ public class ReportMgtRepository {
     MessageSource messageSource;
 
     private final String SQL_GET_COUNT = "select count(*) from master_data m where ";
-
+    private final String SQL_GET_TEMP_PENDING_COUNT = "select count(*) from master_pend_data m where ";
     @LogRepository
     @Transactional(readOnly = true)
     public long getCount(MasterDataInputBeen masterDataInputBeen) throws Exception {
@@ -61,8 +63,25 @@ public class ReportMgtRepository {
 
     @LogRepository
     @Transactional(readOnly = true)
+    public long getTempPendingCount(MasterDataInputBeen masterDataInputBeen) throws Exception {
+        long count = 0;
+        try {
+            StringBuilder dynamicClause = new StringBuilder(SQL_GET_TEMP_PENDING_COUNT);
+            //create the where clause
+            dynamicClause = this.setDynamicClause(masterDataInputBeen, dynamicClause);
+            //create the query
+            count = jdbcTemplate.queryForObject(dynamicClause.toString(), Long.class);
+        } catch (Exception exception) {
+            throw exception;
+        }
+        return count;
+    }
+
+    @LogRepository
+    @Transactional(readOnly = true)
     public List<MasterData> getMasterDataSearchList(MasterDataInputBeen masterDataInputBeen) {
         List<MasterData> masterDataList = null;
+        //List<MasterData> masterPendList = null;
         try {
             StringBuilder dynamicClause = this.setDynamicClause(masterDataInputBeen, new StringBuilder());
 
@@ -128,7 +147,7 @@ public class ReportMgtRepository {
             }
 
             String sql = "" +
-                    "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
+                    "select distinct m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
                     "m.barcode as barcode, m.receiveddate as receivedDate ,s.code as statusCode,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2 " +
                     "from master_data m " +
                     "left join status s on s.code = m.status " +
@@ -280,8 +299,182 @@ public class ReportMgtRepository {
 
                 return masterData;
             });
-        } catch (Exception exception) {
-            throw exception;
+
+//            String pend_sql ="SELECT " +
+//                    "    m.id AS id," +
+//                    "    m.barcode," +
+//                    "    m.status," +
+//                    "    m.referenceno AS referenceNumber," +
+//                    "    m.institutioncode AS institutionCode," +
+//                    "    i.name AS institutionName," +
+//                    "    m.name AS name," +
+//                    "    m.age AS age," +
+//                    "    m.gender AS gender," +
+//                    "    m.nic AS nic," +
+//                    "    m.contactno AS contactnumber," +
+//                    "    m.receiveddate AS receivedDate," +
+//                    "    s.code AS statusCode," +
+//                    "    s.description AS statusDescription," +
+//                    "    p.code AS plateCode " +
+//                    "FROM " +
+//                    "   master_pend_data m " +
+//                    "        LEFT JOIN " +
+//                    "    status s ON s.code = m.status " +
+//                    "        LEFT JOIN " +
+//                    "    plate p ON m.plateid = p.id " +
+//                    "        LEFT JOIN " +
+//                    "    institution i ON i.institutioncode = m.institutioncode " +
+//                    "WHERE " + dynamicClause.toString() + sortingStr +
+//                    " limit " + masterDataInputBeen.displayLength + " offset " + masterDataInputBeen.displayStart;
+//
+//            masterPendList = jdbcTemplate.query(pend_sql, (rs, rowNum) -> {
+//                MasterData masterData = new MasterData();
+//
+//                try {
+//                    masterData.setId(rs.getInt("id"));
+//                } catch (Exception e) {
+//                    masterData.setId(0);
+//                }
+//
+//                try {
+//                    masterData.setSampleID(rs.getInt("sampleid"));
+//                } catch (Exception e) {
+//                    masterData.setSampleID(0);
+//                }
+//
+//                try {
+//                    masterData.setReferenceNumber(rs.getString("referenceNumber"));
+//                } catch (Exception e) {
+//                    masterData.setReferenceNumber(null);
+//                }
+//
+//                try {
+//                    masterData.setInstitutionCode(rs.getString("institutionCode"));
+//                } catch (Exception e) {
+//                    masterData.setInstitutionCode(null);
+//                }
+//
+//                try {
+//                    masterData.setInstitutionName(rs.getString("institutionName"));
+//                } catch (Exception e) {
+//                    masterData.setInstitutionName(null);
+//                }
+//
+//                try {
+//                    masterData.setName(rs.getString("name"));
+//                } catch (Exception e) {
+//                    masterData.setName(null);
+//                }
+//
+//                try {
+//                    masterData.setAge(rs.getString("age"));
+//                } catch (Exception e) {
+//                    masterData.setAge(null);
+//                }
+//
+//                try {
+//                    masterData.setGender(rs.getString("gender"));
+//                } catch (Exception e) {
+//                    masterData.setGender(null);
+//                }
+//
+//                try {
+//                    masterData.setNic(rs.getString("nic"));
+//                } catch (Exception e) {
+//                    masterData.setNic(null);
+//                }
+//
+//                try {
+//                    masterData.setContactNumber(rs.getString("contactNumber"));
+//                } catch (Exception e) {
+//                    masterData.setContactNumber(null);
+//                }
+//
+//                try {
+//                    masterData.setSerialNumber(rs.getString("serialNumber"));
+//                } catch (Exception e) {
+//                    masterData.setSerialNumber(null);
+//                }
+//
+//                try {
+//                    masterData.setSpecimenID(rs.getString("specimenID"));
+//                } catch (Exception e) {
+//                    masterData.setSpecimenID(null);
+//                }
+//
+//                try {
+//                    masterData.setBarcode(rs.getString("barcode"));
+//                } catch (Exception e) {
+//                    masterData.setBarcode(null);
+//                }
+//
+//                try {
+//                    masterData.setReceivedDate(rs.getString("receivedDate"));
+//                } catch (Exception e) {
+//                    masterData.setReceivedDate(null);
+//                }
+//
+//                try {
+//                    masterData.setStatusCode(rs.getString("statusCode"));
+//                } catch (Exception e) {
+//                    masterData.setStatusCode(null);
+//                }
+//
+//                try {
+//                    masterData.setStatusDescription(rs.getString("statusDescription"));
+//                } catch (Exception e) {
+//                    masterData.setStatusDescription(null);
+//                }
+//
+//                try {
+//                    masterData.setPlateCode(rs.getString("plateCode"));
+//                } catch (Exception e) {
+//                    masterData.setPlateCode(null);
+//                }
+//
+//                try {
+//                    masterData.setBlockValue(rs.getString("blockValue"));
+//                } catch (Exception e) {
+//                    masterData.setBlockValue(null);
+//                }
+//
+//                try {
+//                    masterData.setResultDescription(rs.getString("resultDescription"));
+//                } catch (Exception e) {
+//                    masterData.setResultDescription(null);
+//                }
+//
+//                try {
+//                    masterData.setCt_target1(rs.getString("ct_target1"));
+//                } catch (Exception e) {
+//                    masterData.setCt_target1(null);
+//                }
+//
+//                try {
+//                    masterData.setCt_target2(rs.getString("ct_target2"));
+//                } catch (Exception e) {
+//                    masterData.setCt_target2(null);
+//                }
+//
+//                try {
+//                    masterData.setCreatedUser(rs.getString("createdUser"));
+//                } catch (Exception e) {
+//                    masterData.setCreatedUser(null);
+//                }
+//
+//                try {
+//                    masterData.setCreatedTime(rs.getTimestamp("createdTime"));
+//                } catch (Exception e) {
+//                    masterData.setCreatedTime(null);
+//                }
+//
+//                return masterData;
+//            });
+//
+//            masterDataList.addAll(masterPendList);
+
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
 
         return masterDataList;
@@ -291,19 +484,21 @@ public class ReportMgtRepository {
     @Transactional(readOnly = true)
     public List<MasterData> getMasterDataSearchResultListForReport(MasterDataInputBeen masterDataInputBeen) {
         List<MasterData> masterDataList = null;
+        List<MasterData> masterDataList1 = new ArrayList<>();
         try {
             StringBuilder dynamicClause = this.setDynamicClause(masterDataInputBeen, new StringBuilder());
             //create sorting order
             String sortingStr = " order by m.id, m.plateid DESC ";
+            String omitC3 = " and m.barcode not like '%PBS' ";
 
             String sql = "" +
                     "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
-                    "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2 " +
+                    "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2, m.collectiondate " +
                     "from master_data m " +
                     "left join status s on s.code = m.status " +
                     "left join plate p on m.plateid = p.code " +
                     "left join institution i on i.institutioncode = m.institutioncode " +
-                    "left join result r on r.code = m.result where " + dynamicClause.toString() + sortingStr;
+                    "left join result r on r.code = m.result where " + dynamicClause.toString() + omitC3 + sortingStr;
 
             masterDataList = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 MasterData masterData = new MasterData();
@@ -440,12 +635,32 @@ public class ReportMgtRepository {
                     masterData.setCreatedTime(null);
                 }
 
+                try {
+                    masterData.setCollectionDate(rs.getString("collectiondate"));
+                } catch (Exception e) {
+                    masterData.setCollectionDate(null);
+                }
                 return masterData;
             });
+
         } catch (Exception exception) {
             throw exception;
         }
-        return masterDataList;
+        //Remove Duplicates
+        try {
+            if (masterDataList != null) {
+                for (MasterData md : masterDataList) {
+                    if (masterDataList1 != null && masterDataList1.size() <= 0) {
+                        masterDataList1.add(md);
+                    } else if (!masterDataList1.contains(md)) {
+                        masterDataList1.add(md);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return masterDataList1;
     }
 
     @LogRepository
@@ -458,7 +673,7 @@ public class ReportMgtRepository {
             String sortingStr = " order by m.barcode desc ";
             String sql = "" +
                     "select m.id as id , m.sampleid as sampleid , m.referenceno as referenceNumber, m.institutioncode as institutionCode, i.name as institutionName, m.name as name, m.age as age, m.gender as gender, m.nic as nic,m.address as address, m.contactno as contactnumber, m.serialno as serialNumber, m.specimenid as specimenID, " +
-                    "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2 " +
+                    "m.barcode as barcode, m.receiveddate as receivedDate ,s.description as statusDescription, p.code as plateCode, m.blockvalue as blockValue, r.description as resultDescription, m.createduser as createdUser, m.createdtime as createdTime, m.reporttime as reportTime, m.ct_target1 as ct_target1, m.ct_target2 as ct_target2, m.collectiondate " +
                     "from master_data m " +
                     "left join status s on s.code = m.status " +
                     "left join plate p on m.plateid = p.id " +
@@ -606,6 +821,12 @@ public class ReportMgtRepository {
                     } catch (Exception e) {
                         m.setCreatedTime(null);
                     }
+
+                    try {
+                        m.setCollectionDate(rs.getString("collectiondate"));
+                    } catch (Exception e) {
+                        m.setCollectionDate(null);
+                    }
                     return m;
                 }
             });
@@ -618,7 +839,7 @@ public class ReportMgtRepository {
     private StringBuilder setDynamicClause(MasterDataInputBeen masterDataInputBeen, StringBuilder dynamicClause) {
         dynamicClause.append("1=1 ");
         try {
-            if (masterDataInputBeen.getReceivedDate() != null) {
+            if (masterDataInputBeen.getReceivedDate() != null && !masterDataInputBeen.getReceivedDate().isEmpty()) {
                 dynamicClause.append(" and m.receiveddate = '").append(masterDataInputBeen.getReceivedDate()).append("'");
             }
 

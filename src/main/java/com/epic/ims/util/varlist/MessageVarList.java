@@ -118,6 +118,7 @@ public class MessageVarList {
     public static final String SAMPLERECORD_MANDATORYFILED_VALIDATIONFAIL = "samplerecord.mandatoryfield.validationfail";
     public static final String SAMPLERECORD_DUPLICATE_RECORDFOUND = "samplerecord.duplicate.recordfound";
     public static final String SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL = "samplerecord.specialcharacter.validationfail";
+    public static final String SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL = "samplerecord.add.specialcharacter.validationfail";
     //-------------------------- sample file upload mgt---------------------------------------------------------------//
 
     //-------------------------- result update mgt--------------------------------------------------------------------//

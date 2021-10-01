@@ -65,7 +65,8 @@ public class SampleVerifyFileRepository {
             "insert into reject_data(referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, remark, createduser )" +
             "select referenceno, institutioncode, name, age, gender, symptomatic, contacttype, nic, address, district,contactno, secondarycontactno, receiveddate, status, 'Mark as sample not found',createduser from sample_data where id in (:ids)";
 
-    private final String SQL_UPDATE_SAMPLEDATA = "update sample_data set barcode = ? where id = ?";
+    //private final String SQL_UPDATE_SAMPLEDATA = "update sample_data set barcode = ? where id = ?";
+    private final String SQL_UPDATE_SAMPLEDATA = "update sample_data set barcode = ?, ispending=? where id = ?";
 
     @LogRepository
     @Transactional(readOnly = true)
@@ -610,19 +611,33 @@ public class SampleVerifyFileRepository {
 
     @LogRepository
     @Transactional(readOnly = true)
-    public List<SampleVerifyFile> getSampleVerifyFileLabReportSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean) {
+    public List<SampleVerifyFile> getSampleVerifyFileLabReportSearchList(SampleFileVerificationInputBean sampleFileVerificationInputBean, boolean isPending) {
         List<SampleVerifyFile> sampleVerifyFileList = null;
         try {
             StringBuilder dynamicClause = this.setDynamicClauseForEmptyLabCode(sampleFileVerificationInputBean, new StringBuilder());
             //create sorting order
             String sortingStr = " order by i.createdtime desc ";
-
-            String sql = "" +
-                    "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
-                    " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
-                    " i.address as address, i.district as residentdistrict,i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
-                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.ward as ward , i.createdtime as createdtime, i.createduser as createduser   " +
-                    " from sample_data i left join status s on s.code = i.status where " + dynamicClause.toString() + sortingStr;
+            String pendingClause = "1=1 and i.ispending = 'YES' ";
+            String sql = "";
+            if (isPending == true) {
+                sql += "select i.id as id, i.barcode, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
+                        " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
+                        " i.address as address, i.district as residentdistrict,i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
+                        " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.ward as ward , i.createdtime as createdtime, i.createduser as createduser   " +
+                        " from sample_data i left join status s on s.code = i.status where " + pendingClause + sortingStr;
+            } else {
+                sql += "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
+                        " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
+                        " i.address as address, i.district as residentdistrict,i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
+                        " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.ward as ward , i.createdtime as createdtime, i.createduser as createduser   " +
+                        " from sample_data i left join status s on s.code = i.status where " + dynamicClause.toString() + sortingStr;
+            }
+//            String sql = "" +
+//                    "select i.id as id, i.referenceno as referenceno, i.institutioncode as institutioncode, " +
+//                    " i.name as name, i.age as age, i.gender as gender,i.symptomatic as symptomatic, i.contacttype as contacttype, i.nic as nic, " +
+//                    " i.address as address, i.district as residentdistrict,i.contactno as contactnumber, i.secondarycontactno as secondarycontactnumber, i.specimenid as specimenid, " +
+//                    " i.barcode as barcode, i.receiveddate as receiveddate, s.description as status, i.ward as ward , i.createdtime as createdtime, i.createduser as createduser   " +
+//                    " from sample_data i left join status s on s.code = i.status where " + whereClause.toString() + sortingStr;
 
             sampleVerifyFileList = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 SampleVerifyFile sampleVerifyFile = new SampleVerifyFile();
@@ -632,7 +647,13 @@ public class SampleVerifyFileRepository {
                 } catch (Exception e) {
                     sampleVerifyFile.setId(0);
                 }
-
+                if(isPending==true){
+                    try {
+                        sampleVerifyFile.setBarcode(common.handleNullAndEmptyValue(rs.getString("barcode")));
+                    } catch (Exception e) {
+                        sampleVerifyFile.setBarcode("--");
+                    }
+                }
                 try {
                     sampleVerifyFile.setReferenceNo(common.handleNullAndEmptyValue(rs.getString("referenceno")));
                 } catch (Exception e) {
@@ -762,7 +783,8 @@ public class SampleVerifyFileRepository {
         try {
             jdbcTemplate.batchUpdate(SQL_UPDATE_SAMPLEDATA, sampleVerifyFileList, commonVarList.BULKUPDATE_BATCH_SIZE, (ps, argument) -> {
                 ps.setString(1, argument.getBarcode());
-                ps.setInt(2, argument.getId());
+                ps.setString(2, "NO");
+                ps.setInt(3, argument.getId());
             });
         } catch (DataAccessException e) {
             message = MessageVarList.COMMON_ERROR_PROCESS;

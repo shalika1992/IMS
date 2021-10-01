@@ -1,9 +1,6 @@
 package com.epic.ims.mapping.reportmgt;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +11,7 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Scope("request")
 public class MasterData {
     private long id;
@@ -42,4 +40,5 @@ public class MasterData {
     private Date reportTime;
     private String ct_target1;
     private String ct_target2;
+    private String collectionDate;
 }

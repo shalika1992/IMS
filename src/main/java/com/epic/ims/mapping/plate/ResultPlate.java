@@ -14,11 +14,12 @@ public class ResultPlate {
     String plateid;
     String receivedDate;
     String remark;
+    String blockValue;
 
     public ResultPlate(){
     }
 
-    public ResultPlate(String barcode, String resultId, String ct1, String ct2, String plateid, String receivedDate, String remark) {
+    public ResultPlate(String barcode, String resultId, String ct1, String ct2, String plateid, String receivedDate, String remark, String blockValue) {
         this.barcode = barcode;
         this.resultId = resultId;
         this.ct1 = ct1;
@@ -26,6 +27,7 @@ public class ResultPlate {
         this.plateid = plateid;
         this.receivedDate = receivedDate;
         this.remark = remark;
+        this.blockValue = blockValue;
     }
 
     public String getBarcode() {
@@ -82,5 +84,13 @@ public class ResultPlate {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getBlockValue() {
+        return blockValue;
+    }
+
+    public void setBlockValue(String blockValue) {
+        this.blockValue = blockValue;
     }
 }

@@ -48,9 +48,9 @@ public class SampleFileUploadRepository {
 
     private final String SQL_GET_LIST_DATA_COUNT = "select count(*) from sample_data sd left outer join status s on s.code=sd.status where";
     private final String SQL_FIND_SAMPLEFILERECORD = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.id = ?";
-    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? ,ward = ? where sd.id = ?";
-    private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    private final String SQL_INSERT_SAMPLEWARDENTRY = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,ward,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_UPDATE_SAMPLEFILERECORD = "update sample_data sd set name = ? , age = ? , gender = ? , nic = ? , address = ? , district = ? , contactno = ? , secondarycontactno = ? ,ward = ?,institutioncode=? where sd.id = ?";
+    private final String SQL_INSERT_SAMPLEFILERECORD = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,createduser,collectiondate,ispending) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_SAMPLEWARDENTRY = "insert into sample_data(referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,ward,createduser,collectiondate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String SQL_FIND_SAMPLEDATA = "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd where sd.referenceno = ? and sd.receiveddate = ? and sd.institutioncode = ? and sd.ward = ? limit 1";
 
     @LogRepository
@@ -87,9 +87,10 @@ public class SampleFileUploadRepository {
 
             String sql = "" +
                     " select " +
-                    " sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,s.description as statusdescription," +
+                    " sd.id , sd.referenceno, sd.institutioncode ,i.name as institutiondes, sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,s.description as statusdescription," +
                     " sd.district , sd.contactno , sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser from sample_data sd " +
                     " left outer join status s on s.code=sd.status " +
+                    " left outer join institution i on i.institutioncode = sd.institutioncode" +
                     " where " + dynamicClause.toString() + sortingStr +
                     " limit " + sampleFileInputBean.displayLength + " offset " + sampleFileInputBean.displayStart;
 
@@ -111,6 +112,12 @@ public class SampleFileUploadRepository {
                     sampleFile.setInstitutionCode(common.handleNullAndEmptyValue(rs.getString("institutioncode")));
                 } catch (Exception e) {
                     sampleFile.setInstitutionCode("--");
+                }
+
+                try {
+                    sampleFile.setInstitutionDes(common.handleNullAndEmptyValue(rs.getString("institutiondes")));
+                } catch (Exception e) {
+                    sampleFile.setInstitutionDes("--");
                 }
 
                 try {
@@ -381,7 +388,8 @@ public class SampleFileUploadRepository {
                     sampleFileInputBean.getReceivedDate(),
                     commonVarList.STATUS_PENDING,
                     sampleFileInputBean.getWardNumber(),
-                    sampleFileInputBean.getCreatedUser()
+                    sampleFileInputBean.getCreatedUser(),
+                    sampleFileInputBean.getReceivedDate(),
             });
 
             if (value != 1) {
@@ -509,6 +517,8 @@ public class SampleFileUploadRepository {
                         ps.setString(13, receivedDate);
                         ps.setString(14, commonVarList.STATUS_PENDING);
                         ps.setString(15, sessionBean.getUsername());
+                        ps.setString(16, sampleData.getDate());
+                        ps.setString(17, "NO");
                     }
 
                     @Override
@@ -679,6 +689,7 @@ public class SampleFileUploadRepository {
                     sampleFileInputBean.getContactNumber(),
                     sampleFileInputBean.getSecondaryContactNumber(),
                     sampleFileInputBean.getWardNumber(),
+                    sampleFileInputBean.getInstitutionCode(),
                     sampleFileInputBean.getId(),
             });
             if (value != 1) {

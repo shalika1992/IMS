@@ -22,5 +22,7 @@ public class RepeatSampleBean {
     private String contactNumber;//--------------> mandatory
     private String secondaryContactNumber;
     private String receiveddate;
-
+    private String collectionDate;
+    private String tmp_labcode;
+    private String tmp_plate;
 }

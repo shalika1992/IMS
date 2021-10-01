@@ -251,15 +251,15 @@ public class SampleFileService {
                         }
                     }
 
-                    //Date
-                    String date = s.getDate();
-                    if (date != null && !date.isEmpty()) {
-                        if (common.checkSpecialCharacterForDate(date)) {
-                            System.out.println("Date");
-                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
-                            break;
-                        }
-                    }
+                    //Date Validation removed as requested
+//                    String date = s.getDate();
+//                    if (date != null && !date.isEmpty()) {
+//                        if (common.checkSpecialCharacterForDate(date)) {
+//                            System.out.println("Date");
+//                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
+//                            break;
+//                        }
+//                    }
 
                     // Reference No.
                     String referenceNo = s.getReferenceNo();
@@ -275,6 +275,63 @@ public class SampleFileService {
                     message = messageSource.getMessage(MessageVarList.SAMPLERECORD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Row number - " + (i + 1);
                 }
             }
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    public String validateSpecialCharactersFieldsInputs(SampleFileInputBean s, Locale locale) {
+        String message = "";
+        try {
+
+                if (s != null) {
+
+                    String name = s.getName();
+                    String age = s.getAge();
+                    String nic = s.getNic();
+                    String contactNumber = s.getContactNumber();
+                    String secondaryContactNumber = s.getSecondaryContactNumber();
+                    String address = s.getAddress();
+                    String referenceNo = s.getReferenceNo();
+
+                    if (referenceNo != null && !referenceNo.isEmpty()) {
+                        if (common.checkSpecialCharacterOfReferenceNo(referenceNo)) {
+                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Reference No Field";
+                        }
+                        else if (name != null && !name.isEmpty()) {
+                            if (common.checkSpecialCharacter(name)) {
+                                message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Name Field ";
+                            }
+                            else if (age != null && !age.isEmpty()) {
+                                if (common.checkSpecialCharacter(age)) {
+                                    message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Age Field ";
+                                }
+                                else if (nic != null && !nic.isEmpty()) {
+                                    if (common.checkSpecialCharacter(nic)) {
+                                        message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "NIC Field ";
+                                    }
+                                    else if (address != null && !address.isEmpty()) {
+                                        if (common.checkSpecialCharacterForAddress(address)) {
+                                            message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Address Field ";
+                                        }
+                                        else if (contactNumber != null && !contactNumber.isEmpty()) {
+                                            if (common.checkSpecialCharacter(contactNumber)) {
+                                                message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Contact No Field ";
+
+                                            } else if (secondaryContactNumber != null && !secondaryContactNumber.isEmpty()) {
+                                                if (common.checkSpecialCharacter(secondaryContactNumber)) {
+                                                    message = messageSource.getMessage(MessageVarList.SAMPLERECORD_ADD_SPECIALCHARACTER_VALIDATIONFAIL, null, locale) + " - " + "Contact No Field 2 ";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
         } catch (Exception e) {
             throw e;
         }

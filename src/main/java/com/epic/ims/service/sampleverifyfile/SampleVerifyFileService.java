@@ -164,15 +164,19 @@ public class SampleVerifyFileService {
             if (file.exists()) {
                 FileUtils.deleteDirectory(file);
             }
+            //Pending samples.
+            List<SampleVerifyFile> pendingSampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileLabReportSearchList(sampleFileVerificationInputBean,true);
             //get count
             count = sampleVerifyFileRepository.getDataCountEmptyLabCode(sampleFileVerificationInputBean);
             if (count > 0) {
-                List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileLabReportSearchList(sampleFileVerificationInputBean);
+                List<SampleVerifyFile> sampleVerifyFileList = sampleVerifyFileRepository.getSampleVerifyFileLabReportSearchList(sampleFileVerificationInputBean,false);
                 for (SampleVerifyFile sampleVerifyFile : sampleVerifyFileList) {
                     sampleVerifyFile.setBarcode(initialLabCode);
                     String value = initialLabCode.substring(1, initialLabCode.length());
                     initialLabCode = initialLabCode.substring(0, 1) + df.format(Integer.parseInt(value) + 1);
                 }
+                count+=pendingSampleVerifyFileList.size();
+                sampleVerifyFileList.addAll(pendingSampleVerifyFileList);
 
                 String message = sampleVerifyFileRepository.updateSampleVerifyBatch(sampleVerifyFileList);
                 if (message.isEmpty()) {

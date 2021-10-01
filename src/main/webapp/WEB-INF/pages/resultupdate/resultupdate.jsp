@@ -341,6 +341,8 @@
                 data: JSON.stringify({
                     barcode: $('#barcode').val(),
                     resultId: $('#resultId').val(),
+                    //sampleId: $('#sampleId').val(),
+                    blockValue:$("#blockvalue").val(),
                     ct1: $('#ct1').val(),
                     ct2: $('#ct2').val(),
                     plateid: $('#plateId').val(),
@@ -526,9 +528,10 @@
                     type: 'GET',
                     contentType: "application/json",
                     success: function (data) {
-                        //console.log(data.barcode+" :: "+data.ct1 +" :: "+data.ct2+" :: "+data.remark+" :: "+data.resultId);
+                        console.log(data.barcode+" :: "+data.ct1 +" :: "+data.ct2+" :: "+data.remark+" :: "+data.resultId+" :: "+data.blockValue);
                         //get result list
                         getResultTypeList(data.resultId);
+                        $("#blockvalue").val(data.blockValue);
                         switch (data.resultId) {
                             case "DTCD" :  // Detected
                                 $("#ct_txt").css("display","block");
@@ -671,6 +674,9 @@
                                             <input path="barcode" name="barcode" id="barcode"
                                                    class="form-control" readonly="true"
                                                    autocomplete="off" type="text"/>
+                                            <input path="blockvalue" name="blockvalue" id="blockvalue"
+                                                   class="form-control" readonly="true"
+                                                   autocomplete="off" type="text" hidden="hidden"/>
                                         </div>
                                     </div>
                                 </div>

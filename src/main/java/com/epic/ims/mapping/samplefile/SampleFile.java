@@ -12,6 +12,7 @@ public class SampleFile {
     private String referenceNo;
     private String receivedDate;
     private String institutionCode;
+    private String institutionDes;
     private String name;
     private String age;
     private String gender;
@@ -32,6 +33,7 @@ public class SampleFile {
     private String createdUser;
     private Date lastUpdatedTime;
     private String lastUpdatedUser;
+    private String collectionDate;
 
     public SampleFile() {
     }
@@ -45,7 +47,7 @@ public class SampleFile {
         this.barcode = barcode;
     }
 
-    public SampleFile(String id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String ward, String plateId, String blockValue, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser) {
+    public SampleFile(String id, String referenceNo, String receivedDate, String institutionCode, String name, String age, String gender, String symptomatic, String contactType, String nic, String address, String status, String residentDistrict, String contactNumber, String secondaryContactNumber, String specimenid, String barcode, String ward, String plateId, String blockValue, Date createdTime, String createdUser, Date lastUpdatedTime, String lastUpdatedUser,  String collectionDate) {
         this.id = id;
         this.referenceNo = referenceNo;
         this.receivedDate = receivedDate;
@@ -70,6 +72,7 @@ public class SampleFile {
         this.createdUser = createdUser;
         this.lastUpdatedTime = lastUpdatedTime;
         this.lastUpdatedUser = lastUpdatedUser;
+        this.collectionDate = collectionDate;
     }
 
     public String getId() {
@@ -262,5 +265,21 @@ public class SampleFile {
 
     public void setLastUpdatedUser(String lastUpdatedUser) {
         this.lastUpdatedUser = lastUpdatedUser;
+    }
+
+    public String getCollectionDate() {
+        return collectionDate;
+    }
+
+    public void setCollectionDate(String collectionDate) {
+        this.collectionDate = collectionDate;
+    }
+
+    public String getInstitutionDes() {
+        return institutionDes;
+    }
+
+    public void setInstitutionDes(String institutionDes) {
+        this.institutionDes = institutionDes;
     }
 }

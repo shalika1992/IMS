@@ -29,7 +29,7 @@
                 forceParse: false,
                 autoclose: true
             });
-            setReceivedDate();
+            //setReceivedDate();
             getCorrespondingPlateList()
             $('#receivedDate').datepicker().on('changeDate', function (ev) {
                 getCorrespondingPlateList();
@@ -357,8 +357,9 @@
                                         <label class="label-right">Received Date:</label>
                                         <div class="btn-group div-inline input-group input-group-sm input-append date">
                                             <input path="receivedDate" name="receivedDate" id="receivedDate"
-                                                   class="form-control" readonly="true"
-                                                   autocomplete="off" type="text" onkeydown="return false"/>
+                                                   class="form-control"
+<%--                                                   readonly="true" autocomplete="off" type="text" onkeydown="return false"/>--%>
+                                                   readonly="readonly" placeholder="Select date"/>
                                         </div>
                                     </div>
 

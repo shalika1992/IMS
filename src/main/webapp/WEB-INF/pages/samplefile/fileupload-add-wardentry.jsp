@@ -86,7 +86,7 @@
                                 <form:select path="gender" name="gender" class="form-control form-control-sm"
                                              id="aGender">
                                     <form:option value="M">Male</form:option>
-                                    <form:option value="F">FeMale</form:option>
+                                    <form:option value="F">Female</form:option>
                                 </form:select>
                             </div>
                         </div>
@@ -181,17 +181,14 @@
                 }
             },
             success: function (res) {
-                alert("res.flag :"+res.flag);
                 if (res.flag) {
                     // handle success response
-                    alert("res.successMessage :"+res.successMessage);
                     $('#responseMsgEntry').show();
                     $('#responseMsgEntry').removeClass('error-response').addClass('success-response')
                         .text(res.successMessage);
                     $('form[name=sampleWardEntryForm]').trigger("reset");
                     search();
                 } else {
-                    alert("res.errorMessage :"+res.errorMessage);
                     $('#responseMsgEntry').show();
                     $('#responseMsgEntry').removeClass('success-response').addClass('error-response')
                         .text(res.errorMessage);

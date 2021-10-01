@@ -134,8 +134,8 @@ public class MasterDataReportController {
 
                 //set parameters to map
                 parameterMap.put("reportTime", currentDateTime);
+                parameterMap.put("collectionDate",common.replaceEmptyorNullStringToALL(masterDataInputBeen.getReceivedDate()));
                 parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getReceivedDate()));
-                parameterMap.put("collectionDate", "--");
                 parameterMap.put("serialNo", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getSerialNumber()));
                 parameterMap.put("name", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getName()));
                 parameterMap.put("nic", common.replaceEmptyorNullStringToALL(masterDataInputBeen.getNic()));
@@ -195,7 +195,7 @@ public class MasterDataReportController {
                 //set parameters to map
                 parameterMap.put("reportTime", currentDateTime);
                 parameterMap.put("receivedDate", common.replaceEmptyorNullStringToALL(masterData.getReceivedDate()));
-                parameterMap.put("collectionDate", "--");
+                parameterMap.put("collectionDate",common.replaceEmptyorNullStringToALL(masterData.getCollectionDate()));
                 parameterMap.put("institution", common.replaceEmptyorNullStringToALL(masterData.getInstitutionCode()));
                 parameterMap.put("name", common.replaceEmptyorNullStringToALL(masterData.getName()));
                 parameterMap.put("age", common.replaceEmptyorNullStringToALL(masterData.getAge()));
@@ -207,8 +207,8 @@ public class MasterDataReportController {
                 parameterMap.put("barcode", common.replaceEmptyorNullStringToALL(masterData.getBarcode()));
                 parameterMap.put("testMethod", commonVarList.REPORT_TEST_METHOD);
                 parameterMap.put("result", common.replaceEmptyorNullStringToALL(masterData.getResultDescription()));
-                parameterMap.put("ct_target1", common.replaceEmptyorNullStringToALL(masterData.getCt_target1()));
-                parameterMap.put("ct_target2", common.replaceEmptyorNullStringToALL(masterData.getCt_target2()));
+                parameterMap.put("ct_target1", common.replaceEmptyorNullStringToDash(masterData.getCt_target1()));
+                parameterMap.put("ct_target2", common.replaceEmptyorNullStringToDash(masterData.getCt_target2()));
                 //right
                 parameterMap.put("consultantName", commonVarList.REPORT_CONSULTANT_NAME);
                 parameterMap.put("consultantDes", commonVarList.REPORT_CONSULTANT_DESCRIPTION);

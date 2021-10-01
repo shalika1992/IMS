@@ -132,7 +132,7 @@
                     {
                         title: "Institution Code",
                         targets: 2,
-                        mDataProp: "institutionCode",
+                        mDataProp: "institutionDes",
                         defaultContent: "--"
                     },
                     {

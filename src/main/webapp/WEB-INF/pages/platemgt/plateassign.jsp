@@ -42,6 +42,7 @@
                         url: '${pageContext.request.contextPath}/generateDefaultPlate.json',
                         data: {receivedDate: selectedDate},
                         success: function (res) {
+                            //alert(JSON.stringify(res));
                             platesNum = res;
                             initArray = res;
                             _generatePlates(platesNum);
@@ -425,6 +426,7 @@
             let module = Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length % 94;
             // get plate count
             let round = Math.floor(Object.keys(JSON.parse(sessionStorage.getItem('plates'))).length / 94);
+            //alert("round: "+round);
             // plate count final
             if (module != 0) {
                 round++;

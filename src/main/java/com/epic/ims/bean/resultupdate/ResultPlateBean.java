@@ -16,4 +16,5 @@ public class ResultPlateBean {
     String plateid;
     String receivedDate;
     String remark;
+    String blockValue;
 }

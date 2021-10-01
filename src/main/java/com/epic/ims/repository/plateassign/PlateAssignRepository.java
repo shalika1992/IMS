@@ -75,13 +75,14 @@ public class PlateAssignRepository {
 
     private final String SQL_GET_SAMPLEFILE_LIST = "" +
             "select sd.id , sd.referenceno, sd.institutioncode , sd.name , sd.age , sd.gender , sd.symptomatic , sd.contacttype , sd.nic , sd.address ,sd.status as status, sd.district , sd.contactno , " +
-            "sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser " +
-            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' and sd.receiveddate = ? order by  barcode";
+            "sd.secondarycontactno , sd.specimenid , sd.barcode , sd.receiveddate ,sd.ward, sd.createdtime as createdtime,sd.createduser as createduser, sd.collectiondate " +
+            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' order by  barcode";
+    //            "from sample_data sd where sd.status in (?,?) and sd.barcode is not null and sd.barcode <> '' and sd.receiveddate = ? order by  barcode";
     //"from sample_data sd where sd.status in (?,?) ";
 
 
     private final String SQL_GET_EXCELBLOCK_VALUE = "select code from excelblock eb where eb.indexvalue = ?";
-    private final String SQL_INSERT_MASTERTEMPRECORD = "insert into master_temp_data(sampleid,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,plateid,blockvalue,ward,labcode,createduser) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_MASTERTEMPRECORD = "insert into master_temp_data(sampleid,referenceno,institutioncode,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,receiveddate,status,plateid,blockvalue,ward,labcode,createduser,collectiondate,tmp_labcode) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_GET_DEFAULT_PLATE_LIST = "" +
             "select m.id,m.referenceno,m.name,m.nic,m.labcode,m.plateid,m.blockvalue,m.ispool from " +
             "(select GROUP_CONCAT(id SEPARATOR '|') as id, " +
@@ -95,7 +96,7 @@ public class PlateAssignRepository {
             "update master_temp_data a " +
             "inner join master_temp_data b on a.id <> b.id " +
             "set a.sampleid = b.sampleid,a.referenceno = b.referenceno,a.institutioncode = b.institutioncode,a.name = b.name,a.age = b.age,a.gender = b.gender, a.nic = b.nic,a.address = b.address," +
-            "a.district = b.district,a.contactno = b.contactno,a.receiveddate = b.receiveddate,a.status = b.status,a.labcode = b.labcode,a.createduser = b.createduser " +
+            "a.district = b.district,a.contactno = b.contactno,a.receiveddate = b.receiveddate,a.status = b.status,a.labcode = b.labcode,a.createduser = b.createduser, a.collectiondate = b.collectiondate " +
             "where a.labcode in (:aLabCodes) and b.labcode in (:bLabCodes)";
 
     private final String SQL_MERGE_DEFAULT_PLATE_LIST = "" +
@@ -106,14 +107,15 @@ public class PlateAssignRepository {
 
     private final String SQL_GET_MASTERTEMP_LIST = "" +
             "select m.id,m.sampleid,m.referenceno,m.institutioncode,m.name,m.age,m.gender,m.symptomatic,m.contacttype,m.nic,m.address,m.district,m.contactno,m.secondarycontactno,m.serialno,m.specimenid,m.labcode," +
-            "m.receiveddate,s.description as description ,m.plateid,m.blockvalue,e.indexvalue,m.ispool,m.ward,m.createduser,m.createdtime " +
+            "m.receiveddate,s.description as description ,m.plateid,m.blockvalue,e.indexvalue,m.ispool,m.ward,m.createduser,m.createdtime, m.collectiondate, m.tmp_labcode " +
             "from master_temp_data m " +
             "left outer join status s on s.code=m.status " +
             "left outer join excelblock e on e.code=m.blockvalue where plateid = ? order by cast(e.indexvalue as unsigned)";
 
-    private final String SQL_INSERT_MASTERRECORD = "insert into master_data(sampleid,referenceno,institutioncode ,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,serialno,specimenid,barcode,receiveddate,status,plateid,blockvalue,ward,ispool,createduser,createdtime) values(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String SQL_INSERT_MASTERRECORD = "insert into master_data(sampleid,referenceno,institutioncode ,name,age,gender,symptomatic,contacttype,nic,address,district,contactno,secondarycontactno,serialno,specimenid,barcode,receiveddate,status,plateid,blockvalue,ward,ispool,createduser,createdtime,collectiondate, tmp_labcode) values(?,?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private final String SQL_UPDATE_SAMPLEDATA_LIST = "update sample_data set status = :status where id in (:ids)";
-
+    private final String SQL_DELETE_MASTER_PEND_DATA_LIST = "delete from master_pend_data where tmp_labcode =?";
+    private final String SQL_DELETE_MASTERDATA_PEND_LIST = "delete from master_data where tmp_labcode =?";
     private final String SQL_GET_MASTER_TEMP_PLATE_DETAIL = " " +
             " SELECT m.id, m.sampleid, m.labcode, m.blockvalue, m.plateid   "+
             " FROM master_temp_data m where m.sampleid not in   "+
@@ -150,9 +152,10 @@ public class PlateAssignRepository {
             //delete all from master temp table
             this.deleteAllFromMasterTempTable();
             //get the max plate id for corresponding date
-            int maxPlateId = this.getMaxPlateIdForCorrespondingDate(receivedDate);
+            int maxPlateId = this.getMaxPlateIdForCorrespondingDate(currentDate);
+            //int maxPlateId = this.getMaxPlateIdForCorrespondingDate(receivedDate);
             //get the sample data list from sample table
-            List<SampleFile> sampleFileList = this.getSampleFileList(receivedDate);
+            List<SampleFile> sampleFileList = this.getSampleFileList(currentDate);
             //check the sample file length
             if (sampleFileList != null && sampleFileList.size() > 0) {
                 int plateSize = sampleFileList.size();
@@ -195,7 +198,9 @@ public class PlateAssignRepository {
                     //get the master temp data list using sample file list
                     List<MasterTemp> masterTempList = masterTempDataMapper.sampleListMasterTempList(subList);
                     //insert the batch to master temp data table
-                    this.insertMasterTempBatch(masterTempList);
+                    if(masterTempList!=null) {
+                        this.insertMasterTempBatch(masterTempList);
+                    }
                 }
             }
         } catch (EmptyResultDataAccessException ex) {
@@ -315,7 +320,8 @@ public class PlateAssignRepository {
     public List<SampleFile> getSampleFileList(String receivedDate) {
         List<SampleFile> sampleFileList = null;
         try {
-            sampleFileList = jdbcTemplate.query(SQL_GET_SAMPLEFILE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED, receivedDate}, (rs, id) -> {
+            //sampleFileList = jdbcTemplate.query(SQL_GET_SAMPLEFILE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED, receivedDate}, (rs, id) -> {
+            sampleFileList = jdbcTemplate.query(SQL_GET_SAMPLEFILE_LIST, new Object[]{commonVarList.STATUS_VALIDATED, commonVarList.STATUS_REPEATED}, (rs, id) -> {
                 SampleFile sampleFile = new SampleFile();
 
                 try {
@@ -438,6 +444,11 @@ public class PlateAssignRepository {
                     sampleFile.setCreatedUser("--");
                 }
 
+                try {
+                    sampleFile.setCollectionDate(common.handleNullAndEmptyValue(rs.getString("collectiondate")));
+                } catch (Exception e) {
+                    sampleFile.setCollectionDate("--");
+                }
                 return sampleFile;
             });
         } catch (EmptyResultDataAccessException ex) {
@@ -479,6 +490,8 @@ public class PlateAssignRepository {
                         ps.setString(18, masterTemp.getWard());
                         ps.setString(19, masterTemp.getBarcode());
                         ps.setString(20, sessionBean.getUsername());
+                        ps.setString(21, masterTemp.getCollectionDate());
+                        ps.setString(22, masterTemp.getBarcode());//tmp_labcode
                     }
 
                     @Override
@@ -808,6 +821,18 @@ public class PlateAssignRepository {
                 } catch (Exception e) {
                     masterTemp.setCreatedTime(null);
                 }
+
+                try {
+                    masterTemp.setCollectionDate(rs.getString("collectiondate"));
+                } catch (Exception e) {
+                    masterTemp.setCollectionDate(null);
+                }
+
+                try {
+                    masterTemp.setTmp_labcode(rs.getString("tmp_labcode"));
+                } catch (Exception e) {
+                    masterTemp.setTmp_labcode(null);
+                }
                 System.out.println(masterTemp.getBarcode()+" | "+ masterTemp.getBlockValue());
                 return masterTemp;
             });
@@ -951,8 +976,8 @@ public class PlateAssignRepository {
         try {
             int value = 0;
             String currentDate = commonRepository.getCurrentDateAsString();
-            value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, receiveDate});
-
+            value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, currentDate});
+            //value = jdbcTemplate.update("insert into plate(code,receiveddate) values(?,?)", new Object[]{plateId, receiveDate});
             if (value != 1) {
                 message = MessageVarList.COMMON_ERROR_PROCESS;
             }
@@ -1000,6 +1025,8 @@ public class PlateAssignRepository {
                         ps.setString(22, masterTemp.getIsPool());
                         ps.setString(23, sessionBean.getUsername());
                         ps.setString(24, currentDate);
+                        ps.setString(25, masterTemp.getCollectionDate());
+                        ps.setString(26, masterTemp.getTmp_labcode());
                     }
 
                     @Override
@@ -1036,4 +1063,51 @@ public class PlateAssignRepository {
         }
         return message;
     }
+
+    /**
+     * Delete data stored tempory in master_pending_data
+     * @param masterTemps
+     * @return
+     */
+    @LogRepository
+    @Transactional
+    public String deleteExistingTemporaryPending(List<MasterTemp> masterTemps) {
+        String message = "";
+        try {
+            for (int j = 0; j < masterTemps.size(); j++) {
+                MasterTemp pendingTemp = masterTemps.get(j);
+                jdbcTemplate.update(SQL_DELETE_MASTER_PEND_DATA_LIST,
+                        pendingTemp.getTmp_labcode());
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
+    /**
+     * Delete data stored temporary in master_pending_data
+     * @param masterTemps
+     * @return
+     */
+    @LogRepository
+    @Transactional
+    public String deleteExistingPendingFromMasterData(List<MasterTemp> masterTemps) {
+        String message = "";
+        try {
+            for (int j = 0; j < masterTemps.size(); j++) {
+                MasterTemp pendingTemp = masterTemps.get(j);
+                jdbcTemplate.update(SQL_DELETE_MASTERDATA_PEND_LIST,
+                        pendingTemp.getTmp_labcode());
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw e;
+        }
+        return message;
+    }
+
 }

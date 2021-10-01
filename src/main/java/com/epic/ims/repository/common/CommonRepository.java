@@ -69,7 +69,8 @@ public class CommonRepository {
                                                 " IFNULL(ct_target1,'NA') as ct_target1," +
                                                 " IFNULL(ct_target2,'NA') as ct_target2," +
                                                 " IFNULL(rejectremark,'NA') as rejectremark, " +
-                                                " IFNULL(result,'NA') as result " +
+                                                " IFNULL(result,'NA') as result, " +
+                                                " blockvalue " +
                                                 " from master_data where barcode = ? ";
     @LogRepository
     @Transactional(readOnly = true)
@@ -358,6 +359,7 @@ public class CommonRepository {
                     resultPlate.setCt2(record.get("ct_target2").toString());//ct_target2
                     resultPlate.setRemark(record.get("rejectremark").toString());//rejectremark
                     resultPlate.setResultId(record.get("result").toString());//result
+                    resultPlate.setBlockValue(record.get("blockvalue").toString());
                     //resultPlate.setReceivedDate("");
 
                     return resultPlate;

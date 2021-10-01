@@ -134,17 +134,23 @@ public class SampleFileUploadController implements RequestBeanValidation<Object>
                 sampleFileInputBean.setReceivedDate(receivedDate);
                 sampleFileList.add(sampleFileInputBean);
                 boolean isExist = false;
+                String message = "";
                 isExist = sampleFileService.checkDuplicateWardEntry(sampleFileList, locale);
+                message = sampleFileService.validateSpecialCharactersFieldsInputs(sampleFileInputBean, locale);
                 //end
 
-                String message = sampleFileService.insertSampleWardEntry(sampleFileInputBean,isExist, locale);
-
-
-                if (message.isEmpty()) {
-                    responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_ADDED_SUCCESSFULLY, null, locale), null);
-                } else {
-                    responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                if(message.isEmpty()) {
+                    message = sampleFileService.insertSampleWardEntry(sampleFileInputBean, isExist, locale);
+                    if (message.isEmpty()) {
+                        responseBean = new ResponseBean(true, messageSource.getMessage(MessageVarList.SAMPLERECORD_ADDED_SUCCESSFULLY, null, locale), null);
+                    } else {
+                        responseBean = new ResponseBean(false, null, messageSource.getMessage(message, null, locale));
+                    }
+                }else {
+                    responseBean = new ResponseBean(false, null, message);
                 }
+
+
             }
         } catch (Exception e) {
             logger.error("Exception  :  ", e);

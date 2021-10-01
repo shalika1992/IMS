@@ -44,6 +44,7 @@ Generate Plates Function
 @param - platesArray {}
  */
 function _generatePlates(platesArray) {
+    //console.log(JSON.stringify(platesArray));
     // get modulus
     let module = Object.keys(platesArray).length % 94;
     // get plate count
@@ -172,6 +173,7 @@ function _swapCells(platesArray, cellArray) {
 
 // function to select all
 function _checkBoxSelect(id, plateNo) {
+    //alert(id+"-"+plateNo);
     if ($("#" + id).is(':checked')) {
         console.log("checked");
         $('.cell-click.plate-' + plateNo).addClass('active');

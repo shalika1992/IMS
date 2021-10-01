@@ -133,6 +133,22 @@ public class Common {
 
     /**
      * @Author dilanka_w
+     * @CreatedTime 2021-03-23 10:42:45 AM
+     * @Version V1.00
+     * @MethodName replaceEmptyorNullStringToALL
+     * @MethodParams [string]
+     * @MethodDescription - replace employer null string to ALL
+     */
+    public String replaceEmptyorNullStringToDash(String string) {
+        String value = "--";
+        if (string != null && !string.trim().isEmpty()) {
+            value = string;
+        }
+        return value;
+    }
+
+    /**
+     * @Author dilanka_w
      * @CreatedTime 2021-03-23 10:43:14 AM
      * @Version V1.00
      * @MethodName zipFiles
